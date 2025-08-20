@@ -1,0 +1,157 @@
+
+[
+  {
+    "id": "appraisal",
+    "title": "Appraisal",
+    "category": "service",
+    "blurb": "Certified residential & commercial valuations for lending, estate, divorce, tax, and portfolio needs.",
+    "href": "/services/appraisal"
+  },
+  {
+    "id": "long-term-rent-survey",
+    "title": "Long-Term Rent Survey",
+    "category": "service",
+    "blurb": "Data-driven analysis to determine sustainable 12-month market rent for investment properties.",
+    "href": "/services/long-term-rent-survey"
+  },
+  {
+    "id": "short-term-rent-survey",
+    "title": "Short-Term Rent Survey",
+    "category": "service",
+    "blurb": "Nightly rate, occupancy, and RevPAR analysis for vacation rentals (Airbnb/VRBO).",
+    "href": "/services/short-term-rent-survey"
+  },
+  {
+    "id": "operating-rent-statement",
+    "title": "Operating Rent Statement",
+    "category": "service",
+    "blurb": "Standardized T12/T3 income/expense analysis to produce a supportable NOI for underwriting.",
+    "href": "/services/operating-rent-statement"
+  },
+  {
+    "id": "transaction-coordination",
+    "title": "Transaction Coordination",
+    "category": "service",
+    "blurb": "Contract-to-close management of deadlines, documents, and communications for agents and investors.",
+    "href": "/services/transaction-coordination"
+  },
+  {
+    "id": "marketing-services",
+    "title": "Marketing Services",
+    "category": "service",
+    "blurb": "Strategies and execution for property marketing and sales.",
+    "href": "/services/marketing-services"
+  },
+  {
+    "id": "advocacy",
+    "title": "Advocacy",
+    "category": "service",
+    "blurb": "Dedicated project management to achieve a specific real estate outcome on your behalf.",
+    "href": "/services/advocacy"
+  },
+  {
+    "id": "expert-testimony",
+    "title": "Expert Testimony",
+    "category": "service",
+    "blurb": "USPAP-compliant analyses and clear courtroom communication for legal and financial disputes.",
+    "href": "/services/expert-testimony"
+  },
+  {
+    "id": "legal-support",
+    "title": "Legal Support",
+    "category": "service",
+    "blurb": "Connect with licensed counsel and coordinate the workstream for contracts, title, curative, and closings.",
+    "href": "/services/legal-support"
+  },
+  {
+    "id": "disposition",
+    "title": "Disposition",
+    "category": "sector",
+    "blurb": "Strategic sale of real estate assets to maximize returns and minimize holding costs.",
+    "href": "/sectors/disposition"
+  },
+  {
+    "id": "acquisitions",
+    "title": "Acquisitions",
+    "category": "sector",
+    "blurb": "Identification, underwriting, and negotiation for purchasing investment properties.",
+    "href": "/sectors/acquisitions"
+  },
+  {
+    "id": "development",
+    "title": "Development",
+    "category": "sector",
+    "blurb": "Feasibility analysis, valuation, and consulting for new construction and land development projects.",
+    "href": "/sectors/development"
+  },
+  {
+    "id": "asset-management",
+    "title": "Asset Management",
+    "category": "sector",
+    "blurb": "Portfolio review, performance analysis, and strategic advice for real estate asset managers.",
+    "href": "/sectors/asset-management"
+  },
+  {
+    "id": "property-management",
+    "title": "Property Management",
+    "category": "sector",
+    "blurb": "Valuation and consulting for property managers to optimize rental income and operational efficiency.",
+    "href": "/sectors/property-management"
+  },
+  {
+    "id": "lending",
+    "title": "Lending",
+    "category": "sector",
+    "blurb": "Appraisal and review services for mortgage lenders, banks, and credit unions.",
+    "href": "/sectors/lending"
+  },
+  {
+    "id": "tax-appeal-package",
+    "title": "Tax Appeal Package",
+    "category": "solution",
+    "blurb": "A comprehensive appraisal report formatted specifically for property tax appeals.",
+    "href": "/solutions/tax-appeal-package"
+  },
+  {
+    "id": "pre-listing-appraisal",
+    "title": "Pre-Listing Appraisal",
+    "category": "solution",
+    "blurb": "An independent valuation to help sellers and agents price a property accurately before listing.",
+    "href": "/solutions/pre-listing-appraisal"
+  },
+  {
+    "id": "fsbo-package",
+    "title": "FSBO Package",
+    "category": "solution",
+    "blurb": "Valuation and transaction support for For Sale By Owner (FSBO) properties.",
+    "href": "/solutions/fsbo-package"
+  },
+  {
+    "id": "investor-valuation-package",
+    "title": "Investor Valuation Package",
+    "category": "solution",
+    "blurb": "'As-Is' and After Repair Value (ARV) appraisals for fix-and-flip and rental investors.",
+    "href": "/solutions/investor-valuation-package"
+  },
+  {
+    "id": "home-measurement-services",
+    "title": "Home Measurement Services",
+    "category": "solution",
+    "blurb": "ANSI-compliant floor plans and Gross Living Area (GLA) calculations.",
+    "href": "/solutions/home-measurement-services"
+  },
+  {
+    "id": "qualitative-adjustments",
+    "title": "Qualitative Adjustments",
+    "category": "solution",
+    "blurb": "Isolates the contributory value of a single element (e.g. waterfront, golf-course view, etc.).",
+    "href": "/solutions/qualitative-adjustments"
+  },
+  {
+    "id": "quantitative-adjustments",
+    "title": "Quantitative Adjustments",
+    "category": "solution",
+    "blurb": "Isolates the contributory value of measurable elements like GLA, lot size, and bed/bath counts.",
+    "href": "/solutions/quantitative-adjustments"
+  }
+]

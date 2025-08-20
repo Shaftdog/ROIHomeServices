@@ -1,0 +1,51 @@
+
+[
+  {
+    "id": "homeowners",
+    "href": "/clients/homeowners",
+    "icon": "Home",
+    "title": "Homeowners",
+    "description": "Valuations and consulting for buying, selling, refinancing, estate planning, and tax appeals.",
+    "hint": "house family"
+  },
+  {
+    "id": "real-estate-agents-brokers",
+    "href": "/clients/real-estate-agents-brokers",
+    "icon": "Users",
+    "title": "Real Estate Agents & Brokers",
+    "description": "Reliable pre-listing appraisals, home measurements, and marketing support to help you close more deals.",
+    "hint": "real estate sign key"
+  },
+  {
+    "id": "mortgage-lenders",
+    "href": "/clients/mortgage-lenders",
+    "icon": "Banknote",
+    "title": "Mortgage Lenders",
+    "description": "Reliable, fast, and compliant appraisal services for mortgage origination and portfolio management.",
+    "hint": "bank money"
+  },
+  {
+    "id": "real-estate-investors-builders",
+    "href": "/clients/real-estate-investors",
+    "icon": "Building2",
+    "title": "Real Estate Investors & Builders",
+    "description": "Services for fix-and-flip, BRRRR, new construction, buy-and-hold (LTR/STR), and development.",
+    "hint": "investment chart graph"
+  },
+  {
+    "id": "attorneys",
+    "href": "/clients/attorneys",
+    "icon": "Scale",
+    "title": "Attorneys",
+    "description": "Defensible valuations and expert testimony for divorce, estate, bankruptcy, and litigation matters.",
+    "hint": "law books gavel"
+  },
+  {
+    "id": "accountants",
+    "href": "/clients/accountants",
+    "icon": "Calculator",
+    "title": "Accountants",
+    "description": "Valuations for tax planning, gifting, asset management, and financial reporting.",
+    "hint": "calculator spreadsheet"
+  }
+]

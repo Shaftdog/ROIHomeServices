@@ -1,0 +1,43 @@
+{
+  "id": "long-term-rent-survey",
+  "title": "Long-Term Rent Survey",
+  "category": "service",
+  "blurb": "Determine the fair market rent for a property based on comparable listings and market data.",
+  "href": "/services/long-term-rent-survey",
+  "about": [
+    "Price with confidence anywhere in Florida. Our Long‑Term Rent Survey is built by certified appraisers and tuned to each local submarket—from Miami‑Dade and the Gulf Coast to Orlando, Tampa Bay, Jacksonville, and the Panhandle. We synthesize MLS and off‑market listings, verified lease data, concessions, seasonality, school zones, and major‑employer demand to determine a supportable 12‑month (or longer) rent. Your deliverable features a curated, apples‑to‑apples comp set of three rentals matched by beds/baths, living area, amenities, condition, and micro‑location; a mapped summary with photos; clear adjustment commentary; and a recommended asking rent with pricing scenarios (maximize, market, fast‑lease) plus expected days‑to‑lease. We also flag risks—HOA restrictions, insurance shifts, or nearby development—that can affect absorption and renewal risk. Whether you’re optimizing a single home or a portfolio, our methodology produces accurate, defensible guidance you can share with partners and lenders. Need to stay current? We offer refreshes as market conditions change.",
+    "Our commitment to quality and client satisfaction sets us apart. We leverage current data and proven appraisal methodology to deliver exceptional results for Long‑Term Rent Surveys across Florida."
+  ],
+  "faqs": [
+    {
+      "id": "faq-1",
+      "question": "What is included in the Long‑Term Rent Survey service?",
+      "answer": [
+        "Three best‑fit rental comps with photos and a location map",
+        "Adjustments and commentary explaining comparability",
+        "Recommended asking rent (with two alternative pricing scenarios)",
+        "Expected days‑to‑lease and concession guidance",
+        "Risk flags (HOA limits, condition notes, local supply pipeline)",
+        "Optional add‑ons: site visit, broker/property‑manager interviews, quarterly refresh"
+      ]
+    },
+    {
+      "id": "faq-2",
+      "question": "How long does the Long‑Term Rent Survey process take?",
+      "answer": [
+        "Typical turnaround is 3–5 business days from receipt of property details. Rush options (as fast as 48 hours) are available for time‑sensitive listings."
+      ]
+    },
+    {
+      "id": "faq-3",
+      "question": "What do I need to provide for the Long‑Term Rent Survey service?",
+      "answer": [
+        "Property address, bed/bath count, living area, lot size",
+        "Amenities (parking, pool, community features), pets policy",
+        "Recent upgrades/condition notes, HOA/condo rules if applicable",
+        "Target move‑in date and pricing goals (e.g., lease fast vs. maximize rent)",
+        "Any prior leases, rent roll, or comps you’d like considered"
+      ]
+    }
+  ]
+}

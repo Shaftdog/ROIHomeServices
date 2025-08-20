@@ -1,0 +1,16 @@
+<svg viewBox="0 0 220 170" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif" font-weight="bold">
+  <!-- Teal Arrow: hsl(165, 90%, 57%) -> #2FF5C7 -->
+  <path d="M85 55 L110 25 L135 55 L125 55 L125 45 L95 45 L95 55 Z" fill="#2FF5C7"/>
+
+  <!-- R (Electric Blue): hsl(211, 100%, 50%) -> #007CFF -->
+  <text x="60" y="115" font-size="60" fill="#007CFF" text-anchor="middle">R</text>
+  <!-- O (Electric Blue) -->
+  <text x="110" y="115" font-size="60" fill="#007CFF" text-anchor="middle">O</text>
+  <!-- I (Electric Blue) -->
+  <text x="155" y="115" font-size="60" fill="#007CFF" text-anchor="middle">I</text>
+
+  <!-- HOME (White): Using #FFFFFF for white -->
+  <text x="110" y="140" font-size="20" fill="#FFFFFF" text-anchor="middle">HOME</text>
+  <!-- SERVICES (White) -->
+  <text x="110" y="160" font-size="20" fill="#FFFFFF" text-anchor="middle">SERVICES</text>
+</svg>
