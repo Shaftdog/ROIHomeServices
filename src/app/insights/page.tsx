@@ -1,10 +1,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { ButtonProps } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { CardProps } from "@/components/ui/card";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, Rss } from "lucide-react";
 

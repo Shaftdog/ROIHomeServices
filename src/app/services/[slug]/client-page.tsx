@@ -7,7 +7,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Star, PlayCircle, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Star, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
@@ -205,7 +205,7 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
             <h1 className="text-3xl md:text-5xl font-bold mb-4 text-balance">Get an Accurate Home Appraisal Now with Our Expert Valuation Team</h1>
             <p className="text-xl md:text-2xl text-accent mb-6 font-medium text-balance">Comprehensive Services, Cutting-Edge Technology, and Superior Results</p>
             <p className="text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed text-balance">
-              Our team of certified appraisers leverages cutting-edge technology and deep local market knowledge to deliver fast, accurate, and reliable home valuations. Whether you're buying, selling, refinancing, or need a valuation for estate planning, we provide comprehensive reports that meet all industry standards and lender requirements. We are committed to transparency, professionalism, and providing you with the insights needed to make informed property decisions with confidence.
+              Our team of certified appraisers leverages cutting-edge technology and deep local market knowledge to deliver fast, accurate, and reliable home valuations. Whether you&apos;re buying, selling, refinancing, or need a valuation for estate planning, we provide comprehensive reports that meet all industry standards and lender requirements. We are committed to transparency, professionalism, and providing you with the insights needed to make informed property decisions with confidence.
             </p>
             <div className="flex flex-col items-center justify-center gap-6">
               <div className="w-full sm:w-auto max-w-xs sm:max-w-sm md:max-w-md">
@@ -274,7 +274,7 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
                     <div className="p-1 h-full">
                       <Card className="flex flex-col h-full bg-background/90 dark:bg-deep-charcoal text-foreground">
                         <CardContent className="flex-grow flex flex-col justify-between p-6">
-                           <blockquote className="text-muted-foreground italic mb-4 flex-grow">"{review.quote}"</blockquote>
+                           <blockquote className="text-muted-foreground italic mb-4 flex-grow">&quot;{review.quote}&quot;</blockquote>
                            <div>
                              <StarRating rating={review.rating} />
                              <p className="font-semibold mt-2 text-right">- {review.name}</p>
@@ -957,7 +957,7 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
           This is a detailed placeholder description for our {offering.title} service. 
           We provide top-tier {offering.title.toLowerCase()} solutions tailored to your specific needs in the Central Florida market. 
           Our expertise ensures you receive accurate, reliable, and timely information to make informed decisions. 
-          Whether you're dealing with {offering.blurb.toLowerCase().replace('.', '')}, or need comprehensive analysis, our team is here to assist.
+          Whether you&apos;re dealing with {offering.blurb.toLowerCase().replace('.', '')}, or need comprehensive analysis, our team is here to assist.
           (This section should be approximately 150 words).
         </p>
         <p className="text-muted-foreground leading-relaxed">
@@ -990,7 +990,7 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
           <AccordionItem value="item-2">
             <AccordionTrigger>How long does the {offering.title} process take?</AccordionTrigger>
             <AccordionContent>
-              Placeholder answer: The timeline for {offering.title} can vary depending on complexity, but we strive for efficient turnaround times. We'll provide an estimate upfront.
+              Placeholder answer: The timeline for {offering.title} can vary depending on complexity, but we strive for efficient turnaround times. We&apos;ll provide an estimate upfront.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">

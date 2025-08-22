@@ -4,7 +4,7 @@ import offeringsData from '../../../../public/data/offerings.json';
 import { Metadata } from 'next';
 import ServiceClientPage from './client-page';
 
-const typedOfferingsData: Offering[] = offeringsData;
+const typedOfferingsData: Offering[] = offeringsData as Offering[];
 
 export async function generateStaticParams() {
   const services = typedOfferingsData.filter((o) => o.category === 'service');

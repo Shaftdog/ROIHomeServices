@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { CtaButton } from "@/components/shared/cta-button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
 import { TrendingUp, ShieldCheck, Banknote, Zap } from "lucide-react";
 
 const caseStudiesData = [
@@ -117,7 +117,7 @@ export default function CaseStudiesPage() {
         <Zap className="h-12 w-12 text-highlight mx-auto mb-4" />
         <h2 className="text-3xl font-bold mb-4">See How We Can Help Your Property Achieve Its Potential.</h2>
         <p className="text-slate-200 mb-8 max-w-xl mx-auto text-balance">
-          Whether you're buying, selling, investing, or planning, our expertise can make a difference.
+          Whether you&apos;re buying, selling, investing, or planning, our expertise can make a difference.
         </p>
         <CtaButton calendlyEventType="Free Consult – 15 min" variant="highlight" size="lg">
           Book a Call

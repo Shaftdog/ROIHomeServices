@@ -89,7 +89,7 @@ export default function OfferingsPage() {
         return <p className="text-muted-foreground col-span-full text-center py-8">No clients available in this category.</p>;
     }
     return items.map(client => {
-      // @ts-ignore
+      // @ts-expect-error - Dynamic icon access from lucide-react
       const Icon = LucideIcons[client.icon] || LucideIcons.Users;
       return (
           <Link key={client.id} href={client.href} className="block h-full">

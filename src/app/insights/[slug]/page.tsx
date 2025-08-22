@@ -1,15 +1,13 @@
 
 import Image from "next/image";
-import type { ButtonProps } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { AvatarProps } from "@/components/ui/avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Facebook, Twitter, Linkedin, Share2, MessageCircle, Send } from "lucide-react";
 
 // This is a placeholder page. In a real app, you'd fetch data based on the slug.
-export default function InsightPostPage({ params }: { params: { slug: string } }) {
+export default function InsightPostPage() {
   const post = { // Placeholder data
     title: "Understanding ARV: A Key Metric for Property Investors",
     date: "June 28, 2024",

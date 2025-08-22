@@ -8,7 +8,7 @@ export default function TermsOfServicePage() {
       </header>
       <div className="prose dark:prose-invert max-w-none">
         <p>
-          These Terms of Service (the “Terms”) govern your access to and use of websites, portals, and online services operated by ROI Home Services ("ROI Home Services," "we," "us," or "our"). By accessing or using our Sites or Services, you agree to be bound by these Terms and our Privacy Policy. If you do not agree, do not use the Sites or Services.
+          These Terms of Service (the &quot;Terms&quot;) govern your access to and use of websites, portals, and online services operated by ROI Home Services (&quot;ROI Home Services,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). By accessing or using our Sites or Services, you agree to be bound by these Terms and our Privacy Policy. If you do not agree, do not use the Sites or Services.
         </p>
         <p>
           <strong>Not legal, tax, or lending advice.</strong> We are not a law firm or a mortgage lender/broker. Legal and lending services are provided by or under the supervision of licensed third parties you engage. Appraisal services, when provided, are independent and USPAP‑compliant.
@@ -21,7 +21,7 @@ export default function TermsOfServicePage() {
 
         <h2>2. Changes to Terms or Services</h2>
         <p>
-          We may modify these Terms or our Services at any time. Material changes will be posted with a new "Last updated" date. Your continued use after changes constitutes acceptance. We may suspend or discontinue any part of the Sites or Services without notice.
+          We may modify these Terms or our Services at any time. Material changes will be posted with a new &quot;Last updated&quot; date. Your continued use after changes constitutes acceptance. We may suspend or discontinue any part of the Sites or Services without notice.
         </p>
 
         <h2>3. Acceptable Use</h2>
@@ -36,7 +36,7 @@ export default function TermsOfServicePage() {
 
         <h2>4. User Content & License</h2>
         <p>
-          If you upload, submit, or share content ("User Content"), you grant us a non‑exclusive, worldwide, royalty‑free license to host, store, reproduce, and display it solely to operate and improve the Services and to fulfill your engagement. You represent that you have all rights necessary to grant this license and that your User Content does not infringe the rights of others. We may remove content that violates law or these Terms.
+          If you upload, submit, or share content (&quot;User Content&quot;), you grant us a non‑exclusive, worldwide, royalty‑free license to host, store, reproduce, and display it solely to operate and improve the Services and to fulfill your engagement. You represent that you have all rights necessary to grant this license and that your User Content does not infringe the rights of others. We may remove content that violates law or these Terms.
         </p>
 
         <h2>5. Third‑Party Services & Links</h2>
@@ -46,7 +46,7 @@ export default function TermsOfServicePage() {
 
         <h2>6. Intellectual Property</h2>
         <p>
-          The Sites, Services, reports, designs, text, graphics, software, and other materials we provide (collectively, the "ROI Content") are owned by ROI Home Services or its licensors and are protected by intellectual‑property laws. Except as expressly allowed, you may not copy, modify, distribute, or create derivative works of the ROI Content. All trademarks, service marks, and logos are the property of their respective owners.
+          The Sites, Services, reports, designs, text, graphics, software, and other materials we provide (collectively, the &quot;ROI Content&quot;) are owned by ROI Home Services or its licensors and are protected by intellectual‑property laws. Except as expressly allowed, you may not copy, modify, distribute, or create derivative works of the ROI Content. All trademarks, service marks, and logos are the property of their respective owners.
         </p>
 
         <h2>7. Professional Disclosures</h2>
@@ -78,7 +78,7 @@ export default function TermsOfServicePage() {
 
         <h2>12. Disclaimers</h2>
         <p>
-          THE SITES AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, OR NON‑INFRINGEMENT. WE DO NOT WARRANT THAT THE SITES OR SERVICES WILL BE UNINTERRUPTED, ERROR‑FREE, OR SECURE.
+          THE SITES AND SERVICES ARE PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, OR NON‑INFRINGEMENT. WE DO NOT WARRANT THAT THE SITES OR SERVICES WILL BE UNINTERRUPTED, ERROR‑FREE, OR SECURE.
         </p>
 
         <h2>13. Limitation of Liability</h2>

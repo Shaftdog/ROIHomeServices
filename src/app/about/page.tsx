@@ -1,33 +1,9 @@
 
 import Image from "next/image";
 import { CtaButton } from "@/components/shared/cta-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Medal, Users, Building, Star, Briefcase, CheckSquare } from "lucide-react"; // More specific icons
+import { Briefcase } from "lucide-react"; // More specific icons
 
 export default function AboutPage() {
-  const teamMembers = [
-    {
-      name: "Jane Doe (Placeholder)",
-      title: "Lead Appraiser, SRA",
-      imageUrl: "https://picsum.photos/300/300?random=1",
-      bio: "With over 15 years of experience in Central Florida real estate, Jane specializes in complex residential appraisals and market analysis.",
-      hint: "professional headshot woman"
-    },
-    {
-      name: "John Smith (Placeholder)",
-      title: "Investment Analyst",
-      imageUrl: "https://picsum.photos/300/300?random=2",
-      bio: "John brings a sharp analytical mind to investor valuations, focusing on ARV calculations and portfolio optimization strategies.",
-      hint: "professional headshot man"
-    },
-  ];
-
-  const credentials = [
-    { name: "State Certified General Appraiser #RD0000", icon: Medal },
-    { name: "Appraisal Institute Designated Member (SRA/MAI - Placeholder)", icon: Star },
-    { name: "Local Board of Realtors Affiliate", icon: Users },
-    { name: "Fully Insured (E&O)", icon: CheckSquare }
-  ];
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
@@ -48,7 +24,7 @@ export default function AboutPage() {
           />
         </div>
         <div className="md:col-span-3">
-          <h2 className="text-3xl font-semibold mb-4">Our Founder's Journey</h2>
+          <h2 className="text-3xl font-semibold mb-4">Our Founder&apos;s Journey</h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
               ROI Home Services was born out of over three decades of real estate experience and a passion for creating lasting value in communities. Our founder, Rod Haugabrooks, began his career navigating property auctions and negotiating with financial institutions during one of the most challenging housing markets in history. His ability to see opportunity where others saw obstacles became the foundation for what would later grow into ROI Home Services.
@@ -57,7 +33,7 @@ export default function AboutPage() {
               In the early years, Rod successfully orchestrated over a thousand real estate deals, building a reputation for strategic insight and integrity. He founded ROI Homes in 2011, focusing on helping families and investors find the right opportunities. As the company’s services expanded, it rebranded in 2017 as ROI Home Services to reflect a broader mission—delivering appraisal, valuation, and real estate solutions that empower clients to make confident decisions.
             </p>
             <p>
-              Today, ROI Home Services is not just about valuations—it’s about creating systems, processes, and services that simplify real estate for lenders, investors, and homeowners alike. Rod’s vision extends beyond transactions; it’s about building trust, providing clarity, and ensuring that every client, from individuals to institutional lenders, feels supported through every step of the real estate process.
+              Today, ROI Home Services is not just about valuations—it&apos;s about creating systems, processes, and services that simplify real estate for lenders, investors, and homeowners alike. Rod&apos;s vision extends beyond transactions; it&apos;s about building trust, providing clarity, and ensuring that every client, from individuals to institutional lenders, feels supported through every step of the real estate process.
             </p>
             <p>
               Our journey continues with the same entrepreneurial spirit that started it all: identifying opportunities, adapting to change, and always putting clients first.

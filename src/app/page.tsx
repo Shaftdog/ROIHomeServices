@@ -1,12 +1,7 @@
 
 
-import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CtaButton } from "@/components/shared/cta-button";
-import { IconPlaceholder } from "@/components/shared/icon-placeholder";
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Briefcase, FileText, Building2 } from "lucide-react";
 import Typer from './components/Typer';
 import HeroButton from './components/HeroButton';
@@ -14,7 +9,7 @@ import WhoWeServe from "./components/WhoWeServe";
 import offeringsData from "../../public/data/offerings.json";
 import type { Offering } from "@/types/offerings";
 
-const typedOfferingsData: Offering[] = offeringsData;
+const typedOfferingsData: Offering[] = offeringsData as Offering[];
 
 export default function HomePage() {
   const whatWeDoItems = {

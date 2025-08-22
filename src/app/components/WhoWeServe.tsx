@@ -24,7 +24,7 @@ export default function WhoWeServe() {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Who We Serve</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {clients.map((item) => {
-            // @ts-ignore
+            // @ts-expect-error - Dynamic icon access from lucide-react
             const Icon = LucideIcons[item.icon] || LucideIcons.Users;
             return (
               <Link key={item.id} href={item.href} className="block">

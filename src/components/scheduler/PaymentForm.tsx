@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import type { AppraisalFormData } from "@/types/scheduler-types";
-import { Loader2 } from "lucide-react";
+
 
 interface PaymentFormProps {
   onComplete: () => void;

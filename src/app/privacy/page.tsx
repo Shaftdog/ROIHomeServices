@@ -8,7 +8,7 @@ export default function PrivacyPolicyPage() {
       </header>
       <div className="prose dark:prose-invert max-w-none">
         <p>
-          ROI Home Services ("ROI Home Services," "we," "us," or "our") respects your privacy. This Privacy Policy explains how we collect, use, disclose, and protect information when you visit our websites, contact us, or use our services (valuation/appraisal, rent surveys, marketing, lending coordination, transaction coordination, property and asset management, development consulting, and related offerings).
+          ROI Home Services (&quot;ROI Home Services,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) respects your privacy. This Privacy Policy explains how we collect, use, disclose, and protect information when you visit our websites, contact us, or use our services (valuation/appraisal, rent surveys, marketing, lending coordination, transaction coordination, property and asset management, development consulting, and related offerings).
         </p>
         <p>
           By using our sites or services, you agree to this Policy. If you do not agree, please do not use our sites or services.

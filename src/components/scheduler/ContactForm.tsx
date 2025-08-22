@@ -68,7 +68,7 @@ export default function ContactForm({ onContinue, defaultValues = {} }: ContactF
                   <Input placeholder="john.doe@example.com" type="email" {...field} />
                 </FormControl>
                 <FormDescription>
-                  We'll use this email to send your confirmation and receipt.
+                  We&apos;ll use this email to send your confirmation and receipt.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -85,7 +85,7 @@ export default function ContactForm({ onContinue, defaultValues = {} }: ContactF
                   <Input placeholder="(555) 123-4567" type="tel" {...field} />
                 </FormControl>
                 <FormDescription>
-                  We'll use this number to contact you about your appraisal.
+                  We&apos;ll use this number to contact you about your appraisal.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

@@ -963,7 +963,7 @@ export default function ClientDetailPage({ params }: { params: { slug: string } 
   }
 
 
-  // @ts-ignore
+  // @ts-expect-error - Dynamic icon access from lucide-react
   const Icon = LucideIcons[client.icon] || LucideIcons.Users;
 
   return (
@@ -983,7 +983,7 @@ export default function ClientDetailPage({ params }: { params: { slug: string } 
         <h2 className="text-2xl font-semibold mb-4">Specialized Services for {client.title}</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
           This is a detailed placeholder description for our services tailored to {client.title}. 
-          We understand the unique challenges and goals you face, whether it's navigating complex transactions, planning for the future, or making critical investment decisions. 
+          We understand the unique challenges and goals you face, whether it&apos;s navigating complex transactions, planning for the future, or making critical investment decisions. 
           Our expertise in {client.description.toLowerCase().replace('.', '')} ensures you receive accurate valuations and strategic advice.
           (This section should be expanded to approximately 150 words).
         </p>
@@ -1022,7 +1022,7 @@ export default function ClientDetailPage({ params }: { params: { slug: string } 
           <AccordionItem value="item-3">
             <AccordionTrigger>Why should I choose ROI Home Services over a simple CMA from a real estate agent?</AccordionTrigger>
             <AccordionContent>
-              Placeholder answer: While a CMA is a helpful pricing tool, a certified appraisal from ROI Home Services is a legally defensible and impartial valuation required by lenders, courts, and government agencies. It provides a more thorough and reliable assessment of a property's true market value.
+              Placeholder answer: While a CMA is a helpful pricing tool, a certified appraisal from ROI Home Services is a legally defensible and impartial valuation required by lenders, courts, and government agencies. It provides a more thorough and reliable assessment of a property&apos;s true market value.
             </AccordionContent>
           </AccordionItem>
         </Accordion>

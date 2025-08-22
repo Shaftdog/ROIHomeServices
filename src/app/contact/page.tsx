@@ -13,7 +13,7 @@ export default function ContactPage() {
       <header className="text-center mb-12 md:mb-16">
         <h1 className="text-4xl md:text-5xl font-bold">Get in Touch with ROI Home Services</h1>
         <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto text-balance">
-          We're here to answer your questions and help you with your appraisal and consulting needs.
+          We&apos;re here to answer your questions and help you with your appraisal and consulting needs.
         </p>
       </header>
 
@@ -110,7 +110,7 @@ export default function ContactPage() {
             <CardContent>
               <div className="h-[600px] md:h-[800px] bg-light-gray rounded-md flex items-center justify-center" data-ai-hint="calendly embed form">
                 <p className="text-muted-foreground text-center p-4">
-                  [Placeholder for Full-width Embedded Calendly Widget for 'Free Consult – 15 min']
+                  [Placeholder for Full-width Embedded Calendly Widget for &apos;Free Consult – 15 min&apos;]
                 </p>
               </div>
               <div className="mt-6 text-center">

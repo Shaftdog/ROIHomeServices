@@ -9,7 +9,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
-const typedOfferingsData: Offering[] = offeringsData;
+const typedOfferingsData: Offering[] = offeringsData as Offering[];
 
 export async function generateStaticParams() {
   const solutions = typedOfferingsData.filter((o) => o.category === 'solution');

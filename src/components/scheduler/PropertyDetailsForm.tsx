@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -43,7 +43,15 @@ interface PropertyDetailsFormProps {
 }
 
 // Pricing logic from lib/calculatePrice.ts
-function calculateQuote(params: any): number | string {
+interface QuoteParams {
+  scopeOfInspection: string;
+  sizeOfHome: number;
+  numberOfLivingUnits: string;
+  isLotOverOneAcre?: boolean;
+  hasSiteInfluence?: boolean;
+}
+
+function calculateQuote(params: QuoteParams): number | string {
   const { 
     scopeOfInspection, 
     sizeOfHome = 0, 
