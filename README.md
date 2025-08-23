@@ -30,12 +30,19 @@ npm install
 ```
 
 ### **3. Environment Setup**
-Create a `.env.local` file in the root directory:
+Copy the example environment file and configure your variables:
+```bash
+cp .env.example .env.local
+```
+
+Then edit `.env.local` with your actual values:
 ```env
-# Add your environment variables here
-# Example:
-# NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-# NEXT_PUBLIC_CALENDLY_URL=your_calendly_url
+# Required for Calendly integration
+NEXT_PUBLIC_CALENDLY_URL=https://calendly.com/your-username/consultation
+
+# Optional: Additional configuration
+NEXT_PUBLIC_APP_URL=http://localhost:9002
+CONTACT_EMAIL=your-email@domain.com
 ```
 
 ### **4. Run Development Server**
@@ -138,6 +145,17 @@ npm run start
 
 ### **Environment Variables**
 Ensure all required environment variables are set in your production environment.
+
+**Required Variables:**
+- `NEXT_PUBLIC_CALENDLY_URL` - Your Calendly scheduling URL
+- `NEXT_PUBLIC_APP_URL` - Your application's base URL
+
+**Optional Variables:**
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - For payment processing
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` - For Google Analytics
+- `CONTACT_EMAIL` - For contact form notifications
+
+See `.env.example` for a complete list of available environment variables.
 
 ## 🤝 **Contributing**
 

@@ -19,7 +19,7 @@ const CalendlyModal = () => {
 
   if (!eventType) return null;
 
-  const url = "https://calendly.com/rod-23/15min"
+  const url = process.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/rod-23/15min"
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
