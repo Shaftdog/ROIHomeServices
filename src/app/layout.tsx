@@ -7,6 +7,13 @@ import Footer from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CalendlyModalProvider } from '@/contexts/calendly-modal-context';
 
+// Initialize global error handlers
+if (typeof window === 'undefined') {
+  import('@/lib/error-handlers').then(({ setupGlobalErrorHandlers }) => {
+    setupGlobalErrorHandlers();
+  });
+}
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
