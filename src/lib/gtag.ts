@@ -1,9 +1,9 @@
-// Google Analytics 4 utility functions for GTM integration
+// Google Analytics 4 utility functions for GTM integration with Consent Mode V2
 
 // Declare gtag function for TypeScript
 declare global {
   interface Window {
-    gtag: (command: string, targetId: string, config?: any) => void;
+    gtag: (command: string, targetId?: string, config?: any) => void;
     dataLayer: any[];
   }
 }

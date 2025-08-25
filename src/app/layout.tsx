@@ -6,6 +6,7 @@ import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CalendlyModalProvider } from '@/contexts/calendly-modal-context';
+import ConsentManager from '@/components/consent/ConsentManager';
 
 // Initialize global error handlers
 if (typeof window === 'undefined') {
@@ -37,6 +38,29 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
+        {/* Google Consent Mode V2 - Initialize before GTM */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              
+              // Set default consent state (all denied until user consents)
+              gtag('consent', 'default', {
+                'analytics_storage': 'denied',
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'functionality_storage': 'granted',
+                'personalization_storage': 'denied',
+                'security_storage': 'granted',
+                'wait_for_update': 500
+              });
+            `,
+          }}
+        />
+        
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
@@ -70,6 +94,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </main>
           <Footer />
           <Toaster />
+          <ConsentManager />
         </CalendlyModalProvider>
       </body>
     </html>

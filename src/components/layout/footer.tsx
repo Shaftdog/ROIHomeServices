@@ -1,11 +1,25 @@
 
+"use client";
+
 import Link from "next/link";
-import Image from "next/image"; 
+import Image from "next/image";
+import { useState } from "react";
+import ConsentBanner from "@/components/consent/ConsentBanner"; 
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [showConsentBanner, setShowConsentBanner] = useState(false);
+
+  const handleCookiePreferencesClick = () => {
+    setShowConsentBanner(true);
+  };
+
+  const handleBannerClose = () => {
+    setShowConsentBanner(false);
+  };
 
   return (
+    <>
     <footer className="bg-deep-charcoal text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
@@ -39,6 +53,14 @@ export default function Footer() {
               <li><Link href="/privacy" className="text-sm text-slate-300 hover:text-highlight transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="text-sm text-slate-300 hover:text-highlight transition-colors">Terms of Service</Link></li>
               <li><Link href="/accessibility" className="text-sm text-slate-300 hover:text-highlight transition-colors">Accessibility Statement</Link></li>
+              <li>
+                <button 
+                  onClick={handleCookiePreferencesClick}
+                  className="text-sm text-slate-300 hover:text-highlight transition-colors cursor-pointer text-left"
+                >
+                  Cookie Preferences
+                </button>
+              </li>
             </ul>
           </div>
            <div className="md:col-span-1">
@@ -61,5 +83,9 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    {showConsentBanner && (
+      <ConsentBanner onPreferencesClick={handleBannerClose} />
+    )}
+    </>
   );
 }
