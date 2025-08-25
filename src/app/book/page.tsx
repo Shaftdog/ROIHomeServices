@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import type { AppraisalFormData } from "@/types/scheduler-types";
 import { nanoid } from "nanoid";
+import { trackBookingStep } from "@/lib/gtag";
 
 export default function BookPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -38,17 +39,23 @@ export default function BookPage() {
   const handleContactSubmit = (data: { name: string, email: string, phone: string }) => {
     setFormData({ ...formData, ...data });
     setCurrentStep(2);
+    // Track booking step completion
+    trackBookingStep('contact_info_completed', 1);
   };
 
   const handlePropertyDetailsSubmit = (data: AppraisalFormData) => {
     setFormData({ ...formData, ...data });
     setCurrentStep(3);
+    // Track booking step completion
+    trackBookingStep('property_details_completed', 2);
   };
 
   const handleScheduleSubmit = (data: { appointmentDate: string, appointmentTime: string }) => {
     const updatedFormData = { ...formData, ...data };
     setFormData(updatedFormData);
     setCurrentStep(4);
+    // Track booking step completion
+    trackBookingStep('appointment_scheduled', 3);
     // You might want to trigger an API call here to save the data so far
     // and create a payment intent.
   };
@@ -57,6 +64,8 @@ export default function BookPage() {
     // Logic to confirm payment and move to the final step
     setConfirmationNumber(nanoid(8).toUpperCase());
     setCurrentStep(5);
+    // Track payment completion
+    trackBookingStep('payment_completed', 4);
     toast({
       title: "Payment Successful",
       description: "Your appraisal has been scheduled!",

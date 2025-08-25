@@ -1,10 +1,12 @@
 
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Printer, CalendarPlus } from "lucide-react";
 import { format } from "date-fns";
 import type { AppraisalFormData } from "@/types/scheduler-types";
+import { sendPurchaseEvent, trackAppraisalScheduled } from "@/lib/gtag";
 
 interface ConfirmationProps {
   formData: AppraisalFormData;
@@ -13,6 +15,35 @@ interface ConfirmationProps {
 
 export default function Confirmation({ formData, confirmationNumber }: ConfirmationProps) {
   const appointmentDate = formData.appointmentDate ? new Date(formData.appointmentDate) : null;
+
+  // Send GA4 purchase event when confirmation page loads
+  useEffect(() => {
+    // Send the New_Order event to GA4
+    sendPurchaseEvent({
+      transactionId: confirmationNumber,
+      value: Number(formData.quoteAmount) || 595,
+      currency: 'USD',
+      items: [
+        {
+          item_id: 'appraisal-service',
+          item_name: 'Property Appraisal Service',
+          category: 'Real Estate Services',
+          quantity: 1,
+          price: Number(formData.quoteAmount) || 595,
+        },
+      ],
+    });
+
+    // Also track the appraisal scheduling event
+    if (formData.appointmentDate && formData.appointmentTime) {
+      trackAppraisalScheduled({
+        appointmentDate: formData.appointmentDate,
+        appointmentTime: formData.appointmentTime,
+        serviceType: formData.purpose || 'Property Appraisal',
+        value: Number(formData.quoteAmount) || 595,
+      });
+    }
+  }, [confirmationNumber, formData]);
 
   const handlePrintReceipt = () => {
     window.print();
