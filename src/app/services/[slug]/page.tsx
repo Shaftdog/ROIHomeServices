@@ -25,8 +25,40 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   
   if (offering.id === 'appraisal') {
     return {
-      title: "Home Appraisal | ROI Home Services",
-      description: "Get an accurate home appraisal with our expert valuation team. Comprehensive services, cutting-edge technology, and superior results.",
+      title: "Real Estate Appraisal in Florida | ROI Home Services",
+      description: "Fast, compliant residential appraisals across Central Florida. Investor, lender & tax appraisals by certified experts. Book an inspection or get a quote today.",
+      robots: "index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1",
+      alternates: {
+        canonical: "https://www.roihomesvc.com/services/appraisal"
+      },
+      openGraph: {
+        type: "website",
+        siteName: "ROI Home Services",
+        locale: "en_US",
+        title: "Real Estate Appraisal in Florida | ROI Home Services",
+        description: "Fast, compliant residential appraisals across Central Florida. Investor, lender & tax appraisals by certified experts. Book an inspection or get a quote today.",
+        url: "https://www.roihomesvc.com/appraisal",
+        images: [
+          {
+            url: "https://www.roihomesvc.com/og/appraisal-1200x630.jpg",
+            secureUrl: "https://www.roihomesvc.com/og/appraisal-1200x630.jpg",
+            width: 1200,
+            height: 630,
+            alt: "Florida real estate appraisal service—court-ready, fast turnaround."
+          }
+        ]
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Real Estate Appraisal in Florida | ROI Home Services",
+        description: "Fast, compliant residential appraisals across Central Florida. Investor, lender & tax appraisals by certified experts. Book an inspection or get a quote today.",
+        images: [
+          {
+            url: "https://www.roihomesvc.com/og/appraisal-1200x630.jpg",
+            alt: "Florida real estate appraisal service—court-ready, fast turnaround."
+          }
+        ]
+      }
     };
   }
 
