@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
+import { sendContactNotification } from '@/lib/email';
 
 // Contact form schema
 const contactSchema = z.object({
@@ -35,8 +36,30 @@ async function handleContactSubmission(request: NextRequest) {
     // Validate the request
     const validatedData = contactSchema.parse(body);
     
-    // Simulate email sending
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Send email notification to admin
+    try {
+      await sendContactNotification({
+        name: validatedData.name,
+        email: validatedData.email,
+        phone: validatedData.phone,
+        subject: validatedData.subject,
+        message: validatedData.message,
+        requestId,
+      });
+      
+      contactLogger.info({
+        formType: 'contact',
+        subject: validatedData.subject,
+        emailSent: true,
+      }, 'Admin notification email sent successfully');
+      
+    } catch (emailError) {
+      contactLogger.error({
+        err: emailError,
+        subject: validatedData.subject,
+      }, 'Failed to send admin notification email');
+      // Don't fail the contact submission if email fails
+    }
     
     contactLogger.info({
       formType: 'contact',

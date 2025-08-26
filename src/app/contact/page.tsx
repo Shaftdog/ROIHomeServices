@@ -1,4 +1,6 @@
+'use client';
 
+import { useState } from 'react';
 import { CtaButton } from "@/components/shared/cta-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +8,96 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, Clock, MapPin, Send, CalendarDays } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ContactPage() {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast({
+        title: "Missing Required Fields",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast({
+          title: "Message Sent!",
+          description: "Thank you for contacting us. We'll get back to you soon.",
+        });
+        
+        // Clear form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to send message. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
       <header className="text-center mb-12 md:mb-16">
@@ -71,31 +161,79 @@ export default function ContactPage() {
               <CardTitle className="text-2xl">Send Us a Message</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div suppressHydrationWarning={true}>
-                    <Label htmlFor="name">Name</Label>
-                    <Input id="name" type="text" placeholder="Your Name" />
+                    <Label htmlFor="name">Name *</Label>
+                    <Input 
+                      id="name" 
+                      type="text" 
+                      placeholder="Your Name" 
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isSubmitting}
+                    />
                   </div>
                   <div suppressHydrationWarning={true}>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="Your Email" />
+                    <Label htmlFor="email">Email *</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="Your Email" 
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isSubmitting}
+                    />
                   </div>
                 </div>
                 <div suppressHydrationWarning={true}>
                   <Label htmlFor="phone">Phone (Optional)</Label>
-                  <Input id="phone" type="tel" placeholder="Your Phone Number" />
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    placeholder="Your Phone Number" 
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    disabled={isSubmitting}
+                  />
                 </div>
                 <div suppressHydrationWarning={true}>
-                  <Label htmlFor="subject">Subject</Label>
-                  <Input id="subject" type="text" placeholder="Subject of your message" />
+                  <Label htmlFor="subject">Subject *</Label>
+                  <Input 
+                    id="subject" 
+                    type="text" 
+                    placeholder="Subject of your message" 
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isSubmitting}
+                  />
                 </div>
                 <div suppressHydrationWarning={true}>
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea id="message" placeholder="Your message..." rows={5} />
+                  <Label htmlFor="message">Message *</Label>
+                  <Textarea 
+                    id="message" 
+                    placeholder="Your message..." 
+                    rows={5} 
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isSubmitting}
+                  />
                 </div>
-                <Button type="submit" size="lg" className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90">
-                  Send Message <Send className="ml-2 h-4 w-4" />
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>Sending...</>
+                  ) : (
+                    <>Send Message <Send className="ml-2 h-4 w-4" /></>
+                  )}
                 </Button>
               </form>
             </CardContent>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
+import { sendBookingNotification } from '@/lib/email';
 
 // Booking request schema
 const bookingSchema = z.object({
@@ -38,10 +39,35 @@ async function handleBookingRequest(request: NextRequest) {
     // Validate the request
     const validatedData = bookingSchema.parse(body);
     
-    // Simulate booking processing
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const bookingId = crypto.randomUUID();
+    
+    // Send email notification to admin
+    try {
+      await sendBookingNotification({
+        bookingId,
+        serviceType: validatedData.serviceType,
+        preferredDate: validatedData.preferredDate,
+        zip: validatedData.zip,
+        email: validatedData.email,
+        phone: validatedData.phone,
+        name: validatedData.name,
+        address: validatedData.address,
+        notes: validatedData.notes,
+        requestId,
+      });
+      
+      bookingLogger.info({
+        bookingId,
+        emailSent: true,
+      }, 'Admin notification email sent successfully');
+      
+    } catch (emailError) {
+      bookingLogger.error({
+        err: emailError,
+        bookingId,
+      }, 'Failed to send admin notification email');
+      // Don't fail the booking if email fails
+    }
     
     // Log successful booking
     logEvent(bookingLogger, 'booking_confirm', {
