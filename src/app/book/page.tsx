@@ -13,6 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import type { AppraisalFormData } from "@/types/scheduler-types";
 import { nanoid } from "nanoid";
 import { trackBookingStep } from "@/lib/gtag";
+import { pushEvent } from "@/lib/gtm";
+import TrackOnView from "@/components/TrackOnView";
 
 export default function BookPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -37,6 +39,14 @@ export default function BookPage() {
   const { toast } = useToast();
 
   const handleContactSubmit = (data: { name: string, email: string, phone: string }) => {
+    // Fire Start_Booking event with continue_click action
+    pushEvent('Start_Booking', {
+      step: 1,
+      action: 'continue_click',
+      page: '/book',
+      appointment_type: formData.purpose || 'unknown'
+    });
+    
     setFormData({ ...formData, ...data });
     setCurrentStep(2);
     // Track booking step completion
@@ -83,10 +93,21 @@ export default function BookPage() {
 
       <Card className="bg-white rounded-lg shadow-lg p-6 md:p-10">
         {currentStep === 1 && (
-          <ContactForm 
-            onContinue={handleContactSubmit} 
-            defaultValues={formData} 
-          />
+          <>
+            <TrackOnView 
+              name="Start_Booking" 
+              params={{
+                step: 1,
+                step_name: 'ContactInfo',
+                page: '/book',
+                appointment_type: formData.purpose || 'unknown'
+              }}
+            />
+            <ContactForm 
+              onContinue={handleContactSubmit} 
+              defaultValues={formData} 
+            />
+          </>
         )}
         
         {currentStep === 2 && (

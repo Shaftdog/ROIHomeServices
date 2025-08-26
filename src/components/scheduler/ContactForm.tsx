@@ -93,7 +93,9 @@ export default function ContactForm({ onContinue, defaultValues = {} }: ContactF
           />
 
           <div className="flex justify-end mt-6">
-            <Button type="submit">Continue to Property Details</Button>
+            <Button type="submit" data-testid="continue-to-property-details">
+              Continue to Property Details
+            </Button>
           </div>
         </form>
       </Form>
