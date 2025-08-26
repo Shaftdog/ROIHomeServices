@@ -201,10 +201,7 @@ Amount Paid: $${formData.quoteAmount || 0}`
           // This is a placeholder for payment. A real implementation would need a client secret from a server.
           // For now, we will just simulate a successful payment.
           <PaymentForm
-            onComplete={() => {
-              console.log('=== onComplete wrapper called ===');
-              handlePaymentComplete();
-            }}
+            onComplete={handlePaymentComplete}
             onBack={() => setCurrentStep(3)}
             formData={formData}
           />
