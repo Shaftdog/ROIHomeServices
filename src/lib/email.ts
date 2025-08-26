@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import * as nodemailer from 'nodemailer';
 import { logger } from './logger';
 
 // Create reusable transporter
