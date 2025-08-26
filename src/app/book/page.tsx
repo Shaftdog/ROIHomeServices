@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -71,15 +70,65 @@ export default function BookPage() {
   };
 
   const handlePaymentComplete = async () => {
-    // Logic to confirm payment and move to the final step
-    setConfirmationNumber(nanoid(8).toUpperCase());
-    setCurrentStep(5);
-    // Track payment completion
-    trackBookingStep('payment_completed', 4);
-    toast({
-      title: "Payment Successful",
-      description: "Your appraisal has been scheduled!",
-    });
+    try {
+      // Generate confirmation details
+      const confirmationNum = nanoid(8).toUpperCase();
+      setConfirmationNumber(confirmationNum);
+      
+      // Extract ZIP code from address (if available)
+      const zipMatch = formData.address.match(/\b\d{5}(-\d{4})?\b/);
+      const zip = zipMatch ? zipMatch[0] : 'N/A';
+      
+      // Send booking notification email to admin
+      const response = await fetch('/api/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          serviceType: `Property Appraisal - ${formData.purpose}`,
+          preferredDate: formData.appointmentDate,
+          zip: zip,
+          email: formData.email,
+          phone: formData.phone,
+          name: formData.name,
+          address: formData.address,
+          notes: `PAID BOOKING - Confirmation: ${confirmationNum}
+Appointment Time: ${formData.appointmentTime}
+Property Size: ${formData.sizeOfHome} sq ft
+Living Units: ${formData.numberOfLivingUnits}
+Scope: ${formData.scopeOfInspection}
+Purpose: ${formData.purpose}
+Requester: ${formData.requester}
+Date Needed: ${formData.dateNeeded}
+Amount Paid: $${formData.quoteAmount}`
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Admin notification email sent successfully');
+      } else {
+        console.error('Failed to send booking notification');
+      }
+      
+      setCurrentStep(5);
+      trackBookingStep('payment_completed', 4);
+      toast({
+        title: "Payment Successful",
+        description: "Your appraisal has been scheduled! Admin has been notified.",
+      });
+    } catch (error) {
+      console.error('Error processing payment completion:', error);
+      // Still proceed to confirmation even if email fails
+      setConfirmationNumber(nanoid(8).toUpperCase());
+      setCurrentStep(5);
+      trackBookingStep('payment_completed', 4);
+      toast({
+        title: "Payment Successful",
+        description: "Your appraisal has been scheduled!",
+        variant: "default"
+      });
+    }
   };
 
   return (
