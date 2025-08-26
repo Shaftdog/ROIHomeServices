@@ -70,6 +70,7 @@ export default function BookPage() {
   };
 
   const handlePaymentComplete = async () => {
+    console.log('=== handlePaymentComplete CALLED ===');
     try {
       // Generate confirmation details
       const confirmationNum = nanoid(8).toUpperCase();
@@ -133,7 +134,13 @@ Amount Paid: $${formData.quoteAmount || 0}`
         description: "Your appraisal has been scheduled! Admin has been notified.",
       });
     } catch (error) {
-      console.error('Error processing payment completion:', error);
+      console.error('❌ ERROR in handlePaymentComplete:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        error: error
+      });
+      
       // Still proceed to confirmation even if email fails
       setConfirmationNumber(nanoid(8).toUpperCase());
       setCurrentStep(5);
