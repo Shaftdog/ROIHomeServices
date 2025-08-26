@@ -1,15 +1,13 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
 import type { AppraisalFormData } from "@/types/scheduler-types";
-import { Calendar } from "@/components/ui/calendar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Calendar, Clock } from "lucide-react";
 import { pushEvent } from "@/lib/gtm";
+import { InlineWidget } from "react-calendly";
 
 interface ScheduleFormProps {
   onContinue: (data: { appointmentDate: string, appointmentTime: string }) => void;
@@ -17,38 +15,64 @@ interface ScheduleFormProps {
   formData?: AppraisalFormData;
 }
 
-const availableTimes = [
-    "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
-    "11:00 AM", "11:30 AM", "1:00 PM", "1:30 PM",
-    "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM"
-];
-
 export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleFormProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    formData?.appointmentDate ? new Date(formData.appointmentDate) : undefined
-  );
-  const [selectedTime, setSelectedTime] = useState<string | undefined>(formData?.appointmentTime);
+  const [isScheduled, setIsScheduled] = useState<boolean>(false);
+  const [appointmentDetails, setAppointmentDetails] = useState<{
+    appointmentDate: string;
+    appointmentTime: string;
+  } | null>(null);
+
+  // Calendly URL - using the 30min link as requested
+  const calendlyUrl = "https://calendly.com/rod-23/30min";
+
+  // Handle Calendly event scheduling
+  const handleCalendlyEventScheduled = (event: any) => {
+    console.log('Calendly event scheduled:', event);
+    
+    // Extract date and time from Calendly event
+    const startTime = new Date(event.detail.payload.event.start_time);
+    const appointmentDate = startTime.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const appointmentTime = startTime.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+
+    const details = {
+      appointmentDate,
+      appointmentTime
+    };
+
+    setAppointmentDetails(details);
+    setIsScheduled(true);
+
+    // Fire GA4 event
+    pushEvent('Paid_Booking', {
+      step: 3,
+      step_name: 'Schedule',
+      page: '/book',
+      appointment_type: formData?.purpose || 'unknown',
+      location: formData?.address || 'unknown',
+      schedule_date: appointmentDate,
+      schedule_time: appointmentTime,
+    });
+  };
+
+  // Listen for Calendly events
+  useEffect(() => {
+    const handleCalendlyMessage = (event: MessageEvent) => {
+      if (event.data && event.data.event && event.data.event === 'calendly.event_scheduled') {
+        handleCalendlyEventScheduled(event);
+      }
+    };
+
+    window.addEventListener('message', handleCalendlyMessage);
+    return () => window.removeEventListener('message', handleCalendlyMessage);
+  }, [formData]);
 
   const handleContinue = () => {
-    if (selectedDate && selectedTime) {
-      const scheduleDate = format(selectedDate, "yyyy-MM-dd");
-      const scheduleTime = selectedTime;
-      
-      // Fire Paid_Booking GA4 event
-      pushEvent('Paid_Booking', {
-        step: 3,
-        step_name: 'Schedule',
-        page: '/book',
-        appointment_type: formData?.purpose || 'unknown',
-        location: formData?.address || 'unknown',
-        schedule_date: scheduleDate,
-        schedule_time: scheduleTime,
-      });
-      
-      onContinue({
-        appointmentDate: scheduleDate,
-        appointmentTime: scheduleTime
-      });
+    if (appointmentDetails) {
+      onContinue(appointmentDetails);
     }
   };
 
@@ -56,44 +80,63 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
     <div className="step-content">
       <h2 className="text-2xl font-semibold text-primary mb-6">Schedule Your Appraisal</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="flex flex-col items-center">
-            <h3 className="text-lg font-medium text-primary mb-4">Select a Date</h3>
-            <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
-                className="rounded-md border"
-            />
-        </div>
-
-        <div className="flex flex-col items-center">
-            <h3 className="text-lg font-medium text-primary mb-4">Select a Time</h3>
-            <div className="w-full max-w-xs">
-                <Select onValueChange={setSelectedTime} value={selectedTime} disabled={!selectedDate}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a time slot" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {availableTimes.map(time => (
-                            <SelectItem key={time} value={time}>{time}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                 {!selectedDate && <p className="text-sm text-muted-foreground mt-2 text-center">Please select a date first.</p>}
+      {!isScheduled ? (
+        <div className="space-y-6">
+          <div className="text-center space-y-4">
+            <div className="flex justify-center space-x-4 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-4 w-4" />
+                <span>Choose your preferred date</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Clock className="h-4 w-4" />
+                <span>30-minute appointment</span>
+              </div>
             </div>
-
-            {selectedDate && selectedTime && (
-                <Alert className="mt-8 bg-green-50 border-green-200 text-green-800">
-                    <CheckCircle className="h-4 w-4" />
-                    <AlertDescription>
-                        Appointment set for <span className="font-semibold">{format(selectedDate, "MMMM dd, yyyy")}</span> at <span className="font-semibold">{selectedTime}</span>.
-                    </AlertDescription>
-                </Alert>
-            )}
+          </div>
+          
+          <div className="bg-white rounded-lg border shadow-sm min-h-[600px]">
+            <InlineWidget
+              url={calendlyUrl}
+              styles={{
+                height: '600px'
+              }}
+              prefill={{
+                name: formData?.name,
+                email: formData?.email
+              }}
+              utm={{
+                utmCampaign: 'Property Appraisal Booking',
+                utmSource: 'ROI Home Services',
+                utmMedium: 'website'
+              }}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="text-center space-y-6">
+          <Alert className="bg-green-50 border-green-200 text-green-800 max-w-md mx-auto">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>
+              <div className="space-y-1">
+                <p className="font-semibold">Appointment Scheduled Successfully!</p>
+                <p>Date: {appointmentDetails && new Date(appointmentDetails.appointmentDate).toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</p>
+                <p>Time: {appointmentDetails?.appointmentTime}</p>
+              </div>
+            </AlertDescription>
+          </Alert>
+          
+          <div className="text-sm text-muted-foreground">
+            <p>You should receive a calendar invitation and confirmation email shortly.</p>
+            <p>Please proceed to complete your payment to finalize the booking.</p>
+          </div>
+        </div>
+      )}
       
       <div className="flex justify-between pt-8 mt-6 border-t border-border">
         <Button 
@@ -107,7 +150,7 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
         <Button 
           type="button" 
           onClick={handleContinue}
-          disabled={!selectedDate || !selectedTime}
+          disabled={!isScheduled}
           className="px-8 py-3"
           data-testid="continue-to-payment"
         >
