@@ -26,11 +26,11 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
   const calendlyUrl = "https://calendly.com/rod-23/30min";
 
   // Handle Calendly event scheduling
-  const handleCalendlyEventScheduled = (event: any) => {
-    console.log('Calendly event scheduled:', event);
+  const handleCalendlyEventScheduled = (eventData: any) => {
+    console.log('Calendly event scheduled:', eventData);
     
     // Extract date and time from Calendly event
-    const startTime = new Date(event.detail.payload.event.start_time);
+    const startTime = new Date(eventData.payload.event.start_time);
     const appointmentDate = startTime.toISOString().split('T')[0]; // YYYY-MM-DD format
     const appointmentTime = startTime.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
@@ -61,8 +61,25 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
   // Listen for Calendly events
   useEffect(() => {
     const handleCalendlyMessage = (event: MessageEvent) => {
-      if (event.data && event.data.event && event.data.event === 'calendly.event_scheduled') {
-        handleCalendlyEventScheduled(event);
+      console.log('Received message:', event.data);
+      
+      // Handle different Calendly event formats
+      if (event.data && event.data.event) {
+        if (event.data.event === 'calendly.event_scheduled') {
+          handleCalendlyEventScheduled(event.data);
+        }
+      }
+      
+      // Also check for the event type directly in the data
+      if (event.data && event.data.type === 'event_scheduled') {
+        handleCalendlyEventScheduled(event.data);
+      }
+
+      // Check for Calendly iframe events
+      if (event.origin === 'https://calendly.com' && event.data) {
+        if (event.data.event === 'calendly.event_scheduled' || event.data.type === 'event_scheduled') {
+          handleCalendlyEventScheduled(event.data);
+        }
       }
     };
 
@@ -74,6 +91,29 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
     if (appointmentDetails) {
       onContinue(appointmentDetails);
     }
+  };
+
+  const handleManualConfirmation = () => {
+    // Fallback for when automatic detection doesn't work
+    const now = new Date();
+    const details = {
+      appointmentDate: now.toISOString().split('T')[0],
+      appointmentTime: 'Scheduled via Calendly'
+    };
+
+    setAppointmentDetails(details);
+    setIsScheduled(true);
+
+    // Fire GA4 event
+    pushEvent('Paid_Booking', {
+      step: 3,
+      step_name: 'Schedule',
+      page: '/book',
+      appointment_type: formData?.purpose || 'unknown',
+      location: formData?.address || 'unknown',
+      schedule_date: details.appointmentDate,
+      schedule_time: details.appointmentTime,
+    });
   };
 
   return (
@@ -111,6 +151,20 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
                 utmMedium: 'website'
               }}
             />
+          </div>
+          
+          <div className="text-center mt-4">
+            <p className="text-sm text-muted-foreground mb-3">
+              If you've completed your scheduling above but the page hasn't updated:
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleManualConfirmation}
+              className="px-6 py-2"
+            >
+              I've Scheduled My Appointment
+            </Button>
           </div>
         </div>
       ) : (
