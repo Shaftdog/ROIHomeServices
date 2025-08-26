@@ -62,7 +62,19 @@ export default function PaymentForm({ onComplete, onBack, formData }: PaymentFor
            <p className="text-muted-foreground text-center mb-6">
             This is a demo. In a real application, a payment form (like Stripe) would be here. Click below to simulate a successful payment.
            </p>
-          <Button onClick={onComplete} size="lg">
+          <Button 
+            onClick={() => {
+              console.log('=== PAYMENT BUTTON CLICKED ===');
+              console.log('onComplete function exists:', typeof onComplete);
+              if (onComplete) {
+                console.log('Calling onComplete...');
+                onComplete();
+              } else {
+                console.error('onComplete is not defined!');
+              }
+            }} 
+            size="lg"
+          >
             Simulate Payment of ${formattedQuoteAmount}
           </Button>
         </div>
