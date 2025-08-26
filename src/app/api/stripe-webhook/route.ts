@@ -3,13 +3,25 @@ import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
-});
+// Initialize Stripe only if secret key is available
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2024-11-20.acacia',
+    })
+  : null;
 
 const webhookLogger = createChildLogger(LOG_CONTEXTS.PAYMENT);
 
 export async function POST(req: NextRequest) {
+  // Check if Stripe is configured
+  if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) {
+    webhookLogger.warn('Stripe webhook called but not configured');
+    return NextResponse.json(
+      { error: 'Stripe webhook not configured' },
+      { status: 503 }
+    );
+  }
+
   const body = await req.text();
   const signature = headers().get('stripe-signature')!;
 
@@ -19,7 +31,7 @@ export async function POST(req: NextRequest) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
     webhookLogger.error({

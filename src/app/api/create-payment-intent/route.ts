@@ -3,13 +3,25 @@ import Stripe from 'stripe';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
-});
+// Initialize Stripe only if secret key is available
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2024-11-20.acacia',
+    })
+  : null;
 
-const paymentLogger = createChildLogger(LOG_CONTEXTS.payment);
+const paymentLogger = createChildLogger(LOG_CONTEXTS.PAYMENT);
 
 async function handlePaymentIntent(req: NextRequest, requestId: string) {
+  // Check if Stripe is configured
+  if (!stripe) {
+    paymentLogger.error({ requestId }, 'Stripe not configured - missing STRIPE_SECRET_KEY');
+    return NextResponse.json(
+      { error: 'Payment system not configured' },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { amount, customerEmail, customerName, bookingDetails } = body;
