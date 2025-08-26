@@ -60,6 +60,26 @@ describe('GTM Event Tracking', () => {
     });
   });
 
+  it('should push Paid_Booking event with schedule data', () => {
+    const eventParams = {
+      step: 3,
+      step_name: 'Schedule',
+      page: '/book',
+      appointment_type: 'Home Appraisal',
+      location: '123 Main St, Orlando, FL',
+      schedule_date: '2025-08-25',
+      schedule_time: '10:00 AM'
+    };
+
+    pushEvent('Paid_Booking', eventParams);
+
+    expect(mockDataLayer).toHaveLength(1);
+    expect(mockDataLayer[0]).toEqual({
+      event: 'Paid_Booking',
+      ...eventParams
+    });
+  });
+
   it('should not crash in SSR environment', () => {
     // Mock server environment
     const originalWindow = global.window;

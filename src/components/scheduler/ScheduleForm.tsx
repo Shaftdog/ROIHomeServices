@@ -9,6 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle } from "lucide-react";
+import { pushEvent } from "@/lib/gtm";
 
 interface ScheduleFormProps {
   onContinue: (data: { appointmentDate: string, appointmentTime: string }) => void;
@@ -30,9 +31,23 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
 
   const handleContinue = () => {
     if (selectedDate && selectedTime) {
+      const scheduleDate = format(selectedDate, "yyyy-MM-dd");
+      const scheduleTime = selectedTime;
+      
+      // Fire Paid_Booking GA4 event
+      pushEvent('Paid_Booking', {
+        step: 3,
+        step_name: 'Schedule',
+        page: '/book',
+        appointment_type: formData?.purpose || 'unknown',
+        location: formData?.address || 'unknown',
+        schedule_date: scheduleDate,
+        schedule_time: scheduleTime,
+      });
+      
       onContinue({
-        appointmentDate: format(selectedDate, "yyyy-MM-dd"),
-        appointmentTime: selectedTime
+        appointmentDate: scheduleDate,
+        appointmentTime: scheduleTime
       });
     }
   };
@@ -94,6 +109,7 @@ export default function ScheduleForm({ onContinue, onBack, formData }: ScheduleF
           onClick={handleContinue}
           disabled={!selectedDate || !selectedTime}
           className="px-8 py-3"
+          data-testid="continue-to-payment"
         >
           Continue to Payment
         </Button>
