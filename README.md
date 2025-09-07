@@ -90,8 +90,11 @@ ROIHomeServices/
 │   ├── lib/                   # Utility functions
 │   └── types/                 # TypeScript type definitions
 ├── public/                    # Static assets
+│   └── landing-pages/         # Static landing pages
+│       └── central-florida/   # Central Florida landing page
 ├── .idx/                      # Development environment config
 └── docs/                      # Project documentation
+    └── landing-pages/         # Landing pages documentation
 ```
 
 ## 🎨 **Key Features**
@@ -103,6 +106,25 @@ ROIHomeServices/
 - **Booking System**: Integrated Calendly scheduling
 - **SEO Optimized**: Meta tags and structured data
 - **Accessibility**: WCAG compliant components
+- **Landing Pages**: Static HTML landing pages for marketing campaigns
+
+## 🎯 **Landing Pages**
+
+### **Central Florida Landing Page**
+- **Location**: `/public/landing-pages/central-florida/index.html`
+- **Live URL**: `/landing-pages/central-florida/`
+- **Features**:
+  - SEO-optimized with comprehensive meta tags and schema markup
+  - Mobile-responsive design using Tailwind CSS
+  - Conversion-focused with strategic CTAs
+  - Local search optimization for Central Florida market
+  - Customer testimonials and professional credentials
+  - Service area coverage for 7 counties
+
+### **Documentation**
+- **Landing Pages Guide**: `/docs/landing-pages/README.md`
+- **Deployment Guide**: `/docs/landing-pages/deployment-guide.md`
+- **GitHub Integration**: `/docs/landing-pages/github-deployment.md`
 
 ## 🔧 **Development Tools**
 
