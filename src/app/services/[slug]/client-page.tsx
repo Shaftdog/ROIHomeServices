@@ -1,8 +1,9 @@
 
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Offering } from '@/types/offerings';
+import CustomChatWidget from '@/components/chatbot/CustomChatWidget';
 import { notFound } from 'next/navigation';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -192,6 +193,8 @@ interface ServiceClientPageProps {
 }
 
 export default function ServiceClientPage({ offering }: ServiceClientPageProps) {
+  const [lindyFailed, setLindyFailed] = useState(false);
+  
   if (!offering) {
     notFound();
   }
@@ -241,6 +244,17 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
               loadLindyFallback();
             }
           }, 3000);
+          
+          // Set a longer timeout to enable custom fallback if Lindy completely fails
+          setTimeout(() => {
+            const lindyWidget = document.querySelector('[data-lindy]') || 
+                              document.querySelector('.lindy-embed') ||
+                              document.querySelector('#lindy');
+            if (!lindyWidget && !(window as any).lindy) {
+              console.log('Lindy failed to load after all attempts, enabling custom fallback');
+              setLindyFailed(true);
+            }
+          }, 15000);
           
         } catch (error) {
           console.error('Official Lindy embed failed:', error);
@@ -474,6 +488,9 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
             </Button>
           </div>
         </section>
+        
+        {/* Custom Chatbot Fallback - only show if Lindy fails */}
+        {lindyFailed && <CustomChatWidget />}
       </div>
     );
   }
