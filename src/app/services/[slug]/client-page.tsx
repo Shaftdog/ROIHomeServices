@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect } from 'react';
 import type { Offering } from '@/types/offerings';
 import { notFound } from 'next/navigation';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -194,6 +195,33 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
   if (!offering) {
     notFound();
   }
+
+  // Add Lindy embed script for appraisal page only
+  useEffect(() => {
+    if (offering.id === 'appraisal') {
+      // Configure Lindy
+      (window as any).lindyConfig = {
+        agentId: "68be29025f1c92514f5be3c2",
+        triggerId: "68be40dfc244ebbff86dd870"
+      };
+
+      // Load Lindy embed script
+      const script = document.createElement('script');
+      script.src = 'https://embed.lindy.ai/embed.js';
+      script.async = true;
+      document.head.appendChild(script);
+
+      // Cleanup function to remove script when component unmounts
+      return () => {
+        const existingScript = document.querySelector('script[src="https://embed.lindy.ai/embed.js"]');
+        if (existingScript) {
+          existingScript.remove();
+        }
+        // Clean up Lindy config
+        delete (window as any).lindyConfig;
+      };
+    }
+  }, [offering.id]);
 
   if (offering.id === 'appraisal') {
     // Render NEW custom layout for "appraisal" service
