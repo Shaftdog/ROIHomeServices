@@ -36,6 +36,35 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.roihomesvc.com/services/appraisal/florida/cfl/cfl-hi.html">
     
+    <!-- Google Consent Mode V2 - Initialize before GTM -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        
+        // Set default consent state (all denied until user consents)
+        gtag('consent', 'default', {
+            'analytics_storage': 'denied',
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'functionality_storage': 'granted',
+            'personalization_storage': 'denied',
+            'security_storage': 'granted',
+            'wait_for_update': 500
+        });
+    </script>
+    
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-PLG3HLD8');
+    </script>
+    <!-- End Google Tag Manager -->
+    
     <!-- Local Business Schema Markup -->
     <script type="application/ld+json">
     {
@@ -262,6 +291,13 @@
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PLG3HLD8"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
 
     <!-- Header Section -->
     <header class="bg-white shadow-sm">
@@ -636,6 +672,63 @@
             }
         }
     </style>
+
+    <!-- Google Ads Conversion Tracking -->
+    <script>
+        // Track CTA button clicks for Google Ads conversion tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track all CTA button clicks
+            const ctaButtons = document.querySelectorAll('.cta-button, .floating-cta');
+            
+            ctaButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    // Send conversion event to Google Ads via GTM
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'conversion', {
+                            'send_to': 'AW-CONVERSION_ID/CONVERSION_LABEL', // Replace with your actual conversion ID
+                            'event_category': 'CTA',
+                            'event_label': 'Central Florida Landing Page',
+                            'value': 250, // Estimated value of conversion
+                            'currency': 'USD'
+                        });
+                    }
+                    
+                    // Also send to dataLayer for GTM
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        'event': 'cta_click',
+                        'page_location': window.location.href,
+                        'page_title': document.title,
+                        'button_text': this.textContent.trim(),
+                        'conversion_value': 250
+                    });
+                });
+            });
+            
+            // Track page view
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+                'event': 'page_view',
+                'page_type': 'landing_page',
+                'service_area': 'central_florida',
+                'page_location': window.location.href,
+                'page_title': document.title
+            });
+            
+            // Track scroll depth
+            let scrollTracked = false;
+            window.addEventListener('scroll', function() {
+                if (!scrollTracked && window.scrollY > document.body.scrollHeight * 0.5) {
+                    scrollTracked = true;
+                    window.dataLayer.push({
+                        'event': 'scroll_50_percent',
+                        'engagement': 'high',
+                        'page_location': window.location.href
+                    });
+                }
+            });
+        });
+    </script>
 
     <!-- Lindy Chatbot Embed - Deferred with error handling -->
     <script>
