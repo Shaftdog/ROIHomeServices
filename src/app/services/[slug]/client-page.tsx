@@ -203,71 +203,112 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
     if (offering.id === 'appraisal') {
       console.log('Loading Lindy embed for appraisal page');
       
-      // Function to load Lindy script
-      const loadLindyScript = () => {
-        // Check if script is already loaded
-        const existingScript = document.querySelector('script[src="https://embed.lindy.ai/embed.js"]');
+      // Configure Lindy first (before script loading)
+      (window as any).lindyConfig = {
+        agentId: "68be29025f1c92514f5be3c2",
+        triggerId: "68be40dfc244ebbff86dd870"
+      };
+      console.log('Lindy config set:', (window as any).lindyConfig);
+      
+      // Function to try loading Lindy script with multiple approaches
+      const loadLindyScript = async (attempt = 1) => {
+        console.log(`Loading Lindy script attempt ${attempt}`);
+        
+        // Remove any existing script first
+        const existingScript = document.querySelector('script[src*="lindy"]');
         if (existingScript) {
-          console.log('Lindy script already exists, removing it first');
+          console.log('Removing existing Lindy script');
           existingScript.remove();
         }
         
-        // Configure Lindy first
-        (window as any).lindyConfig = {
-          agentId: "68be29025f1c92514f5be3c2",
-          triggerId: "68be40dfc244ebbff86dd870"
-        };
+        // Try different script URLs - using the correct Lindy format
+        const scriptUrls = [
+          `https://embed.lindy.ai/${(window as any).lindyConfig.agentId}.js`,
+          'https://embed.lindy.ai/embed.js',
+          `https://cdn.lindy.ai/${(window as any).lindyConfig.agentId}.js`,
+          'https://assets.lindy.ai/embed.js'
+        ];
         
-        console.log('Lindy config set:', (window as any).lindyConfig);
-
-        // Create and load script
-        const script = document.createElement('script');
-        script.src = 'https://embed.lindy.ai/embed.js';
-        script.async = true;
-        script.defer = true;
+        const currentUrl = scriptUrls[(attempt - 1) % scriptUrls.length];
+        console.log(`Trying URL: ${currentUrl}`);
         
-        script.onload = () => {
-          console.log('Lindy script loaded successfully');
-          // Give Lindy time to initialize
-          setTimeout(() => {
-            console.log('Checking for Lindy widget...');
-            const lindyWidget = document.querySelector('[data-lindy-widget]') || 
-                              document.querySelector('.lindy-widget') ||
-                              document.querySelector('#lindy-widget');
-            if (lindyWidget) {
-              console.log('Lindy widget found:', lindyWidget);
+        return new Promise<void>((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = currentUrl;
+          script.async = true;
+          script.defer = true;
+          
+          const timeout = setTimeout(() => {
+            console.error(`Script loading timeout for ${currentUrl}`);
+            script.remove();
+            reject(new Error('Script loading timeout'));
+          }, 10000); // 10 second timeout
+          
+          script.onload = () => {
+            clearTimeout(timeout);
+            console.log(`Lindy script loaded successfully from ${currentUrl}`);
+            
+            // Check for Lindy initialization
+            setTimeout(() => {
+              console.log('Checking for Lindy initialization...');
+              if ((window as any).Lindy || document.querySelector('[data-lindy]') || document.querySelector('.lindy-embed')) {
+                console.log('Lindy appears to be initialized');
+                resolve();
+              } else {
+                console.log('Lindy not yet initialized, but script loaded');
+                resolve();
+              }
+            }, 2000);
+          };
+          
+          script.onerror = (error) => {
+            clearTimeout(timeout);
+            console.error(`Lindy script failed to load from ${currentUrl}:`, error);
+            script.remove();
+            reject(error);
+          };
+          
+          document.head.appendChild(script);
+          console.log(`Lindy script added to head: ${currentUrl}`);
+        });
+      };
+      
+      // Try loading with retries
+      const attemptLoad = async (maxAttempts = 3) => {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+          try {
+            await loadLindyScript(attempt);
+            console.log('Lindy script loaded successfully');
+            return;
+          } catch (error) {
+            console.error(`Attempt ${attempt} failed:`, error);
+            
+            if (attempt < maxAttempts) {
+              console.log(`Waiting 5 seconds before attempt ${attempt + 1}...`);
+              await new Promise(resolve => setTimeout(resolve, 5000));
             } else {
-              console.log('Lindy widget not found, checking window.Lindy...');
-              console.log('window.Lindy:', (window as any).Lindy);
+              console.error('All attempts to load Lindy script failed');
+              console.log('Please check:');
+              console.log('1. Network connectivity');
+              console.log('2. DNS resolution for embed.lindy.ai');
+              console.log('3. Ad blockers or firewall settings');
+              console.log('4. Lindy service status');
             }
-          }, 2000);
-        };
-        
-        script.onerror = (error) => {
-          console.error('Lindy script failed to load:', error);
-          // Retry after 3 seconds
-          setTimeout(() => {
-            console.log('Retrying Lindy script load...');
-            loadLindyScript();
-          }, 3000);
-        };
-        
-        document.head.appendChild(script);
-        console.log('Lindy script added to head');
+          }
+        }
       };
 
-      // Load script after a short delay to ensure DOM is ready
-      const timer = setTimeout(loadLindyScript, 500);
+      // Start loading after a short delay
+      const timer = setTimeout(() => attemptLoad(), 1000);
 
-      // Cleanup function to remove script when component unmounts
+      // Cleanup function
       return () => {
         console.log('Cleaning up Lindy embed');
         clearTimeout(timer);
-        const scriptToRemove = document.querySelector('script[src="https://embed.lindy.ai/embed.js"]');
+        const scriptToRemove = document.querySelector('script[src*="lindy"]');
         if (scriptToRemove) {
           scriptToRemove.remove();
         }
-        // Clean up Lindy config
         delete (window as any).lindyConfig;
         delete (window as any).Lindy;
       };
