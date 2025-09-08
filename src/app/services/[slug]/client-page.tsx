@@ -198,27 +198,78 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
 
   // Add Lindy embed script for appraisal page only
   useEffect(() => {
+    console.log('useEffect running, offering.id:', offering.id);
+    
     if (offering.id === 'appraisal') {
-      // Configure Lindy
-      (window as any).lindyConfig = {
-        agentId: "68be29025f1c92514f5be3c2",
-        triggerId: "68be40dfc244ebbff86dd870"
+      console.log('Loading Lindy embed for appraisal page');
+      
+      // Function to load Lindy script
+      const loadLindyScript = () => {
+        // Check if script is already loaded
+        const existingScript = document.querySelector('script[src="https://embed.lindy.ai/embed.js"]');
+        if (existingScript) {
+          console.log('Lindy script already exists, removing it first');
+          existingScript.remove();
+        }
+        
+        // Configure Lindy first
+        (window as any).lindyConfig = {
+          agentId: "68be29025f1c92514f5be3c2",
+          triggerId: "68be40dfc244ebbff86dd870"
+        };
+        
+        console.log('Lindy config set:', (window as any).lindyConfig);
+
+        // Create and load script
+        const script = document.createElement('script');
+        script.src = 'https://embed.lindy.ai/embed.js';
+        script.async = true;
+        script.defer = true;
+        
+        script.onload = () => {
+          console.log('Lindy script loaded successfully');
+          // Give Lindy time to initialize
+          setTimeout(() => {
+            console.log('Checking for Lindy widget...');
+            const lindyWidget = document.querySelector('[data-lindy-widget]') || 
+                              document.querySelector('.lindy-widget') ||
+                              document.querySelector('#lindy-widget');
+            if (lindyWidget) {
+              console.log('Lindy widget found:', lindyWidget);
+            } else {
+              console.log('Lindy widget not found, checking window.Lindy...');
+              console.log('window.Lindy:', (window as any).Lindy);
+            }
+          }, 2000);
+        };
+        
+        script.onerror = (error) => {
+          console.error('Lindy script failed to load:', error);
+          // Retry after 3 seconds
+          setTimeout(() => {
+            console.log('Retrying Lindy script load...');
+            loadLindyScript();
+          }, 3000);
+        };
+        
+        document.head.appendChild(script);
+        console.log('Lindy script added to head');
       };
 
-      // Load Lindy embed script
-      const script = document.createElement('script');
-      script.src = 'https://embed.lindy.ai/embed.js';
-      script.async = true;
-      document.head.appendChild(script);
+      // Load script after a short delay to ensure DOM is ready
+      const timer = setTimeout(loadLindyScript, 500);
 
       // Cleanup function to remove script when component unmounts
       return () => {
-        const existingScript = document.querySelector('script[src="https://embed.lindy.ai/embed.js"]');
-        if (existingScript) {
-          existingScript.remove();
+        console.log('Cleaning up Lindy embed');
+        clearTimeout(timer);
+        const scriptToRemove = document.querySelector('script[src="https://embed.lindy.ai/embed.js"]');
+        if (scriptToRemove) {
+          scriptToRemove.remove();
         }
         // Clean up Lindy config
         delete (window as any).lindyConfig;
+        delete (window as any).Lindy;
       };
     }
   }, [offering.id]);
