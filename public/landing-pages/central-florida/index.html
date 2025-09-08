@@ -145,14 +145,62 @@
     }
     </script>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Preconnect to critical domains for faster loading -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://connect.facebook.net">
+    <link rel="preconnect" href="https://s3.amazonaws.com">
+    <link rel="preconnect" href="https://chat.lindy.ai">
+    <link rel="preconnect" href="https://canny.io">
+    
+    <!-- Load fonts with better performance -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Load TailwindCSS asynchronously to avoid render blocking -->
+    <script>
+        (function() {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.tailwindcss.com';
+            script.async = true;
+            document.head.appendChild(script);
+        })();
+    </script>
     <style>
+        /* Critical CSS - inline for immediate rendering */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            color: #1f2937;
         }
+        
+        /* Critical layout styles */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .bg-white { background-color: #ffffff; }
+        .text-center { text-align: center; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .hidden { display: none; }
+        .block { display: block; }
+        .inline-block { display: inline-block; }
+        .w-full { width: 100%; }
+        .h-12 { height: 3rem; }
+        .w-auto { width: auto; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .font-bold { font-weight: 700; }
+        .text-blue-800 { color: #1e40af; }
+        .text-gray-500 { color: #6b7280; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
         .cta-button {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
@@ -216,7 +264,7 @@
     <header class="bg-white shadow-sm">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center">
-                <img src="/Logo.png" alt="ROI Home Services Logo" class="h-12 w-auto mr-3">
+                <img src="/logo.svg" alt="ROI Home Services Logo" class="h-12 w-auto mr-3" width="80" height="80" loading="eager">
                 <div>
                     <h1 class="text-2xl font-bold text-blue-800">ROI Home Services</h1>
                     <p class="text-sm text-gray-500">Certified Real Estate Appraisals</p>
@@ -476,7 +524,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
                 <div class="md:col-span-1">
                     <a href="/" class="inline-block mb-4">
-                        <img src="/Logo.png" alt="ROI Home Services Logo" width="80" height="80">
+                        <img src="/logo.svg" alt="ROI Home Services Logo" width="80" height="80" loading="lazy">
                     </a>
                     <p class="text-sm" style="color: hsl(210, 40%, 80%);">
                         Your partner in property valuation, market insights, and strategic real estate solutions.
@@ -586,8 +634,19 @@
         }
     </style>
 
-    <!-- Lindy Chatbot Embed -->
-    <script async src="https://api.lindy.ai/api/lindyEmbed/lindyEmbed.js?a=jordan-pierce-roi-home-services" crossorigin="use-credentials"></script>
+    <!-- Lindy Chatbot Embed - Deferred for better performance -->
+    <script>
+        // Defer chatbot loading until after page load
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const chatScript = document.createElement('script');
+                chatScript.src = 'https://api.lindy.ai/api/lindyEmbed/lindyEmbed.js?a=jordan-pierce-roi-home-services';
+                chatScript.async = true;
+                chatScript.crossOrigin = 'use-credentials';
+                document.head.appendChild(chatScript);
+            }, 2000); // Load 2 seconds after page load
+        });
+    </script>
 
 </body>
 </html>
