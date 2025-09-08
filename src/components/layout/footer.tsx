@@ -66,8 +66,8 @@ export default function Footer() {
            <div className="md:col-span-1">
             <h4 className="text-lg font-medium mb-2 text-slate-200">Contact Us</h4>
             <address className="not-italic text-sm text-slate-300 space-y-1">
-              <p>941 West Morse Boulevard, Suite 100</p>
-              <p>Winter Park, Florida 32789</p>
+              <p>100 E Pine St., #110</p>
+              <p>Orlando, FL 32801</p>
               <p>
                 <a href="tel:407-759-3611" className="hover:text-highlight transition-colors">
                   407-759-3611

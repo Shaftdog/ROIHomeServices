@@ -126,8 +126,8 @@ export default function ContactPage() {
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 mr-3 text-accent shrink-0 mt-0.5" />
                 <span className="text-muted-foreground">
-                  941 West Morse Boulevard, Suite 100<br />
-                  Winter Park, Florida 32789
+                  100 E Pine St., #110<br />
+                  Orlando, FL 32801
                 </span>
               </div>
             </CardContent>
@@ -140,7 +140,7 @@ export default function ContactPage() {
             <CardContent>
               <div className="aspect-video bg-light-gray rounded-md overflow-hidden" data-ai-hint="map location office">
                 <iframe
-                  src="https://maps.google.com/maps?q=941%20West%20Morse%20Boulevard%2C%20Suite%20100%2C%20Winter%20Park%2C%20FL%2032789&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  src="https://maps.google.com/maps?q=100%20E%20Pine%20St.%2C%20%23110%2C%20Orlando%2C%20FL%2032801&t=&z=15&ie=UTF8&iwloc=&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border:0 }}
