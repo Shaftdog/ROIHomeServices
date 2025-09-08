@@ -160,6 +160,54 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        
+        /* Floating CTA Styles */
+        .floating-cta {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-in-out;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .floating-cta.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .floating-cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        
+        /* Mobile styles for floating CTA */
+        @media (max-width: 768px) {
+            .floating-cta {
+                padding: 16px 28px;
+                font-size: 16px;
+                bottom: 25px;
+                right: 15px;
+            }
+        }
+        
+        /* Desktop styles for floating CTA */
+        @media (min-width: 769px) {
+            .floating-cta {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -481,6 +529,62 @@
             </div>
         </div>
     </footer>
+
+    <!-- Floating Call-to-Action Button -->
+    <a href="https://www.roihomesvc.com/book" class="floating-cta" id="floatingCTA">
+        <span class="desktop-text">Book Your Appraisal Now</span>
+        <span class="mobile-text">Book Now</span>
+    </a>
+
+    <script>
+        // Floating CTA functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const floatingCTA = document.getElementById('floatingCTA');
+            const testimonialsSection = document.getElementById('testimonialsContainer');
+            
+            // Function to check if element is in viewport
+            function isElementInViewport(el) {
+                const rect = el.getBoundingClientRect();
+                return rect.top <= window.innerHeight && rect.bottom >= 0;
+            }
+            
+            // Function to handle scroll events
+            function handleScroll() {
+                if (testimonialsSection && !isElementInViewport(testimonialsSection)) {
+                    // User has scrolled past the testimonials section
+                    floatingCTA.classList.add('visible');
+                } else {
+                    // User hasn't reached or has scrolled back to testimonials section
+                    floatingCTA.classList.remove('visible');
+                }
+            }
+            
+            // Add scroll event listener
+            window.addEventListener('scroll', handleScroll);
+            
+            // Check initial state
+            handleScroll();
+        });
+    </script>
+
+    <style>
+        /* Responsive text display for floating CTA */
+        .floating-cta .desktop-text {
+            display: inline;
+        }
+        .floating-cta .mobile-text {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .floating-cta .desktop-text {
+                display: none;
+            }
+            .floating-cta .mobile-text {
+                display: inline;
+            }
+        }
+    </style>
 
     <!-- Lindy Chatbot Embed -->
     <script async src="https://api.lindy.ai/api/lindyEmbed/lindyEmbed.js?a=jordan-pierce-roi-home-services" crossorigin="use-credentials"></script>
