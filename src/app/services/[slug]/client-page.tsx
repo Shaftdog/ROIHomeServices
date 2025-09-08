@@ -203,114 +203,121 @@ export default function ServiceClientPage({ offering }: ServiceClientPageProps) 
     if (offering.id === 'appraisal') {
       console.log('Loading Lindy embed for appraisal page');
       
-      // Configure Lindy first (before script loading)
-      (window as any).lindyConfig = {
-        agentId: "68be29025f1c92514f5be3c2",
-        triggerId: "68be40dfc244ebbff86dd870"
-      };
-      console.log('Lindy config set:', (window as any).lindyConfig);
-      
-      // Function to try loading Lindy script with multiple approaches
-      const loadLindyScript = async (attempt = 1) => {
-        console.log(`Loading Lindy script attempt ${attempt}`);
+      // Try the official Lindy embed format first
+      const loadLindyEmbedOfficial = () => {
+        console.log('Attempting official Lindy embed format...');
         
-        // Remove any existing script first
-        const existingScript = document.querySelector('script[src*="lindy"]');
-        if (existingScript) {
-          console.log('Removing existing Lindy script');
-          existingScript.remove();
+        // Remove any existing Lindy scripts
+        const existingScripts = document.querySelectorAll('script[src*="lindy"], script[id="lindy"]');
+        existingScripts.forEach(script => script.remove());
+        
+        try {
+          // Official Lindy embed format based on documentation
+          const script = document.createElement('script');
+          script.innerHTML = `
+            (function(w, d, s, o, f, js, fjs) {
+              w['LindyEmbedObject'] = o;
+              w[o] = w[o] || function() {
+                (w[o].q = w[o].q || []).push(arguments);
+              };
+              js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
+              js.id = o;
+              js.src = f;
+              js.async = 1;
+              fjs.parentNode.insertBefore(js, fjs);
+            })(window, document, 'script', 'lindy', 'https://embed.lindy.ai/68be40dfc244ebbff86dd870');
+            lindy('init', { triggerId: '68be40dfc244ebbff86dd870' });
+          `;
+          document.head.appendChild(script);
+          console.log('Official Lindy embed script added');
+          
+          // Check for initialization after delay
+          setTimeout(() => {
+            if ((window as any).lindy && typeof (window as any).lindy === 'function') {
+              console.log('Official Lindy embed appears to be working');
+            } else {
+              console.log('Official Lindy embed may not have initialized properly');
+              // Fallback to original method
+              loadLindyFallback();
+            }
+          }, 3000);
+          
+        } catch (error) {
+          console.error('Official Lindy embed failed:', error);
+          loadLindyFallback();
         }
+      };
+      
+      // Fallback to original method if official format fails
+      const loadLindyFallback = () => {
+        console.log('Trying fallback Lindy embed method...');
         
-        // Try different script URLs - using the correct Lindy format
-        const scriptUrls = [
-          `https://embed.lindy.ai/${(window as any).lindyConfig.agentId}.js`,
-          'https://embed.lindy.ai/embed.js',
-          `https://cdn.lindy.ai/${(window as any).lindyConfig.agentId}.js`,
-          'https://assets.lindy.ai/embed.js'
+        // Set up original config
+        (window as any).lindyConfig = {
+          agentId: "68be29025f1c92514f5be3c2",
+          triggerId: "68be40dfc244ebbff86dd870"
+        };
+        console.log('Lindy config set:', (window as any).lindyConfig);
+        
+        // Try different approaches for loading
+        const approaches = [
+          // Direct script injection
+          () => {
+            const script = document.createElement('script');
+            script.src = 'https://embed.lindy.ai/68be40dfc244ebbff86dd870';
+            script.async = true;
+            script.onload = () => console.log('Direct script approach loaded');
+            script.onerror = () => console.log('Direct script approach failed');
+            document.head.appendChild(script);
+          },
+          // Config-based approach
+          () => {
+            const script = document.createElement('script');
+            script.innerHTML = `
+              window.lindyConfig = {
+                agentId: "68be29025f1c92514f5be3c2",
+                triggerId: "68be40dfc244ebbff86dd870"
+              };
+            `;
+            document.head.appendChild(script);
+            
+            const embedScript = document.createElement('script');
+            embedScript.src = 'https://embed.lindy.ai/embed.js';
+            embedScript.async = true;
+            embedScript.onload = () => console.log('Config-based approach loaded');
+            embedScript.onerror = () => console.log('Config-based approach failed');
+            document.head.appendChild(embedScript);
+          }
         ];
         
-        const currentUrl = scriptUrls[(attempt - 1) % scriptUrls.length];
-        console.log(`Trying URL: ${currentUrl}`);
-        
-        return new Promise<void>((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = currentUrl;
-          script.async = true;
-          script.defer = true;
-          
-          const timeout = setTimeout(() => {
-            console.error(`Script loading timeout for ${currentUrl}`);
-            script.remove();
-            reject(new Error('Script loading timeout'));
-          }, 10000); // 10 second timeout
-          
-          script.onload = () => {
-            clearTimeout(timeout);
-            console.log(`Lindy script loaded successfully from ${currentUrl}`);
-            
-            // Check for Lindy initialization
-            setTimeout(() => {
-              console.log('Checking for Lindy initialization...');
-              if ((window as any).Lindy || document.querySelector('[data-lindy]') || document.querySelector('.lindy-embed')) {
-                console.log('Lindy appears to be initialized');
-                resolve();
-              } else {
-                console.log('Lindy not yet initialized, but script loaded');
-                resolve();
-              }
-            }, 2000);
-          };
-          
-          script.onerror = (error) => {
-            clearTimeout(timeout);
-            console.error(`Lindy script failed to load from ${currentUrl}:`, error);
-            script.remove();
-            reject(error);
-          };
-          
-          document.head.appendChild(script);
-          console.log(`Lindy script added to head: ${currentUrl}`);
+        // Try each approach with delays
+        approaches.forEach((approach, index) => {
+          setTimeout(() => {
+            console.log(`Trying fallback approach ${index + 1}`);
+            try {
+              approach();
+            } catch (error) {
+              console.error(`Fallback approach ${index + 1} failed:`, error);
+            }
+          }, index * 2000);
         });
       };
       
-      // Try loading with retries
-      const attemptLoad = async (maxAttempts = 3) => {
-        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-          try {
-            await loadLindyScript(attempt);
-            console.log('Lindy script loaded successfully');
-            return;
-          } catch (error) {
-            console.error(`Attempt ${attempt} failed:`, error);
-            
-            if (attempt < maxAttempts) {
-              console.log(`Waiting 5 seconds before attempt ${attempt + 1}...`);
-              await new Promise(resolve => setTimeout(resolve, 5000));
-            } else {
-              console.error('All attempts to load Lindy script failed');
-              console.log('Please check:');
-              console.log('1. Network connectivity');
-              console.log('2. DNS resolution for embed.lindy.ai');
-              console.log('3. Ad blockers or firewall settings');
-              console.log('4. Lindy service status');
-            }
-          }
-        }
-      };
-
-      // Start loading after a short delay
-      const timer = setTimeout(() => attemptLoad(), 1000);
+      // Start with official method, fallback if needed
+      const timer = setTimeout(() => {
+        console.log('Starting Lindy embed initialization...');
+        loadLindyEmbedOfficial();
+      }, 1000);
 
       // Cleanup function
       return () => {
         console.log('Cleaning up Lindy embed');
         clearTimeout(timer);
-        const scriptToRemove = document.querySelector('script[src*="lindy"]');
-        if (scriptToRemove) {
-          scriptToRemove.remove();
-        }
+        const scriptsToRemove = document.querySelectorAll('script[src*="lindy"], script[id="lindy"]');
+        scriptsToRemove.forEach(script => script.remove());
         delete (window as any).lindyConfig;
-        delete (window as any).Lindy;
+        delete (window as any).lindy;
+        delete (window as any).LindyEmbedObject;
       };
     }
   }, [offering.id]);
