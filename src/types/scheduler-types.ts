@@ -7,6 +7,7 @@ export interface AppraisalFormData {
   
   // Property details
   address: string;
+  zipCode?: string; // Add dedicated ZIP code field
   dateNeeded: string;
   purpose: string;
   requester: string;

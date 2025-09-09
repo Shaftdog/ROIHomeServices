@@ -62,14 +62,43 @@ export async function sendAdminNotification({
   html: string;
   text: string;
 }) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'Admin@roiappraise.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@roiappraise.com'; // Fixed case sensitivity
   
-  return sendEmail({
-    to: adminEmail,
-    subject,
-    html,
-    text,
-  });
+  // Try primary admin email first
+  try {
+    return await sendEmail({
+      to: adminEmail,
+      subject,
+      html,
+      text,
+    });
+  } catch (primaryError) {
+    logger.warn({
+      err: primaryError,
+      primaryEmail: adminEmail,
+    }, 'Primary admin email failed, trying fallback');
+    
+    // Try fallback email if configured
+    const fallbackEmail = process.env.ADMIN_EMAIL_FALLBACK;
+    if (fallbackEmail && fallbackEmail !== adminEmail) {
+      try {
+        return await sendEmail({
+          to: fallbackEmail,
+          subject: `[FALLBACK] ${subject}`,
+          html,
+          text,
+        });
+      } catch (fallbackError) {
+        logger.error({
+          err: fallbackError,
+          fallbackEmail,
+        }, 'Fallback admin email also failed');
+      }
+    }
+    
+    // Re-throw the original error if all attempts failed
+    throw primaryError;
+  }
 }
 
 export async function sendBookingNotification(bookingData: {

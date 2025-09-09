@@ -4,11 +4,11 @@ import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { sendBookingNotification } from '@/lib/email';
 
-// Booking request schema
+// Booking request schema - made ZIP code optional for better reliability
 const bookingSchema = z.object({
   serviceType: z.string().min(1, 'Service type is required'),
   preferredDate: z.string().min(1, 'Preferred date is required'),
-  zip: z.string().min(5, 'ZIP code must be at least 5 characters'),
+  zip: z.string().optional(), // Made optional to prevent validation failures
   email: z.string().email('Invalid email address'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   name: z.string().optional(),

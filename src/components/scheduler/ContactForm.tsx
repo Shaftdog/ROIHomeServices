@@ -10,9 +10,13 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 
 const contactFormSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
+  name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
+  email: z.string().email("Please enter a valid email address").max(255, "Email is too long"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits").max(20, "Phone number is too long").refine(val => {
+    // Remove all non-digits and check length
+    const digitsOnly = val.replace(/\D/g, '');
+    return digitsOnly.length >= 10 && digitsOnly.length <= 15;
+  }, { message: "Please enter a valid phone number" }),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;

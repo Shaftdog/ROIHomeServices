@@ -14,6 +14,7 @@ import { nanoid } from "nanoid";
 import { trackBookingStep } from "@/lib/gtag";
 import { pushEvent } from "@/lib/gtm";
 import TrackOnView from "@/components/TrackOnView";
+import { ErrorBoundary, BookingErrorFallback } from "@/components/shared/ErrorBoundary";
 
 export default function BookPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -81,15 +82,18 @@ export default function BookPage() {
       console.log('Form Data:', formData);
       console.log('Confirmation Number:', confirmationNum);
       
-      // Extract ZIP code from address (if available)
-      const zipMatch = formData.address?.match(/\b\d{5}(-\d{4})?\b/);
-      const zip = zipMatch ? zipMatch[0] : 'N/A';
+      // Use dedicated ZIP code field first, then extract from address as fallback
+      let zip = formData.zipCode;
+      if (!zip) {
+        const zipMatch = formData.address?.match(/\b\d{5}(-\d{4})?\b/);
+        zip = zipMatch ? zipMatch[0] : undefined; // No fallback needed since ZIP is now optional
+      }
       
       // Build booking data
       const bookingData = {
         serviceType: `Property Appraisal - ${formData.purpose || 'General'}`,
         preferredDate: formData.appointmentDate || new Date().toISOString(),
-        zip: zip,
+        zip: zip || undefined, // Send undefined if no ZIP available (API now accepts optional ZIP)
         email: formData.email || '',
         phone: formData.phone || '',
         name: formData.name || '',
@@ -122,17 +126,27 @@ Amount Paid: $${formData.quoteAmount || 0}`
       if (response.ok && result.success) {
         console.log('✅ Admin notification email sent successfully');
         console.log('Booking ID:', result.bookingId);
+        
+        // Show success message to user
+        toast({
+          title: "Booking Confirmed!",
+          description: "Admin has been notified and will contact you shortly.",
+          variant: "default"
+        });
       } else {
         console.error('❌ Failed to send booking notification');
         console.error('Error:', result.error || 'Unknown error');
+        
+        // Show warning to user but don't fail the booking
+        toast({
+          title: "Payment Successful",
+          description: "Your payment was processed. We'll contact you within 24 hours to confirm your appointment.",
+          variant: "default"
+        });
       }
       
       setCurrentStep(5);
       trackBookingStep('payment_completed', 4);
-      toast({
-        title: "Payment Successful",
-        description: "Your appraisal has been scheduled! Admin has been notified.",
-      });
     } catch (error) {
       console.error('❌ ERROR in handlePaymentComplete:', error);
       console.error('Error details:', {
@@ -147,22 +161,23 @@ Amount Paid: $${formData.quoteAmount || 0}`
       trackBookingStep('payment_completed', 4);
       toast({
         title: "Payment Successful",
-        description: "Your appraisal has been scheduled!",
+        description: "Your payment was processed. We'll contact you within 24 hours to confirm your appointment.",
         variant: "default"
       });
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-primary mb-2">Property Appraisal Quote & Scheduling</h1>
-        <p className="text-muted-foreground">Get an instant quote and schedule your property appraisal in minutes.</p>
-      </div>
+    <ErrorBoundary fallback={BookingErrorFallback}>
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-primary mb-2">Property Appraisal Quote & Scheduling</h1>
+          <p className="text-muted-foreground">Get an instant quote and schedule your property appraisal in minutes.</p>
+        </div>
 
-      <ProgressStepper currentStep={currentStep} />
+        <ProgressStepper currentStep={currentStep} />
 
-      <Card className="bg-white rounded-lg shadow-lg p-6 md:p-10">
+        <Card className="bg-white rounded-lg shadow-lg p-6 md:p-10">
         {currentStep === 1 && (
           <>
             <TrackOnView 
@@ -213,7 +228,8 @@ Amount Paid: $${formData.quoteAmount || 0}`
             confirmationNumber={confirmationNumber}
           />
         )}
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </ErrorBoundary>
   );
 }

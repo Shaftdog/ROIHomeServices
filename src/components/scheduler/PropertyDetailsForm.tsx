@@ -23,13 +23,28 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 
 const formSchema = z.object({
-  address: z.string().min(1, "Address is required"),
-  dateNeeded: z.string().min(1, "Date is required"),
+  address: z.string().min(10, "Please enter a complete street address"),
+  zipCode: z.string().optional().refine(val => !val || /^\d{5}(-\d{4})?$/.test(val), { 
+    message: "ZIP code must be in format 12345 or 12345-6789" 
+  }),
+  dateNeeded: z.string().min(1, "Date is required").refine(val => {
+    const date = new Date(val);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date >= today;
+  }, { message: "Date must be today or in the future" }),
   purpose: z.string().min(1, "Purpose is required"),
   requester: z.string().min(1, "Requester role is required"),
-  sizeOfHome: z.string().min(1, "Size of home is required").refine(val => !isNaN(parseInt(val, 10)) && parseInt(val, 10) > 0, { message: "Must be a positive number" }),
+  sizeOfHome: z.string().min(1, "Size of home is required").refine(val => {
+    const num = parseInt(val, 10);
+    return !isNaN(num) && num >= 100 && num <= 50000;
+  }, { message: "Home size must be between 100 and 50,000 sq ft" }),
   siteInfluences: z.string().optional(),
-  sizeOfLot: z.string().optional(),
+  sizeOfLot: z.string().optional().refine(val => {
+    if (!val) return true;
+    const num = parseFloat(val);
+    return !isNaN(num) && num > 0 && num <= 1000;
+  }, { message: "Lot size must be between 0 and 1,000 acres" }),
   isLotOverOneAcre: z.boolean().optional().default(false),
   hasSiteInfluence: z.boolean().optional().default(false),
   numberOfLivingUnits: z.string().min(1, "Number of living units is required"),
@@ -89,6 +104,7 @@ export default function PropertyDetailsForm({ onContinue, onBack, defaultValues 
     resolver: zodResolver(formSchema),
     defaultValues: {
       address: defaultValues.address || "",
+      zipCode: defaultValues.zipCode || "",
       dateNeeded: defaultValues.dateNeeded || "",
       purpose: defaultValues.purpose || "",
       requester: defaultValues.requester || "",
@@ -139,6 +155,14 @@ export default function PropertyDetailsForm({ onContinue, onBack, defaultValues 
                   <FormItem>
                     <FormLabel>Address<span className="text-destructive">*</span></FormLabel>
                     <FormControl><Input placeholder="Street address" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+              )}/>
+              <FormField control={form.control} name="zipCode" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ZIP Code</FormLabel>
+                    <FormControl><Input placeholder="12345" maxLength={10} {...field} /></FormControl>
+                    <FormDescription>Optional - helps ensure accurate service area coverage</FormDescription>
                     <FormMessage />
                   </FormItem>
               )}/>
