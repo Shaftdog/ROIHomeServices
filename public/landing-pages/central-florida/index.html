@@ -36,13 +36,14 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.roihomesvc.com/landing-pages/central-florida/">
     
-    <!-- Google Consent Mode V2 - Initialize before GTM -->
+    <!-- Google Consent Mode V2 with Enhanced Attribution - Initialize before GTM -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         
-        // Set default consent state (all denied until user consents)
+        // Enhanced consent mode for better attribution while maintaining privacy
+        // This enables conversion modeling and basic attribution even without full consent
         gtag('consent', 'default', {
             'analytics_storage': 'denied',
             'ad_storage': 'denied',
@@ -51,8 +52,28 @@
             'functionality_storage': 'granted',
             'personalization_storage': 'denied',
             'security_storage': 'granted',
-            'wait_for_update': 500
+            'wait_for_update': 2000 // Increased wait time for consent banner
         });
+        
+        // Enable enhanced conversions for better attribution without cookies
+        // This helps Google Ads track conversions even when ad_storage is denied
+        gtag('config', 'AW-CONVERSION_ID', {
+            'allow_enhanced_conversions': true,
+            'enhanced_conversions_automatic_settings': true
+        });
+        
+        // Check for existing consent and apply immediately
+        try {
+            const savedConsent = localStorage.getItem('roi_consent_preferences');
+            if (savedConsent) {
+                const consentData = JSON.parse(savedConsent);
+                if (consentData && consentData.preferences) {
+                    gtag('consent', 'update', consentData.preferences);
+                }
+            }
+        } catch (error) {
+            console.log('Consent preferences not found, using defaults');
+        }
     </script>
     
     <!-- Google Tag Manager -->
@@ -682,57 +703,126 @@
         }
     </style>
 
-    <!-- Google Ads Conversion Tracking -->
+    <!-- Enhanced Google Ads & Analytics Tracking -->
     <script>
-        // Track CTA button clicks for Google Ads conversion tracking
+        // Enhanced tracking with Google Ads integration
         document.addEventListener('DOMContentLoaded', function() {
-            // Track all CTA button clicks
+            // Extract UTM parameters and gclid for attribution
+            const urlParams = new URLSearchParams(window.location.search);
+            const utmSource = urlParams.get('utm_source');
+            const utmMedium = urlParams.get('utm_medium');
+            const utmCampaign = urlParams.get('utm_campaign');
+            const utmTerm = urlParams.get('utm_term');
+            const utmContent = urlParams.get('utm_content');
+            const gclid = urlParams.get('gclid');
+            
+            // Store attribution data for the session
+            const attributionData = {
+                utm_source: utmSource,
+                utm_medium: utmMedium,
+                utm_campaign: utmCampaign,
+                utm_term: utmTerm,
+                utm_content: utmContent,
+                gclid: gclid,
+                traffic_source: utmSource || (gclid ? 'google-ads' : 'direct'),
+                is_paid_traffic: !!(gclid || (utmSource && utmMedium === 'cpc'))
+            };
+            
+            // Track all CTA button clicks with enhanced attribution
             const ctaButtons = document.querySelectorAll('.cta-button, .floating-cta');
             
             ctaButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
-                    // Send conversion event to Google Ads via GTM
-                    if (typeof gtag !== 'undefined') {
-                        gtag('event', 'conversion', {
-                            'send_to': 'AW-CONVERSION_ID/CONVERSION_LABEL', // Replace with your actual conversion ID
-                            'event_category': 'CTA',
-                            'event_label': 'Central Florida Landing Page',
-                            'value': 250, // Estimated value of conversion
-                            'currency': 'USD'
-                        });
-                    }
-                    
-                    // Also send to dataLayer for GTM
+                    // Enhanced dataLayer event for GTM
                     window.dataLayer = window.dataLayer || [];
                     window.dataLayer.push({
                         'event': 'cta_click',
+                        'event_category': 'engagement',
+                        'event_label': 'Central Florida Landing Page CTA',
                         'page_location': window.location.href,
                         'page_title': document.title,
                         'button_text': this.textContent.trim(),
-                        'conversion_value': 250
+                        'conversion_value': 250,
+                        'currency': 'USD',
+                        'landing_page': 'central-florida',
+                        ...attributionData
                     });
+                    
+                    // Google Ads conversion tracking (will be configured in GTM)
+                    // This event will trigger the conversion in GTM when properly configured
+                    window.dataLayer.push({
+                        'event': 'ads_conversion',
+                        'conversion_id': 'central_florida_cta_click',
+                        'conversion_value': 250,
+                        'currency': 'USD',
+                        'page_type': 'landing_page',
+                        'service_area': 'central_florida',
+                        ...attributionData
+                    });
+                    
+                    // Debug logging in development
+                    if (window.location.hostname === 'localhost' || window.location.hostname.includes('dev')) {
+                        console.log('CTA Click Tracked:', {
+                            button_text: this.textContent.trim(),
+                            attribution: attributionData,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
                 });
             });
             
-            // Track page view
+            // Enhanced page view tracking with attribution
             window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
                 'event': 'page_view',
                 'page_type': 'landing_page',
                 'service_area': 'central_florida',
                 'page_location': window.location.href,
-                'page_title': document.title
+                'page_title': document.title,
+                'page_referrer': document.referrer,
+                ...attributionData
             });
             
-            // Track scroll depth
+            // Track scroll depth with attribution context
             let scrollTracked = false;
             window.addEventListener('scroll', function() {
                 if (!scrollTracked && window.scrollY > document.body.scrollHeight * 0.5) {
                     scrollTracked = true;
                     window.dataLayer.push({
                         'event': 'scroll_50_percent',
-                        'engagement': 'high',
-                        'page_location': window.location.href
+                        'engagement_type': 'scroll_depth',
+                        'engagement_value': '50_percent',
+                        'page_location': window.location.href,
+                        ...attributionData
+                    });
+                }
+            });
+            
+            // Track time on page for engagement measurement
+            let timeOnPageTracked = false;
+            setTimeout(function() {
+                if (!timeOnPageTracked) {
+                    timeOnPageTracked = true;
+                    window.dataLayer.push({
+                        'event': 'engagement_time',
+                        'engagement_type': 'time_on_page',
+                        'engagement_value': '30_seconds',
+                        'page_location': window.location.href,
+                        ...attributionData
+                    });
+                }
+            }, 30000); // 30 seconds
+            
+            // Track form interactions if any forms are added later
+            document.addEventListener('submit', function(e) {
+                if (e.target.tagName === 'FORM') {
+                    window.dataLayer.push({
+                        'event': 'form_submit',
+                        'form_type': 'contact_form',
+                        'page_location': window.location.href,
+                        'conversion_value': 500, // Higher value for form submissions
+                        'currency': 'USD',
+                        ...attributionData
                     });
                 }
             });

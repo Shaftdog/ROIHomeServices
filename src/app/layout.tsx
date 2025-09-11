@@ -7,6 +7,7 @@ import Footer from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CalendlyModalProvider } from '@/contexts/calendly-modal-context';
 import ConsentManager from '@/components/consent/ConsentManager';
+import TrackingDebugger from '@/components/debug/TrackingDebugger';
 
 // Initialize global error handlers
 if (typeof window === 'undefined') {
@@ -95,6 +96,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <Footer />
           <Toaster />
           <ConsentManager />
+          <TrackingDebugger />
         </CalendlyModalProvider>
       </body>
     </html>

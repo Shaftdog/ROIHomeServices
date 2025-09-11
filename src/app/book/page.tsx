@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import type { AppraisalFormData } from "@/types/scheduler-types";
 import { nanoid } from "nanoid";
-import { trackBookingStep } from "@/lib/gtag";
+import { trackBookingStep, getAttributionData, sendGTMEvent } from "@/lib/gtag";
 import { pushEvent } from "@/lib/gtm";
 import TrackOnView from "@/components/TrackOnView";
 import { ErrorBoundary, BookingErrorFallback } from "@/components/shared/ErrorBoundary";
@@ -39,7 +39,21 @@ export default function BookPage() {
   const { toast } = useToast();
 
   const handleContactSubmit = (data: { name: string, email: string, phone: string }) => {
-    // Fire Start_Booking event with continue_click action
+    // Get attribution data for enhanced tracking
+    const attributionData = getAttributionData();
+    
+    // Enhanced booking start tracking with attribution
+    sendGTMEvent('booking_started', {
+      step: 1,
+      step_name: 'contact_info',
+      booking_id: bookingId,
+      conversion_value: 50,
+      currency: 'USD',
+      appointment_type: formData.purpose || 'unknown',
+      ...attributionData
+    });
+    
+    // Fire Start_Booking event with continue_click action (legacy)
     pushEvent('Start_Booking', {
       step: 1,
       action: 'continue_click',
@@ -49,6 +63,18 @@ export default function BookPage() {
     
     setFormData({ ...formData, ...data });
     setCurrentStep(2);
+    
+    // Enhanced step completion tracking
+    sendGTMEvent('booking_step_completed', {
+      step: 1,
+      next_step: 2,
+      step_name: 'contact_info_completed',
+      booking_id: bookingId,
+      conversion_value: 100,
+      currency: 'USD',
+      ...attributionData
+    });
+    
     // Track booking step completion
     trackBookingStep('contact_info_completed', 1);
   };
