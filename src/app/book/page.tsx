@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import ProgressStepper from "@/components/scheduler/ProgressStepper";
 import ContactForm from "@/components/scheduler/ContactForm";
 import PropertyDetailsForm from "@/components/scheduler/PropertyDetailsForm";
@@ -37,6 +37,7 @@ export default function BookPage() {
   const [confirmationNumber, setConfirmationNumber] = useState("");
   const [appraisalRequestId, setAppraisalRequestId] = useState<number | null>(null);
   const { toast } = useToast();
+  const bookingIdRef = useRef(nanoid(10));
 
   const handleContactSubmit = (data: { name: string, email: string, phone: string }) => {
     // Get attribution data for enhanced tracking
@@ -46,7 +47,7 @@ export default function BookPage() {
     sendGTMEvent('booking_started', {
       step: 1,
       step_name: 'contact_info',
-      booking_id: bookingId,
+      booking_id: bookingIdRef.current,
       conversion_value: 50,
       currency: 'USD',
       appointment_type: formData.purpose || 'unknown',
@@ -69,7 +70,7 @@ export default function BookPage() {
       step: 1,
       next_step: 2,
       step_name: 'contact_info_completed',
-      booking_id: bookingId,
+      booking_id: bookingIdRef.current,
       conversion_value: 100,
       currency: 'USD',
       ...attributionData
