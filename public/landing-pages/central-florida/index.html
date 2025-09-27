@@ -748,10 +748,10 @@
                         ...attributionData
                     });
                     
-                    // Google Ads conversion tracking (will be configured in GTM)
-                    // This event will trigger the conversion in GTM when properly configured
+                    // Google Ads conversion tracking - MATCHES YOUR GTM TRIGGER
+                    // This event will trigger the CFLCTA tag in GTM
                     window.dataLayer.push({
-                        'event': 'ads_conversion',
+                        'event': 'cflads_conversion',  // ← FIXED: Now matches your GTM trigger
                         'conversion_id': 'central_florida_cta_click',
                         'conversion_value': 250,
                         'currency': 'USD',

@@ -84,7 +84,7 @@ export default function BookPage() {
     });
   }, [bookingId]); // Include bookingId in deps
 
-  const handleContactSubmit = (data: { name: string, email: string, phone: string }) => {
+  const handleContactSubmit = async (data: { name: string, email: string, phone: string }) => {
     // Get attribution data for enhanced tracking
     const attributionData = getAttributionData();
     
@@ -107,6 +107,37 @@ export default function BookPage() {
       appointment_type: formData.purpose || 'unknown',
       booking_id: bookingId
     });
+    
+    // 🚀 Send contact info to Lindy AI nurturing campaign
+    try {
+      const nurturingResponse = await fetch('/api/nurturing-webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          bookingId: bookingId,
+          source: 'booking_form',
+          step: 'contact_info',
+          attributionData: attributionData,
+        }),
+      });
+
+      const nurturingResult = await nurturingResponse.json();
+      
+      if (nurturingResponse.ok && nurturingResult.success) {
+        console.log('✅ Contact sent to Lindy AI nurturing campaign successfully');
+      } else {
+        console.warn('⚠️ Failed to send contact to Lindy nurturing campaign:', nurturingResult.error);
+        // Don't show error to user - this is background functionality
+      }
+    } catch (error) {
+      console.error('❌ Error sending contact to Lindy nurturing campaign:', error);
+      // Don't fail the booking flow if nurturing fails
+    }
     
     setFormData({ ...formData, ...data });
     setCurrentStep(2);
@@ -319,8 +350,8 @@ Amount Paid: $${formData.quoteAmount || 0}`
     } catch (error) {
       console.error('❌ ERROR in handlePaymentComplete:', error);
       console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
         error: error
       });
       

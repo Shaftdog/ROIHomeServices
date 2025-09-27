@@ -4,6 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
 import type { AppraisalFormData } from "@/types/scheduler-types";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -22,11 +23,13 @@ const contactFormSchema = z.object({
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 interface ContactFormProps {
-  onContinue: (data: ContactFormValues) => void;
+  onContinue: (data: ContactFormValues) => Promise<void>;
   defaultValues?: Partial<AppraisalFormData>;
 }
 
 export default function ContactForm({ onContinue, defaultValues = {} }: ContactFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -36,8 +39,13 @@ export default function ContactForm({ onContinue, defaultValues = {} }: ContactF
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
-    onContinue(data);
+  const onSubmit = async (data: ContactFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await onContinue(data);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -97,8 +105,12 @@ export default function ContactForm({ onContinue, defaultValues = {} }: ContactF
           />
 
           <div className="flex justify-end mt-6">
-            <Button type="submit" data-testid="continue-to-property-details">
-              Continue to Property Details
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              data-testid="continue-to-property-details"
+            >
+              {isSubmitting ? 'Sending to AI...' : 'Continue to Property Details'}
             </Button>
           </div>
         </form>
