@@ -23,7 +23,7 @@ export function SimpleSearch({
     if (query.trim()) {
       // For now, redirect to Google site search
       // In a real app, you might have internal search
-      const searchUrl = `https://www.google.com/search?q=site:roiappraise.com ${encodeURIComponent(query.trim())}`;
+      const searchUrl = `https://www.google.com/search?q=site:roihomesvc.com ${encodeURIComponent(query.trim())}`;
       window.open(searchUrl, '_blank');
     }
   };
