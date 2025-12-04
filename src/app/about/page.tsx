@@ -1,7 +1,20 @@
-
+import type { Metadata } from 'next';
 import Image from "next/image";
 import { CtaButton } from "@/components/shared/cta-button";
-import { Briefcase } from "lucide-react"; // More specific icons
+import { Briefcase } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description: 'Learn about ROI Home Services - over 30 years of real estate experience in Central Florida. Meet our founder and discover our mission to provide trusted appraisals and valuations.',
+  alternates: {
+    canonical: 'https://www.roihomesvc.com/about',
+  },
+  openGraph: {
+    title: 'About ROI Home Services',
+    description: 'Over 30 years of real estate experience in Central Florida. Trusted appraisals and valuations.',
+    url: 'https://www.roihomesvc.com/about',
+  },
+};
 
 export default function AboutPage() {
 

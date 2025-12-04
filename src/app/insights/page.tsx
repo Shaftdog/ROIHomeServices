@@ -1,7 +1,20 @@
-
+import type { Metadata } from 'next';
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: 'Market Insights & Appraisal Know-How',
+  description: 'Expert advice on Central Florida real estate, property valuations, and market trends. Tips for homeowners, investors, and industry professionals.',
+  alternates: {
+    canonical: 'https://www.roihomesvc.com/insights',
+  },
+  openGraph: {
+    title: 'Market Insights | ROI Home Services',
+    description: 'Expert advice on Central Florida real estate and property valuations.',
+    url: 'https://www.roihomesvc.com/insights',
+  },
+};
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, Rss } from "lucide-react";

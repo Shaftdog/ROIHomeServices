@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, Clock, MapPin, Send, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { InlineWidget } from "react-calendly";
 
 export default function ContactPage() {
   const { toast } = useToast();
@@ -246,10 +247,18 @@ export default function ContactPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[600px] md:h-[800px] bg-light-gray rounded-md flex items-center justify-center" data-ai-hint="calendly embed form">
-                <p className="text-muted-foreground text-center p-4">
-                  [Placeholder for Full-width Embedded Calendly Widget for &apos;Free Consult – 15 min&apos;]
-                </p>
+              <div className="calendly-embed-container rounded-md overflow-hidden">
+                <InlineWidget
+                  url={process.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/rod-23/15min"}
+                  styles={{ height: '700px', minWidth: '320px' }}
+                  pageSettings={{
+                    backgroundColor: 'ffffff',
+                    hideEventTypeDetails: false,
+                    hideLandingPageDetails: false,
+                    primaryColor: '2563eb',
+                    textColor: '1a1a1a'
+                  }}
+                />
               </div>
               <div className="mt-6 text-center">
                 <CtaButton calendlyEventType="On-site Appraisal" variant="highlight">

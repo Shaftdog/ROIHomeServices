@@ -28,8 +28,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 
   return {
-    title: `${offering.title} | Solutions | ROI Home Services`,
+    title: `${offering.title} | Solutions`,
     description: `Learn more about our ${offering.title} solution. ${offering.blurb}`,
+    alternates: {
+      canonical: `https://www.roihomesvc.com/solutions/${offering.id}`,
+    },
+    openGraph: {
+      title: `${offering.title} | ROI Home Services`,
+      description: offering.blurb,
+      url: `https://www.roihomesvc.com/solutions/${offering.id}`,
+    },
   };
 }
 

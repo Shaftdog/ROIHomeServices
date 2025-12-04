@@ -1,7 +1,18 @@
-
-
+import type { Metadata } from 'next';
 import Link from "next/link";
 import { CtaButton } from "@/components/shared/cta-button";
+import FAQSection from "@/components/shared/FAQSection";
+import TestimonialsSection from "@/components/shared/TestimonialsSection";
+import { generalFAQs } from "@/data/faqs";
+import { testimonials } from "@/data/testimonials";
+
+export const metadata: Metadata = {
+  title: 'ROI Home Services | Central Florida Appraisals & Consulting',
+  description: 'Expert property valuations and advisory services in Central Florida. Appraisals, rent surveys, and real estate consulting. Fast, data-driven, professional.',
+  alternates: {
+    canonical: 'https://www.roihomesvc.com',
+  },
+};
 import { CheckCircle, Briefcase, FileText, Building2 } from "lucide-react";
 import Typer from './components/Typer';
 import HeroButton from './components/HeroButton';
@@ -103,6 +114,20 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <TestimonialsSection
+        testimonials={testimonials}
+        subtitle="See what our clients are saying about their experience with ROI Home Services."
+        className="bg-accent text-accent-foreground"
+      />
+
+      {/* FAQ Section */}
+      <FAQSection
+        items={generalFAQs.slice(0, 6)}
+        subtitle="Get answers to the most common questions about our appraisal and consulting services."
+        className="bg-light-gray dark:bg-slate-800"
+      />
 
       {/* CTA Banner Section */}
       <section className="py-20 md:py-28 bg-gradient-to-r from-deep-charcoal to-accent">

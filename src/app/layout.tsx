@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google'; // Assuming Inter is not strictly required or Geist is preferred for starter
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { CalendlyModalProvider } from '@/contexts/calendly-modal-context';
 import ConsentManager from '@/components/consent/ConsentManager';
 import TrackingDebugger from '@/components/debug/TrackingDebugger';
+import { OrganizationSchema, LocalBusinessSchema, WebSiteSchema } from '@/components/seo/JsonLd';
 
 // Initialize global error handlers
 if (typeof window === 'undefined') {
@@ -27,8 +28,67 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ROI Home Services | Central Florida Appraisals & Consulting',
+  metadataBase: new URL('https://www.roihomesvc.com'),
+  title: {
+    default: 'ROI Home Services | Central Florida Appraisals & Consulting',
+    template: '%s | ROI Home Services',
+  },
   description: 'Expert property valuations and advisory services in Central Florida. Fast, data-driven, and professional.',
+  keywords: [
+    'real estate appraisal',
+    'property valuation',
+    'Central Florida',
+    'Orlando appraisal',
+    'home appraisal',
+    'commercial appraisal',
+    'rent survey',
+    'expert testimony',
+    'USPAP',
+  ],
+  authors: [{ name: 'ROI Home Services' }],
+  creator: 'ROI Home Services',
+  publisher: 'ROI Home Services',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://www.roihomesvc.com',
+    siteName: 'ROI Home Services',
+    title: 'ROI Home Services | Central Florida Appraisals & Consulting',
+    description: 'Expert property valuations and advisory services in Central Florida. Fast, data-driven, and professional.',
+    images: [
+      {
+        url: '/og/default-1200x630.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'ROI Home Services - Property Valuations & Consulting',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ROI Home Services | Central Florida Appraisals & Consulting',
+    description: 'Expert property valuations and advisory services in Central Florida. Fast, data-driven, and professional.',
+    images: ['/og/default-1200x630.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+  },
 };
 
 export default function RootLayout({
@@ -89,6 +149,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </noscript>
         {/* End Google Tag Manager (noscript) */}
         <CalendlyModalProvider>
+          <OrganizationSchema />
+          <LocalBusinessSchema />
+          <WebSiteSchema />
           <Navbar />
           <main className="flex-grow">
             {children}
