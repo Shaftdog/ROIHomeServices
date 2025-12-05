@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Rss } from "lucide-react";
+import { Search, Rss, TrendingUp, ArrowRight } from "lucide-react";
 
 const placeholderPosts = [
   {
@@ -61,6 +61,26 @@ export default function InsightsPage() {
         <h1 className="text-4xl md:text-5xl font-bold">Market Insights & Appraisal Know-How</h1>
         <p className="text-lg text-muted-foreground mt-2">Your source for expert advice and updates on the Central Florida property market.</p>
       </header>
+
+      {/* Market Reports Feature Banner */}
+      <Link href="/insights/market-reports" className="block mb-12">
+        <div className="bg-gradient-to-r from-accent to-highlight rounded-xl p-6 md:p-8 hover:shadow-lg transition-shadow">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-highlight-foreground/20 p-3 rounded-lg">
+                <TrendingUp className="h-8 w-8 text-highlight-foreground" />
+              </div>
+              <div className="text-center md:text-left">
+                <h2 className="text-xl md:text-2xl font-bold text-highlight-foreground">Market Reports</h2>
+                <p className="text-highlight-foreground/80 text-sm md:text-base">In-depth analysis of Central Florida real estate markets by region and property type</p>
+              </div>
+            </div>
+            <Button className="bg-highlight-foreground text-highlight hover:bg-highlight-foreground/90 flex items-center gap-2">
+              View Reports <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </Link>
 
       <div className="grid lg:grid-cols-12 gap-8">
         {/* Insights Posts Section */}
@@ -127,6 +147,7 @@ export default function InsightsPage() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
+                <li><Link href="/insights/market-reports" className="text-accent font-medium hover:underline flex items-center gap-1"><TrendingUp className="h-3 w-3" /> Market Reports (6)</Link></li>
                 <li><Link href="#" className="text-muted-foreground hover:text-accent">Appraisal Tips (10)</Link></li>
                 <li><Link href="#" className="text-muted-foreground hover:text-accent">Market Updates (5)</Link></li>
                 <li><Link href="#" className="text-muted-foreground hover:text-accent">Investor Insights (8)</Link></li>
