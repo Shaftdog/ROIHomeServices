@@ -8,11 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Facebook,
-  Twitter,
-  Linkedin,
   Share2,
-  ArrowLeft,
   MapPin,
   Calendar,
   FileText,
@@ -25,6 +21,7 @@ import {
   regionLabels,
   reportTypeLabels,
 } from "@/data/market-reports";
+import { SocialShare } from "@/components/shared/SocialShare";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -169,17 +166,11 @@ export default async function MarketReportPage({ params }: PageProps) {
             <Share2 className="mr-2 h-5 w-5 text-accent" />
             Share this report
           </h3>
-          <div className="flex space-x-3">
-            <Button variant="outline" size="icon" aria-label="Share on Facebook">
-              <Facebook className="h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="icon" aria-label="Share on Twitter">
-              <Twitter className="h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="icon" aria-label="Share on LinkedIn">
-              <Linkedin className="h-5 w-5" />
-            </Button>
-          </div>
+          <SocialShare
+            url={`https://www.roihomesvc.com/insights/market-reports/${slug}`}
+            title={report.title}
+            description={report.excerpt}
+          />
         </div>
 
         {/* Related Reports */}
