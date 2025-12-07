@@ -3,6 +3,7 @@ export interface Location {
   city: string;
   county: string;
   region: string;
+  regionSlug: string;
   description: string;
   keywords: string[];
   nearbyAreas: string[];
@@ -15,6 +16,7 @@ export const locations: Location[] = [
     city: 'Orlando',
     county: 'Orange County',
     region: 'Central Florida',
+    regionSlug: 'central-florida',
     description: 'Orlando is the heart of Central Florida, home to world-famous theme parks, a thriving real estate market, and diverse neighborhoods from downtown urban living to suburban family communities.',
     keywords: ['Orlando appraisal', 'Orange County home valuation', 'Orlando property assessment', 'Central Florida appraiser'],
     nearbyAreas: ['Winter Park', 'Maitland', 'Altamonte Springs', 'Kissimmee', 'Lake Nona'],
@@ -25,6 +27,7 @@ export const locations: Location[] = [
     city: 'Winter Park',
     county: 'Orange County',
     region: 'Central Florida',
+    regionSlug: 'central-florida',
     description: 'Winter Park is an upscale suburb of Orlando known for its historic charm, brick-lined streets, chain of lakes, and prestigious Rollins College. The area features luxury homes, historic estates, and family-friendly neighborhoods.',
     keywords: ['Winter Park appraisal', 'Winter Park home valuation', 'Winter Park luxury appraisal', 'Orange County appraiser'],
     nearbyAreas: ['Orlando', 'Maitland', 'Casselberry', 'Oviedo'],
@@ -35,6 +38,7 @@ export const locations: Location[] = [
     city: 'Tampa',
     county: 'Hillsborough County',
     region: 'Tampa Bay',
+    regionSlug: 'tampa-bay',
     description: 'Tampa is a major Gulf Coast city with a diverse economy, waterfront properties, historic Ybor City, and growing neighborhoods from South Tampa luxury to suburban New Tampa.',
     keywords: ['Tampa appraisal', 'Hillsborough County home valuation', 'Tampa Bay property assessment', 'Tampa appraiser'],
     nearbyAreas: ['St. Petersburg', 'Clearwater', 'Brandon', 'Temple Terrace', 'Wesley Chapel'],
@@ -45,6 +49,7 @@ export const locations: Location[] = [
     city: 'Jacksonville',
     county: 'Duval County',
     region: 'Northeast Florida',
+    regionSlug: 'first-coast',
     description: 'Jacksonville is Florida\'s largest city by area, offering diverse real estate from historic riverside neighborhoods to beach communities in Jacksonville Beach, Neptune Beach, and Atlantic Beach.',
     keywords: ['Jacksonville appraisal', 'Duval County home valuation', 'Northeast Florida appraiser', 'Jacksonville property assessment'],
     nearbyAreas: ['St. Augustine', 'Ponte Vedra Beach', 'Orange Park', 'Fleming Island'],
@@ -55,6 +60,7 @@ export const locations: Location[] = [
     city: 'Miami',
     county: 'Miami-Dade County',
     region: 'South Florida',
+    regionSlug: 'south-florida',
     description: 'Miami is an international gateway city known for luxury waterfront properties, Art Deco architecture, diverse neighborhoods from Brickell to Coral Gables, and a dynamic real estate market.',
     keywords: ['Miami appraisal', 'Miami-Dade home valuation', 'South Florida appraiser', 'Miami luxury appraisal'],
     nearbyAreas: ['Miami Beach', 'Coral Gables', 'Coconut Grove', 'Brickell', 'Doral'],
@@ -65,6 +71,7 @@ export const locations: Location[] = [
     city: 'Kissimmee',
     county: 'Osceola County',
     region: 'Central Florida',
+    regionSlug: 'central-florida',
     description: 'Kissimmee is located in Osceola County near Walt Disney World, featuring a mix of vacation homes, family communities, and growing suburban developments. It\'s a popular area for investment properties and short-term rentals.',
     keywords: ['Kissimmee appraisal', 'Osceola County home valuation', 'vacation home appraisal', 'short-term rental valuation'],
     nearbyAreas: ['Orlando', 'Celebration', 'St. Cloud', 'Poinciana'],
@@ -75,6 +82,7 @@ export const locations: Location[] = [
     city: 'Lakeland',
     county: 'Polk County',
     region: 'Central Florida',
+    regionSlug: 'central-florida',
     description: 'Lakeland sits between Tampa and Orlando, known for its historic downtown, numerous lakes, and growing suburban development. The area offers affordable housing and easy access to both major cities.',
     keywords: ['Lakeland appraisal', 'Polk County home valuation', 'Lakeland property assessment', 'Central Florida appraiser'],
     nearbyAreas: ['Winter Haven', 'Bartow', 'Auburndale', 'Plant City'],
@@ -85,6 +93,7 @@ export const locations: Location[] = [
     city: 'St. Petersburg',
     county: 'Pinellas County',
     region: 'Tampa Bay',
+    regionSlug: 'tampa-bay',
     description: 'St. Petersburg offers waterfront living on Tampa Bay and the Gulf, with a vibrant arts scene, historic neighborhoods, and beautiful beaches. The city features diverse real estate from downtown condos to beachfront properties.',
     keywords: ['St. Petersburg appraisal', 'Pinellas County home valuation', 'waterfront property appraisal', 'St. Pete appraiser'],
     nearbyAreas: ['Tampa', 'Clearwater', 'Gulfport', 'Treasure Island'],
@@ -94,7 +103,8 @@ export const locations: Location[] = [
     slug: 'daytona-beach',
     city: 'Daytona Beach',
     county: 'Volusia County',
-    region: 'East Central Florida',
+    region: 'Central Florida',
+    regionSlug: 'central-florida',
     description: 'Daytona Beach is famous for its hard-packed beach and motorsports, offering oceanfront condos, beachside homes, and mainland family neighborhoods. The area attracts both permanent residents and vacation property investors.',
     keywords: ['Daytona Beach appraisal', 'Volusia County home valuation', 'beachfront property appraisal', 'Daytona appraiser'],
     nearbyAreas: ['Port Orange', 'Ormond Beach', 'New Smyrna Beach', 'DeLand'],
@@ -105,6 +115,7 @@ export const locations: Location[] = [
     city: 'Fort Lauderdale',
     county: 'Broward County',
     region: 'South Florida',
+    regionSlug: 'south-florida',
     description: 'Fort Lauderdale is known as the "Venice of America" for its extensive canal system, offering luxury waterfront properties, vibrant Las Olas Boulevard, and proximity to the beach.',
     keywords: ['Fort Lauderdale appraisal', 'Broward County home valuation', 'waterfront property appraisal', 'Fort Lauderdale appraiser'],
     nearbyAreas: ['Hollywood', 'Pompano Beach', 'Plantation', 'Coral Springs', 'Boca Raton'],
@@ -118,4 +129,8 @@ export function getLocationBySlug(slug: string): Location | undefined {
 
 export function getAllLocationSlugs(): string[] {
   return locations.map(loc => loc.slug);
+}
+
+export function getLocationsByRegionSlug(regionSlug: string): Location[] {
+  return locations.filter(loc => loc.regionSlug === regionSlug);
 }

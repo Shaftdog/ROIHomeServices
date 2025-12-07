@@ -216,3 +216,50 @@ export function FAQSchema({ items }: FAQSchemaProps) {
 
   return <JsonLd data={data} />
 }
+
+// Region Service Schema (for Hub & Spoke SEO)
+interface RegionServiceSchemaProps {
+  regionName: string
+  regionSlug: string
+  counties: string[]
+  description: string
+}
+
+export function RegionServiceSchema({
+  regionName,
+  regionSlug,
+  counties,
+  description,
+}: RegionServiceSchemaProps) {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    serviceType: 'Real Estate Appraisal',
+    name: `Real Estate Appraisals in ${regionName}`,
+    description,
+    url: `https://www.roihomesvc.com/florida-appraisals/${regionSlug}`,
+    provider: {
+      '@type': 'LocalBusiness',
+      name: 'ROI Home Services',
+      url: 'https://www.roihomesvc.com',
+      telephone: '+1-407-759-3611',
+      priceRange: '$250+',
+    },
+    areaServed: counties.map((county) => ({
+      '@type': 'Place',
+      name: `${county} County, Florida`,
+    })),
+    offers: {
+      '@type': 'Offer',
+      availability: 'https://schema.org/InStock',
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        price: '250',
+        priceCurrency: 'USD',
+        minPrice: '250',
+      },
+    },
+  }
+
+  return <JsonLd data={data} />
+}

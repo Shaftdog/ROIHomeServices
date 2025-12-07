@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import offerings from '@/../public/data/offerings.json'
 import { locations } from '@/data/locations'
+import { regions } from '@/data/regions'
 
 const BASE_URL = 'https://www.roihomesvc.com'
 
@@ -99,21 +100,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     }))
 
-  // Location pages
-  const locationPages: MetadataRoute.Sitemap = [
+  // Florida Appraisals Hub & Spoke pages (new structure)
+  const floridaAppraisalsPages: MetadataRoute.Sitemap = [
+    // Hub page
     {
-      url: `${BASE_URL}/locations`,
+      url: `${BASE_URL}/florida-appraisals`,
       lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
+    // Region hub pages
+    ...regions.map((region) => ({
+      url: `${BASE_URL}/florida-appraisals/${region.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    // City spoke pages (nested under regions)
     ...locations.map((location) => ({
-      url: `${BASE_URL}/locations/${location.slug}`,
+      url: `${BASE_URL}/florida-appraisals/${location.regionSlug}/${location.slug}`,
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
   ]
 
-  return [...staticPages, ...services, ...sectors, ...solutions, ...locationPages]
+  return [...staticPages, ...services, ...sectors, ...solutions, ...floridaAppraisalsPages]
 }
