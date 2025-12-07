@@ -118,7 +118,7 @@ export default function RegionPage({ params }: { params: { region: string } }) {
               {region.name} region, including {region.counties.join(', ')}{' '}
               {region.counties.length === 1 ? 'County' : 'Counties'}.
             </p>
-            <p className="text-lg text-slate-300 mb-8">{region.localFlavorAngle}</p>
+            <p className="text-lg text-slate-300 mb-8">{region.introSentence}</p>
             <div className="flex flex-col sm:flex-row gap-4">
               <CtaButton calendlyEventType="Free Consult – 15 min" size="lg" variant="highlight">
                 Get a Free Consultation

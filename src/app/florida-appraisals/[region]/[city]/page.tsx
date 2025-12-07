@@ -29,8 +29,13 @@ export async function generateMetadata({
     return { title: 'Location Not Found' };
   }
 
+  // Custom title for Orlando to include Lake Nona
+  const pageTitle = location.slug === 'orlando'
+    ? `Certified Orlando Real Estate Appraisers | ${location.county} & Lake Nona`
+    : `Real Estate Appraisal in ${location.city}, FL | ${region.name}`;
+
   return {
-    title: `Real Estate Appraisal in ${location.city}, FL | ${region.name}`,
+    title: pageTitle,
     description: `Expert property appraisals and valuations in ${location.city}, ${location.county}. Certified appraisers serving ${region.name}. Fast turnaround, accurate valuations starting at $250.`,
     keywords: location.keywords,
     alternates: {
@@ -87,7 +92,8 @@ export default function CityPage({
     },
   ];
 
-  const locationFaqs = [
+  // Base FAQs that apply to all locations
+  const baseFaqs = [
     {
       question: `How long does an appraisal take in ${location.city}?`,
       answer: `For residential properties in ${location.city}, the on-site inspection typically takes 1-2 hours. Report delivery is usually 3-5 business days. Rush service is available for time-sensitive matters in ${location.county}.`,
@@ -105,6 +111,11 @@ export default function CityPage({
       answer: `Yes, we offer expedited turnaround for properties in ${location.city} and throughout ${location.county}. Rush options can be as fast as 24-48 hours for residential appraisals.`,
     },
   ];
+
+  // Combine custom FAQs (if any) with base FAQs
+  const locationFaqs = location.customFaqs
+    ? [...location.customFaqs, ...baseFaqs]
+    : baseFaqs;
 
   return (
     <>
@@ -164,8 +175,28 @@ export default function CityPage({
         </div>
       </section>
 
+      {/* Local Expertise Section - Only shown if localExpertise content exists */}
+      {location.localExpertise && (
+        <section className="py-16 md:py-24 bg-background">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
+                Local Expertise in {location.city}
+              </h2>
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                {location.localExpertise.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="text-muted-foreground mb-4">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Services Section */}
-      <section className="py-16 md:py-24 bg-background">
+      <section className={`py-16 md:py-24 ${location.localExpertise ? 'bg-light-gray dark:bg-slate-800' : 'bg-background'}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
             Our Services in {location.city}
@@ -201,7 +232,7 @@ export default function CityPage({
       </section>
 
       {/* Service Area Section */}
-      <section className="py-16 md:py-24 bg-light-gray dark:bg-slate-800">
+      <section className={`py-16 md:py-24 ${location.localExpertise ? 'bg-background' : 'bg-light-gray dark:bg-slate-800'}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">

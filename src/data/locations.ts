@@ -1,3 +1,8 @@
+export interface LocationFAQ {
+  question: string;
+  answer: string;
+}
+
 export interface Location {
   slug: string;
   city: string;
@@ -5,9 +10,11 @@ export interface Location {
   region: string;
   regionSlug: string;
   description: string;
+  localExpertise?: string;
   keywords: string[];
   nearbyAreas: string[];
   zipCodes: string[];
+  customFaqs?: LocationFAQ[];
 }
 
 export const locations: Location[] = [
@@ -18,9 +25,28 @@ export const locations: Location[] = [
     region: 'Central Florida',
     regionSlug: 'central-florida',
     description: 'Orlando is the heart of Central Florida, home to world-famous theme parks, a thriving real estate market, and diverse neighborhoods from downtown urban living to suburban family communities.',
-    keywords: ['Orlando appraisal', 'Orange County home valuation', 'Orlando property assessment', 'Central Florida appraiser'],
-    nearbyAreas: ['Winter Park', 'Maitland', 'Altamonte Springs', 'Kissimmee', 'Lake Nona'],
-    zipCodes: ['32801', '32803', '32804', '32806', '32807', '32808', '32809', '32810', '32811', '32812', '32817', '32818', '32819', '32820', '32821', '32822', '32824', '32825', '32826', '32827', '32828', '32829', '32830', '32831', '32832', '32833', '32834', '32835', '32836', '32837', '32839']
+    localExpertise: `Our certified Orlando appraisers bring deep neighborhood-level expertise to every valuation. We understand the premium buyers pay for walkability in Thornton Park and College Park, the distinct value drivers of Lake Nona's medical city development, and the unique considerations of MetroWest's established community amenities.
+
+Orlando's short-term rental (STR) landscape requires specialized knowledge. We're fluent in Orange County's current zoning regulations that affect STR eligibility, helping investors and homeowners understand how these restrictions impact property value. From downtown condos in South Eola to family homes in Dr. Phillips, we provide accurate valuations that reflect the true market dynamics of each micro-market.
+
+Whether you're a cash buyer seeking a pre-purchase appraisal, an investor evaluating ADU potential, or a homeowner in a high-HOA community needing accurate equity analysis, our Orlando team delivers USPAP-compliant reports trusted by lenders, attorneys, and courts throughout Orange County.`,
+    keywords: ['Orlando appraisal', 'Orange County home valuation', 'Orlando property assessment', 'Central Florida appraiser', 'Lake Nona appraiser', 'Thornton Park home valuation'],
+    nearbyAreas: ['Winter Park', 'Maitland', 'Altamonte Springs', 'Kissimmee', 'Lake Nona', 'Dr. Phillips', 'Thornton Park', 'College Park'],
+    zipCodes: ['32801', '32803', '32804', '32806', '32807', '32808', '32809', '32810', '32811', '32812', '32817', '32818', '32819', '32820', '32821', '32822', '32824', '32825', '32826', '32827', '32828', '32829', '32830', '32831', '32832', '32833', '32834', '32835', '32836', '32837', '32839'],
+    customFaqs: [
+      {
+        question: 'Do you provide appraisals for cash buyers in Orlando?',
+        answer: 'Yes, we provide pre-purchase appraisals for cash buyers throughout Orlando and Orange County. While lender-required appraisals are only needed for financed purchases, many cash buyers wisely choose to get an independent appraisal to confirm they\'re paying fair market value. Our reports give you the confidence to make informed decisions on properties in Lake Nona, Dr. Phillips, Thornton Park, and every Orlando neighborhood.',
+      },
+      {
+        question: 'Can you appraise properties with ADU potential in Orlando?',
+        answer: 'We provide valuations for properties with existing ADUs (Accessory Dwelling Units) and can assess properties where ADU construction may be permitted under Orange County regulations. Our appraisers understand how additional living spaces, guest houses, and in-law suites affect property value—both for rental income potential and resale value in Orlando\'s competitive market.',
+      },
+      {
+        question: 'How do you handle appraisals in Orlando communities with high HOA fees?',
+        answer: 'High HOA fees are common in Orlando\'s amenity-rich communities, and they significantly impact property values. Our appraisers analyze monthly fees, special assessments, community amenities, and comparable sales to determine accurate market value. We\'re experienced with Orlando\'s master-planned communities like Lake Nona, Baldwin Park, and Celebration where HOA considerations are critical to proper valuation.',
+      },
+    ],
   },
   {
     slug: 'winter-park',
