@@ -174,7 +174,9 @@ export default function InsightsPage() {
 
           <Card className="bg-gradient-to-br from-accent to-highlight text-accent-foreground p-6">
             <CardHeader className="p-0 mb-3">
-              <Rss className="h-8 w-8 mb-2 text-highlight-foreground/80" />
+              <Link href="/feed.xml" className="inline-block hover:opacity-80 transition-opacity" title="Subscribe via RSS">
+                <Rss className="h-8 w-8 mb-2 text-highlight-foreground/80" />
+              </Link>
               <CardTitle className="text-2xl text-highlight-foreground">Get Expert Insights Delivered</CardTitle>
             </CardHeader>
             <CardContent className="p-0">

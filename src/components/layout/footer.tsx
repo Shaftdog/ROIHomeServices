@@ -45,6 +45,7 @@ export default function Footer() {
                <li><Link href="/case-studies" className="text-sm text-slate-300 hover:text-highlight transition-colors">Case Studies</Link></li>
               <li><Link href="/insights" className="text-sm text-slate-300 hover:text-highlight transition-colors">Insights</Link></li>
               <li><Link href="/contact" className="text-sm text-slate-300 hover:text-highlight transition-colors">Contact</Link></li>
+              <li><Link href="/feed.xml" className="text-sm text-slate-300 hover:text-highlight transition-colors">RSS Feed</Link></li>
             </ul>
           </div>
           <div className="md:col-span-1">
