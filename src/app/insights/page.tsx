@@ -177,14 +177,16 @@ export default function InsightsPage() {
               <Link href="/feed.xml" className="inline-block hover:opacity-80 transition-opacity" title="Subscribe via RSS">
                 <Rss className="h-8 w-8 mb-2 text-highlight-foreground/80" />
               </Link>
-              <CardTitle className="text-2xl text-highlight-foreground">Get Expert Insights Delivered</CardTitle>
+              <CardTitle className="text-2xl text-highlight-foreground">Stay Updated</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <p className="text-sm text-highlight-foreground/90 mb-4">Subscribe to our newsletter for the latest market trends and appraisal advice.</p>
-              <div className="flex flex-col space-y-2">
-                <Input type="email" placeholder="Email Address" className="bg-white/20 placeholder:text-white/60 text-white border-white/30 focus:bg-white/30 focus:ring-white/50" />
-                <Button type="submit" variant="default" className="bg-highlight-foreground text-highlight hover:bg-highlight-foreground/90">Subscribe</Button>
-              </div>
+              <p className="text-sm text-highlight-foreground/90 mb-4">Subscribe to our RSS feed for the latest market trends and appraisal advice.</p>
+              <Button asChild variant="default" className="bg-highlight-foreground text-highlight hover:bg-highlight-foreground/90 w-full">
+                <Link href="/feed.xml">
+                  <Rss className="h-4 w-4 mr-2" />
+                  Subscribe via RSS
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </aside>
