@@ -9,6 +9,7 @@ export interface MarketReport {
   propertyType: PropertyType;
   region: Region;
   reportType: ReportType;
+  locationSlug?: string; // Optional: links to a specific city page (e.g., 'winter-park')
   content: string;
 }
 
@@ -69,6 +70,7 @@ export const marketReports: MarketReport[] = [
     propertyType: 'residential',
     region: 'orlando',
     reportType: 'appraisal-insights',
+    locationSlug: 'winter-park',
     content: `
       <p class="text-lg font-medium leading-relaxed mb-8">If you own a home in Winter Park, Florida—especially in the sought-after 32792 zip code—you know that our market is unique. We have a blend of historic charm, mid-century modern classics, and new construction that creates a dynamic real estate landscape.</p>
       
@@ -482,4 +484,8 @@ export function getAllRegions(): Region[] {
 
 export function getAllReportTypes(): ReportType[] {
   return [...new Set(marketReports.map(r => r.reportType))];
+}
+
+export function getMarketReportsByLocation(locationSlug: string): MarketReport[] {
+  return marketReports.filter(report => report.locationSlug === locationSlug);
 }

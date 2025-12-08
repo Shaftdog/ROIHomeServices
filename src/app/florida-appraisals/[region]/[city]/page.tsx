@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,8 @@ import FAQSection from '@/components/shared/FAQSection';
 import { ServiceSchema, BreadcrumbSchema } from '@/components/seo/JsonLd';
 import { getRegionBySlug } from '@/data/regions';
 import { locations, getLocationBySlug, getLocationsByRegionSlug } from '@/data/locations';
-import { MapPin, CheckCircle, Phone, ArrowRight } from 'lucide-react';
+import { getMarketReportsByLocation } from '@/data/market-reports';
+import { MapPin, CheckCircle, Phone, ArrowRight, FileText } from 'lucide-react';
 
 export async function generateStaticParams() {
   return locations.map((location) => ({
@@ -64,6 +66,9 @@ export default function CityPage({
   const otherCitiesInRegion = getLocationsByRegionSlug(region.slug).filter(
     (loc) => loc.slug !== location.slug
   );
+
+  // Get related blog posts/insights for this location
+  const relatedInsights = getMarketReportsByLocation(location.slug);
 
   const services = [
     {
@@ -259,6 +264,64 @@ export default function CityPage({
           </div>
         </div>
       </section>
+
+      {/* Related Insights Section - Only shown if there are related blog posts */}
+      {relatedInsights.length > 0 && (
+        <section className="py-16 md:py-24 bg-light-gray dark:bg-slate-800">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                {location.city} Appraisal Insights
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Expert analysis and market insights for {location.city} homeowners and investors.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {relatedInsights.map((report) => (
+                <Link
+                  key={report.slug}
+                  href={`/insights/market-reports/${report.slug}`}
+                  className="group"
+                >
+                  <Card className="h-full hover-lift overflow-hidden">
+                    <div className="relative h-48 w-full">
+                      <Image
+                        src={report.imageUrl}
+                        alt={report.imageHint}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="text-lg group-hover:text-accent transition-colors line-clamp-2">
+                        {report.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                        {report.excerpt}
+                      </p>
+                      <div className="flex items-center text-sm text-accent font-medium">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Read Article
+                        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+            <div className="text-center mt-10">
+              <Button variant="outline" size="lg" asChild>
+                <Link href="/insights">
+                  View All Insights <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* FAQ Section */}
       <FAQSection
