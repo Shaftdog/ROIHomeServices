@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { sendDealScreenOrderNotification } from '@/lib/email';
+import { triggerDealScreenJob } from '@/lib/roi-agent';
 
 // Match the Stripe apiVersion used elsewhere in the app. Cast to keep runtime
 // behavior identical to create-payment-intent / stripe-webhook without adding a
@@ -94,16 +95,30 @@ async function handleDealScreenOrder(req: NextRequest) {
       );
     }
 
-    // ------------------------------------------------------------------
-    // TODO (SEPARATE TICKET — do NOT build here):
-    // Hand off the paid order to Salesmod for full fulfillment:
-    //   1. Provision / look up the investor account (buyer email).
-    //   2. Create the Deal Screen order record (address, contract, arv,
-    //      paymentIntentId) in Salesmod.
-    //   3. Trigger the ROI agent to run the appraiser-grade Deal Screen.
-    // This route's responsibility is limited to verifying payment + capturing
-    // the lead. Provisioning + ROI-agent trigger are tracked separately.
-    // ------------------------------------------------------------------
+    // IMMEDIATE ROI agent trigger (SAL-20, fast path). The durable
+    // payment_intent.succeeded webhook (src/app/api/deal-screen/webhook) fires
+    // the SAME trigger so the order survives a dropped client-side capture POST.
+    // Both use paymentIntentId as the idempotency key, so the agent dedupes and
+    // never double-generates a screen. triggerDealScreenJob NEVER throws, so a
+    // trigger failure can never break the payment/confirmation response.
+    try {
+      await triggerDealScreenJob({
+        idempotencyKey: paymentIntentId,
+        customer: { email },
+        deal: {
+          address: deal?.address,
+          contract: deal?.contract,
+          arv: deal?.arv,
+        },
+      });
+    } catch (triggerError) {
+      // Belt-and-suspenders: triggerDealScreenJob is designed not to throw, but
+      // we still guard so the buyer always gets a clean success response.
+      orderLogger.error(
+        { err: triggerError, requestId, paymentIntentId },
+        'ROI agent trigger threw unexpectedly (payment still captured)'
+      );
+    }
 
     return NextResponse.json({ success: true, requestId });
   } catch (error) {
