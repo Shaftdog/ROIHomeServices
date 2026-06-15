@@ -206,6 +206,100 @@ This is an automated message from ROI Home Services booking system.
   return sendAdminNotification({ subject, html, text });
 }
 
+export async function sendDealScreenOrderNotification(orderData: {
+  email: string;
+  name?: string;
+  address?: string;
+  contract?: string;
+  arv?: string;
+  amountFormatted: string;
+  paymentIntentId: string;
+  requestId: string;
+}) {
+  const subject = `New Deal Screen Order ($49) - ${orderData.address || 'Property'}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; }
+        .content { background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 20px; }
+        .field { margin-bottom: 15px; }
+        .label { font-weight: bold; color: #555; }
+        .value { margin-left: 10px; color: #333; }
+        .badge { display: inline-block; background-color: #16a34a; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold; }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h2>New Deal Screen Order — Payment Received</h2>
+        </div>
+        <div class="content">
+          <div class="field">
+            <span class="label">Status:</span>
+            <span class="value"><span class="badge">PAID ${orderData.amountFormatted}</span></span>
+          </div>
+          <div class="field">
+            <span class="label">Property Address:</span>
+            <span class="value">${orderData.address || 'N/A'}</span>
+          </div>
+          ${orderData.contract ? `
+          <div class="field">
+            <span class="label">Contract Price:</span>
+            <span class="value">${orderData.contract}</span>
+          </div>` : ''}
+          ${orderData.arv ? `
+          <div class="field">
+            <span class="label">Target ARV:</span>
+            <span class="value">${orderData.arv}</span>
+          </div>` : ''}
+          <div class="field">
+            <span class="label">Customer Email:</span>
+            <span class="value">${orderData.email}</span>
+          </div>
+          ${orderData.name ? `
+          <div class="field">
+            <span class="label">Customer Name:</span>
+            <span class="value">${orderData.name}</span>
+          </div>` : ''}
+          <div class="field">
+            <span class="label">Stripe Payment Intent:</span>
+            <span class="value">${orderData.paymentIntentId}</span>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Request ID: ${orderData.requestId}</p>
+          <p>This is an automated message from the ROI Home Services Deal Screen checkout.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+New Deal Screen Order — Payment Received
+
+Status: PAID ${orderData.amountFormatted}
+Property Address: ${orderData.address || 'N/A'}
+${orderData.contract ? `Contract Price: ${orderData.contract}` : ''}
+${orderData.arv ? `Target ARV: ${orderData.arv}` : ''}
+Customer Email: ${orderData.email}
+${orderData.name ? `Customer Name: ${orderData.name}` : ''}
+Stripe Payment Intent: ${orderData.paymentIntentId}
+
+Request ID: ${orderData.requestId}
+
+This is an automated message from the ROI Home Services Deal Screen checkout.
+  `.trim();
+
+  return sendAdminNotification({ subject, html, text });
+}
+
 export async function sendContactNotification(contactData: {
   name: string;
   email: string;
