@@ -13,6 +13,9 @@ import type { FAQItem } from "@/data/faqs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import DealScreenOrderForm from "@/components/deal-screen/DealScreenOrderForm";
+import DealScreenDisclaimer from "@/components/deal-screen/DealScreenDisclaimer";
+import DealScreenMoatSection from "@/components/deal-screen/DealScreenMoatSection";
+import DealScreenPageAnalytics from "@/components/deal-screen/DealScreenPageAnalytics";
 
 export const metadata: Metadata = {
   title: "Deal Screen — Will It Appraise? Know Before You Buy",
@@ -89,11 +92,24 @@ const dealScreenFAQs: FAQItem[] = [
     answer:
       "No. The Deal Screen is a professional opinion to support your decision — it does not guarantee a value, a sale price, or a lender's appraised value. You remain responsible for your own purchase decision.",
   },
+  {
+    question: "Why can't I just ask a regular AI chatbot what it's worth?",
+    answer:
+      "Generic AI hallucinates valuation theory, invents comp adjustments with no market support, and shortcuts straight to a number to be helpful — skipping the comp selection, condition reads, and risk checks that decide whether a price makes sense. It lacks real appraiser domain knowledge and only has public data to draw on, so the result is a public-grade guess, not an appraiser-grade read. The Deal Screen is built on a proprietary, appraiser-grade Data Lake instead.",
+  },
+  {
+    question: "What makes the Deal Screen's data different?",
+    answer:
+      "It's powered by a growing, appraiser-grade Data Lake — real appraisal workfiles, decades of appraiser trainings, and a community that compounds. Every workfile and member makes the warehouse deeper and the reads sharper, so a Deal Screen taps an ongoing AI powerhouse rather than a one-off answer, the way Grok sits on top of X. That's a compounding edge no general-purpose model can match. It remains decision-support — not an appraisal.",
+  },
 ];
 
 export default function DealScreenPage() {
   return (
     <div>
+      {/* SAL-39 / SAL-48 — fire the funnel page-view event on mount */}
+      <DealScreenPageAnalytics />
+
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-deep-charcoal to-accent text-white">
         <div className="container mx-auto grid items-center gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-2 lg:px-8">
@@ -182,6 +198,9 @@ export default function DealScreenPage() {
         </p>
       </section>
 
+      {/* WHY A REGULAR AI CHATBOT WON'T WORK + DATA-LAKE MOAT (SAL-38 / SAL-55) */}
+      <DealScreenMoatSection />
+
       {/* PRICE FRAMING */}
       <section className="bg-light-gray py-16 md:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -231,21 +250,18 @@ export default function DealScreenPage() {
               flags, and pro-forma.
             </p>
           </div>
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto max-w-2xl space-y-6">
             <DealScreenOrderForm id="bottom-order-form" />
+            {/* SAL-29 — disclaimer directly under the order form */}
+            <DealScreenDisclaimer />
           </div>
         </div>
       </section>
 
-      {/* Compliance line */}
+      {/* SAL-29 — Compliance disclaimer (footer area) */}
       <section className="bg-background py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="mx-auto max-w-3xl text-center text-sm text-muted-foreground">
-            Decision-support only &mdash; not an appraisal, not for lending. The
-            Deal Screen is a professional opinion to support your purchase
-            decision and does not guarantee any value, sale price, or appraised
-            value.
-          </p>
+          <DealScreenDisclaimer />
         </div>
       </section>
     </div>

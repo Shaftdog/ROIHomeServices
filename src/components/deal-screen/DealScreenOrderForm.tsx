@@ -25,6 +25,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getAttributionData, sendGTMEvent } from "@/lib/gtag";
+import { pushEvent } from "@/lib/gtm";
+import DealScreenDisclaimer from "@/components/deal-screen/DealScreenDisclaimer";
 
 // Contract price / target ARV come in as free-text so users can paste
 // "$450,000" or "450000"; we normalize to digits before validating range.
@@ -92,6 +95,27 @@ export default function DealScreenOrderForm({
 
     const arv = normalizeAmount(values.arv);
     if (arv) params.set("arv", arv);
+
+    // SAL-39 / SAL-48 — "address entered / order started" funnel event.
+    const attributionData = getAttributionData();
+    sendGTMEvent("deal_screen_order_started", {
+      page_type: "deal_screen",
+      step: 1,
+      step_name: "address_entered",
+      form_id: id,
+      has_contract: Boolean(contract),
+      has_arv: Boolean(arv),
+      conversion_value: 10,
+      currency: "USD",
+      ...attributionData,
+    });
+    // Legacy event for backwards compatibility (parallels Start_Booking).
+    pushEvent("deal_screen_order_started", {
+      page: "/deal-screen",
+      step: 1,
+      action: "continue_click",
+      form_id: id,
+    });
 
     router.push(`/deal-screen/start?${params.toString()}`);
   };
@@ -187,9 +211,8 @@ export default function DealScreenOrderForm({
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
 
-            <p className="text-center text-xs text-muted-foreground">
-              Decision-support only &mdash; not an appraisal, not for lending.
-            </p>
+            {/* SAL-29 — compliance disclaimer inside the order form */}
+            <DealScreenDisclaimer variant="inline" />
           </form>
         </Form>
       </CardContent>
