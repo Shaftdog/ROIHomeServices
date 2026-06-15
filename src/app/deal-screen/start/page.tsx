@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import DealScreenCheckout from "@/components/deal-screen/DealScreenCheckout";
+import DealScreenDisclaimer from "@/components/deal-screen/DealScreenDisclaimer";
 
 export const metadata: Metadata = {
   title: "Complete Your Deal Screen — $49",
@@ -57,6 +58,11 @@ export default async function DealScreenStartPage({
           arv: arvDisplay,
         }}
       />
+
+      {/* SAL-29 — compliance disclaimer on the checkout/start page */}
+      <div className="mt-10">
+        <DealScreenDisclaimer />
+      </div>
     </div>
   );
 }

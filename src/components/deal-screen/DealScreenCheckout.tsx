@@ -28,6 +28,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  getAttributionData,
+  sendGTMEvent,
+  sendPurchaseEvent,
+} from "@/lib/gtag";
+import { pushEvent } from "@/lib/gtm";
+
+// Fixed Deal Screen price (in dollars) for conversion-event values.
+const DEAL_SCREEN_PRICE = 49;
 
 // Load Stripe once, outside the component, so it isn't recreated on render.
 const stripePromise = loadStripe(
@@ -111,6 +120,46 @@ function CheckoutForm({
           // Swallowed deliberately: payment succeeded; the webhook + Stripe
           // dashboard remain a backstop if this capture call fails in transit.
         }
+
+        // SAL-39 / SAL-48 — "purchase" funnel event on payment success.
+        const attributionData = getAttributionData();
+        sendPurchaseEvent({
+          transactionId: paymentIntent.id,
+          value: DEAL_SCREEN_PRICE,
+          currency: "USD",
+          items: [
+            {
+              item_id: "DEAL_SCREEN",
+              item_name: "Deal Screen",
+              category: "deal_screen",
+              quantity: 1,
+              price: DEAL_SCREEN_PRICE,
+            },
+          ],
+        });
+        sendGTMEvent("deal_screen_purchase", {
+          page_type: "deal_screen",
+          step_name: "payment_completed",
+          transaction_id: paymentIntent.id,
+          conversion_value: DEAL_SCREEN_PRICE,
+          value: DEAL_SCREEN_PRICE,
+          currency: "USD",
+          ...attributionData,
+        });
+        sendGTMEvent("ads_conversion", {
+          conversion_id: "deal_screen_purchase",
+          conversion_value: DEAL_SCREEN_PRICE,
+          currency: "USD",
+          transaction_id: paymentIntent.id,
+          ...attributionData,
+        });
+        // Legacy event for backwards compatibility.
+        pushEvent("deal_screen_purchase", {
+          page: "/deal-screen/start",
+          transaction_id: paymentIntent.id,
+          value: DEAL_SCREEN_PRICE,
+        });
+
         onSucceeded();
         return;
       }
@@ -184,6 +233,24 @@ export default function DealScreenCheckout({
   const [confirmedEmail, setConfirmedEmail] = useState("");
   const [confirmedName, setConfirmedName] = useState("");
 
+  // SAL-39 / SAL-48 — "checkout started" funnel event when checkout mounts.
+  useEffect(() => {
+    const attributionData = getAttributionData();
+    sendGTMEvent("deal_screen_checkout_started", {
+      page_type: "deal_screen",
+      step: 2,
+      step_name: "checkout_started",
+      conversion_value: 20,
+      value: DEAL_SCREEN_PRICE,
+      currency: "USD",
+      ...attributionData,
+    });
+    pushEvent("deal_screen_checkout_started", {
+      page: "/deal-screen/start",
+      step: 2,
+    });
+  }, []);
+
   const startCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedEmail = email.trim();
@@ -221,6 +288,22 @@ export default function DealScreenCheckout({
       setConfirmedEmail(trimmedEmail);
       setConfirmedName(name.trim());
       setClientSecret(data.clientSecret);
+
+      // SAL-39 / SAL-48 — payment begins (PaymentElement is about to render).
+      const attributionData = getAttributionData();
+      sendGTMEvent("deal_screen_payment_started", {
+        page_type: "deal_screen",
+        step: 3,
+        step_name: "payment_started",
+        conversion_value: 30,
+        value: DEAL_SCREEN_PRICE,
+        currency: "USD",
+        ...attributionData,
+      });
+      pushEvent("deal_screen_payment_started", {
+        page: "/deal-screen/start",
+        step: 3,
+      });
     } catch {
       setInitError("We couldn't start checkout. Please try again.");
     } finally {
