@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, Clock, MapPin, Send, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { InlineWidget } from "react-calendly";
+import { getAttributionData } from "@/lib/gtag";
 
 export default function ContactPage() {
   const { toast } = useToast();
@@ -62,7 +63,7 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, attribution: getAttributionData() }),
       });
 
       const data = await response.json();

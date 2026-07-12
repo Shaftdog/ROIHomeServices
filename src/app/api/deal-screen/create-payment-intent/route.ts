@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { getProduct } from '@/lib/products';
+import { attributionToStripeMetadata } from '@/lib/salesmod';
 
 // Match the Stripe apiVersion used elsewhere in the app (create-payment-intent /
 // stripe-webhook both pin '2024-11-20.acacia'). The installed `stripe` types only
@@ -43,6 +44,10 @@ const bodySchema = z.object({
       arv: z.string().optional(),
     })
     .optional(),
+  // Client attribution (getAttributionData) — passed through to Stripe
+  // metadata so the durable webhook can classify the lead's channel. Loosely
+  // typed on purpose; only known keys are read.
+  attribution: z.record(z.any()).optional(),
 });
 
 async function handleCreatePaymentIntent(req: NextRequest) {
@@ -63,7 +68,7 @@ async function handleCreatePaymentIntent(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { sku, customerEmail, customerName, deal } = bodySchema.parse(body);
+    const { sku, customerEmail, customerName, deal, attribution } = bodySchema.parse(body);
 
     // SERVER-SIDE PRICE. Any `amount` sent by the client is ignored entirely.
     const amountCents = resolveAmountCents(sku);
@@ -94,6 +99,7 @@ async function handleCreatePaymentIntent(req: NextRequest) {
         dealContract: deal?.contract || '',
         dealArv: deal?.arv || '',
         requestId,
+        ...attributionToStripeMetadata(attribution),
       },
     });
 

@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import Stripe from 'stripe';
 import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { sendDealScreenOrderNotification } from '@/lib/email';
 import { triggerDealScreenJob } from '@/lib/roi-agent';
+import { forwardMarketingLead, attributionFromStripeMetadata } from '@/lib/salesmod';
 
 // Match the Stripe apiVersion used elsewhere in the app. Cast to keep runtime
 // behavior identical to create-payment-intent / stripe-webhook without adding a
@@ -119,6 +120,25 @@ async function handleDealScreenOrder(req: NextRequest) {
         'ROI agent trigger threw unexpectedly (payment still captured)'
       );
     }
+
+    // Forward the paid order to Salesmod CRM (fire-and-forget). Deduped on the
+    // PaymentIntent id, so this and the durable Stripe webhook collapse to one
+    // marketing_leads row. Attribution rides in the order POST body when the
+    // checkout captured it.
+    after(() => forwardMarketingLead({
+      formSource: 'deal_screen_order',
+      email,
+      name,
+      amountCents: paymentIntent.amount,
+      externalId: paymentIntentId,
+      attribution: attributionFromStripeMetadata(paymentIntent.metadata || {}),
+      context: {
+        address: deal?.address,
+        contract: deal?.contract,
+        arv: deal?.arv,
+        requestId,
+      },
+    }));
 
     return NextResponse.json({ success: true, requestId });
   } catch (error) {
