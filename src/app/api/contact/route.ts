@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { sendContactNotification } from '@/lib/email';
+import { forwardMarketingLead } from '@/lib/salesmod';
 
 // Contact form schema
 const contactSchema = z.object({
@@ -61,6 +62,16 @@ async function handleContactSubmission(request: NextRequest) {
       // Don't fail the contact submission if email fails
     }
     
+    // Forward to Salesmod CRM (fire-and-forget; never blocks the response)
+    after(() => forwardMarketingLead({
+      formSource: 'contact',
+      email: validatedData.email,
+      name: validatedData.name,
+      phone: validatedData.phone,
+      attribution: body?.attribution,
+      context: { subject: validatedData.subject, requestId },
+    }));
+
     contactLogger.info({
       formType: 'contact',
       subject: validatedData.subject,

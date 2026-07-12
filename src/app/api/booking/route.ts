@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { sendBookingNotification } from '@/lib/email';
+import { forwardMarketingLead } from '@/lib/salesmod';
 
 // Booking request schema - made ZIP code optional for better reliability
 const bookingSchema = z.object({
@@ -77,6 +78,22 @@ async function handleBookingRequest(request: NextRequest) {
       zip: validatedData.zip,
     }, requestId);
     
+    // Forward to Salesmod CRM (fire-and-forget; never blocks the response)
+    after(() => forwardMarketingLead({
+      formSource: 'booking',
+      email: validatedData.email,
+      name: validatedData.name,
+      phone: validatedData.phone,
+      externalId: bookingId,
+      attribution: body?.attribution,
+      context: {
+        serviceType: validatedData.serviceType,
+        preferredDate: validatedData.preferredDate,
+        zip: validatedData.zip,
+        requestId,
+      },
+    }));
+
     bookingLogger.info({
       bookingId,
       serviceType: validatedData.serviceType,

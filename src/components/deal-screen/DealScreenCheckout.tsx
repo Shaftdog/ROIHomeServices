@@ -273,6 +273,9 @@ export default function DealScreenCheckout({
           customerEmail: trimmedEmail,
           customerName: name.trim() || undefined,
           deal,
+          // Attribution flows to Stripe metadata → the durable webhook + order
+          // route forward it to Salesmod for channel classification.
+          attribution: getAttributionData(),
         }),
       });
 

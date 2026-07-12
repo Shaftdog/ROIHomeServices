@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
+import { forwardMarketingLead } from '@/lib/salesmod';
 
 // Quote request schema
 const quoteSchema = z.object({
@@ -56,6 +57,23 @@ async function handleQuoteRequest(request: NextRequest) {
     
     const quoteId = crypto.randomUUID();
     
+    // Forward to Salesmod CRM (fire-and-forget; never blocks the response)
+    after(() => forwardMarketingLead({
+      formSource: 'quote',
+      email: validatedData.email ?? null,
+      externalId: quoteId,
+      attribution: body?.attribution,
+      context: {
+        serviceType: validatedData.serviceType,
+        propertyType: validatedData.propertyType,
+        squareFootage: validatedData.squareFootage,
+        zip: validatedData.zip,
+        urgency: validatedData.urgency,
+        estimatedPrice: basePrice,
+        requestId,
+      },
+    }));
+
     quoteLogger.info({
       quoteId,
       serviceType: validatedData.serviceType,

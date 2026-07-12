@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import Stripe from 'stripe';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { triggerDealScreenJob } from '@/lib/roi-agent';
+import { forwardMarketingLead, attributionFromStripeMetadata } from '@/lib/salesmod';
 
 /**
  * DURABLE Deal Screen fulfillment trigger (SAL-20).
@@ -100,6 +101,25 @@ export async function POST(req: NextRequest) {
             'ROI agent trigger did not succeed from webhook (acknowledged anyway)'
           );
         }
+
+        // Durable Salesmod CRM forward (fire-and-forget). Deduped on the
+        // PaymentIntent id with the fast order-capture path, so the two paths
+        // collapse to one marketing_leads row. Attribution comes from the
+        // metadata stamped at create-payment-intent time.
+        after(() => forwardMarketingLead({
+          formSource: 'deal_screen_order',
+          email: metadata.customerEmail || paymentIntent.receipt_email || null,
+          name: metadata.customerName || null,
+          amountCents: paymentIntent.amount,
+          externalId: paymentIntent.id,
+          attribution: attributionFromStripeMetadata(metadata),
+          context: {
+            address: metadata.dealAddress || undefined,
+            contract: metadata.dealContract || undefined,
+            arv: metadata.dealArv || undefined,
+            via: 'stripe_webhook',
+          },
+        }));
       }
     } else {
       webhookLogger.info(

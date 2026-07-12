@@ -252,7 +252,7 @@ Amount Paid: $${formData.quoteAmount || 0}`
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify({ ...bookingData, attribution: attributionData }),
       });
 
       const result = await response.json();
