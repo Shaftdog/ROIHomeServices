@@ -16,7 +16,7 @@ the tracked list of variables the page needs.
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `SALESMOD_SUPABASE_URL` | yes | `https://<project-ref>.supabase.co` |
-| `SALESMOD_SUPABASE_SERVICE_ROLE_KEY` | yes | `products` has tenant-scoped RLS for `authenticated`, so the anon key returns `[]`. Reads only. |
+| `SALESMOD_SUPABASE_ANON_KEY` | yes | `products` has tenant-scoped RLS for `authenticated`, so the anon key returns `[]`. Reads only. |
 | `SALESMOD_CATALOG_TENANT_ID` | no | The service role bypasses RLS; set this to pin the catalog to one tenant. |
 
 Access is read-only: `src/lib/blueprint-catalog.ts` only ever issues `GET`s against
