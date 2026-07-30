@@ -1,34 +1,42 @@
+/**
+ * Coupon preview for the booking UI.
+ *
+ * This endpoint is DISPLAY ONLY. It tells the form what a code is worth so the
+ * user sees a discounted total before paying; it does not authorise anything.
+ * The binding discount is recomputed in /api/create-payment-intent from the
+ * same Stripe lookup at the moment the PaymentIntent is created — so tampering
+ * with this response changes what the page shows and nothing that is charged.
+ *
+ * Codes are real Stripe promotion codes (the owner already manages them there —
+ * e.g. NELS500, JACOBY500). The previous hardcoded map is gone: it carried a
+ * live `TEST100` worth 100% off, plus guessable WELCOME10 / FRIEND25, and the
+ * discount it computed was applied client-side and charged verbatim.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
+import { quoteAppraisalCents } from '@/lib/appraisal-pricing';
+import { resolveDiscount } from '@/lib/stripe-promotions';
 
 const couponLogger = createChildLogger({ context: LOG_CONTEXTS.PAYMENT, component: 'coupon' });
 
-// Coupon configuration - can be extended to use database in the future
-// Format: CODE -> { discountPercent, description, active }
-const COUPONS: Record<string, { discountPercent: number; description: string; active: boolean }> = {
-  // Test coupon for 100% off - for testing conversion tracking
-  'TEST100': {
-    discountPercent: 100,
-    description: 'Test coupon - 100% off',
-    active: true,
-  },
-  // Add more coupons as needed
-  'WELCOME10': {
-    discountPercent: 10,
-    description: 'Welcome discount - 10% off',
-    active: true,
-  },
-  'FRIEND25': {
-    discountPercent: 25,
-    description: 'Referral discount - 25% off',
-    active: true,
-  },
-};
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-11-20.acacia' })
+  : null;
 
 export async function POST(req: NextRequest) {
   try {
+    if (!stripe) {
+      couponLogger.error('Stripe not configured - missing STRIPE_SECRET_KEY');
+      return NextResponse.json(
+        { valid: false, error: 'Coupons are unavailable right now' },
+        { status: 503 }
+      );
+    }
+
     const body = await req.json();
-    const { code, originalAmount } = body;
+    const { code, pricing } = body;
 
     if (!code || typeof code !== 'string') {
       return NextResponse.json(
@@ -37,48 +45,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const normalizedCode = code.trim().toUpperCase();
-    const coupon = COUPONS[normalizedCode];
+    // The subtotal a percentage applies to is derived from the pricing inputs,
+    // never from a client-supplied `originalAmount` — otherwise a caller could
+    // inflate the displayed discount by lying about the base.
+    const quote = quoteAppraisalCents(pricing ?? {});
+    if (quote.kind === 'declined') {
+      return NextResponse.json({ valid: false, error: quote.message }, { status: 400 });
+    }
+    const subtotalCents = quote.amountCents;
 
-    if (!coupon) {
-      couponLogger.info({ code: normalizedCode }, 'Invalid coupon code attempted');
-      return NextResponse.json(
-        { valid: false, error: 'Invalid coupon code' },
-        { status: 200 }
-      );
+    const result = await resolveDiscount(stripe, code, subtotalCents);
+    if (!result.ok) {
+      couponLogger.info({ code: code.trim().toUpperCase() }, 'Coupon rejected');
+      return NextResponse.json({ valid: false, error: result.reason }, { status: 200 });
     }
 
-    if (!coupon.active) {
-      couponLogger.info({ code: normalizedCode }, 'Expired coupon code attempted');
-      return NextResponse.json(
-        { valid: false, error: 'This coupon has expired' },
-        { status: 200 }
-      );
-    }
+    const { discountCents, description } = result.discount;
+    const finalCents = subtotalCents - discountCents;
 
-    const discountAmount = originalAmount ? (originalAmount * coupon.discountPercent) / 100 : 0;
-    const finalAmount = originalAmount ? originalAmount - discountAmount : 0;
-
-    couponLogger.info({
-      code: normalizedCode,
-      discountPercent: coupon.discountPercent,
-      originalAmount,
-      discountAmount,
-      finalAmount,
-    }, 'Coupon applied successfully');
+    couponLogger.info(
+      { code: result.discount.code, subtotalCents, discountCents, finalCents },
+      'Coupon preview issued'
+    );
 
     return NextResponse.json({
       valid: true,
-      code: normalizedCode,
-      discountPercent: coupon.discountPercent,
-      description: coupon.description,
-      discountAmount,
-      finalAmount,
+      code: result.discount.code,
+      description,
+      // Dollars for display. The server recomputes all of this at charge time.
+      originalAmount: subtotalCents / 100,
+      discountAmount: discountCents / 100,
+      finalAmount: finalCents / 100,
+      discountPercent: subtotalCents > 0
+        ? Math.round((discountCents / subtotalCents) * 100)
+        : 0,
     });
   } catch (error) {
     couponLogger.error({ err: error }, 'Error validating coupon');
     return NextResponse.json(
-      { valid: false, error: 'Failed to validate coupon' },
+      { valid: false, error: 'Could not validate that code' },
       { status: 500 }
     );
   }

@@ -2,6 +2,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { quoteAppraisalForDisplay } from "@/lib/appraisal-pricing";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -57,45 +58,10 @@ interface PropertyDetailsFormProps {
   defaultValues?: Partial<AppraisalFormData>;
 }
 
-// Pricing logic from lib/calculatePrice.ts
-interface QuoteParams {
-  scopeOfInspection: string;
-  sizeOfHome: number;
-  numberOfLivingUnits: string;
-  isLotOverOneAcre?: boolean;
-  hasSiteInfluence?: boolean;
-}
-
-function calculateQuote(params: QuoteParams): number | string {
-  const { 
-    scopeOfInspection, 
-    sizeOfHome = 0, 
-    numberOfLivingUnits,
-    isLotOverOneAcre = false,
-    hasSiteInfluence = false
-  } = params;
-  
-  let basePrice = 450;
-  
-  if (scopeOfInspection === 'inspection') basePrice = 200;
-  else if (scopeOfInspection === 'desktop') basePrice = 250;
-  else if (scopeOfInspection === 'interior') basePrice = 450;
-  else if (scopeOfInspection === 'exterior') basePrice = 350;
-  
-  if (numberOfLivingUnits === '5+') {
-    return "Please call for a quote. We only appraise residential properties with up to four units.";
-  }
-  
-  if (sizeOfHome > 3000) {
-    basePrice += (sizeOfHome - 3000) * 0.1;
-  }
-  
-  if (isLotOverOneAcre) basePrice += 100;
-  if (hasSiteInfluence) basePrice += 100;
-  if (['2', '3', '4'].includes(numberOfLivingUnits)) basePrice += 200;
-  
-  return basePrice;
-}
+// The fee schedule lives in @/lib/appraisal-pricing — the SAME module the API
+// route charges from. It used to be a local `calculateQuote()` here, which made
+// this component the only authority on price; the quote shown and the amount
+// charged could not be guaranteed to agree. Do not reintroduce a local copy.
 
 
 export default function PropertyDetailsForm({ onContinue, onBack, defaultValues = {} }: PropertyDetailsFormProps) {
@@ -121,7 +87,7 @@ export default function PropertyDetailsForm({ onContinue, onBack, defaultValues 
   const watchedValues = form.watch();
 
   const quoteResult = useMemo(() => {
-    return calculateQuote({
+    return quoteAppraisalForDisplay({
         ...watchedValues,
         sizeOfHome: parseInt(watchedValues.sizeOfHome) || 0,
     });

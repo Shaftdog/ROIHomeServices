@@ -29,7 +29,13 @@ interface CouponData {
 }
 
 interface PaymentFormProps {
-  onComplete: () => void;
+  /**
+   * Called once payment has succeeded. `paymentIntentId` is passed so the
+   * server can VERIFY the payment with Stripe before anything is recorded or
+   * described as paid — the booking notification used to be sent on the
+   * client's word alone, with a client-supplied amount.
+   */
+  onComplete: (paymentIntentId?: string) => void;
   onBack: () => void;
   formData: AppraisalFormData;
 }
@@ -69,8 +75,8 @@ function CheckoutForm({ onComplete, onBack, formData, clientSecret, appliedCoupo
         setIsProcessing(false);
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
         console.log("Payment successful!", paymentIntent.id);
-        // Call the original onComplete to trigger email and confirmation
-        onComplete();
+        // Pass the id through so the server can confirm it with Stripe.
+        onComplete(paymentIntent.id);
       }
     } catch (err) {
       console.error("Payment error:", err);
@@ -203,6 +209,8 @@ function FreeBookingForm({ onComplete, onBack, formData, appliedCoupon }: Paymen
     e.preventDefault();
     setIsProcessing(true);
     console.log("Free booking completed with coupon:", appliedCoupon.code);
+    // No PaymentIntent exists on this path. onComplete is called WITHOUT an id
+    // so the server records this as an unpaid booking, never as "PAID".
     // Small delay to simulate processing
     await new Promise(resolve => setTimeout(resolve, 500));
     onComplete();
@@ -327,7 +335,15 @@ export default function PaymentForm({ onComplete, onBack, formData }: PaymentFor
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: couponCode,
-          originalAmount,
+          // Inputs, not an amount — the server derives the subtotal a
+          // percentage applies to, so the base can't be misrepresented.
+          pricing: {
+            scopeOfInspection: formData.scopeOfInspection,
+            sizeOfHome: formData.sizeOfHome,
+            numberOfLivingUnits: formData.numberOfLivingUnits,
+            isLotOverOneAcre: formData.isLotOverOneAcre,
+            hasSiteInfluence: formData.hasSiteInfluence,
+          },
         }),
       });
 
@@ -363,15 +379,24 @@ export default function PaymentForm({ onComplete, onBack, formData }: PaymentFor
     const createPaymentIntent = async () => {
       setIsLoading(true);
       try {
-        const amountToCharge = appliedCoupon ? appliedCoupon.finalAmount : originalAmount;
-
+        // Send the pricing INPUTS and the coupon code only. The server derives
+        // the amount from the shared fee schedule and applies the discount
+        // itself. Never send a dollar figure here — this request used to carry
+        // `amount`, which the API charged verbatim above a $50 floor.
         const response = await fetch("/api/create-payment-intent", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            amount: amountToCharge,
+            pricing: {
+              scopeOfInspection: formData.scopeOfInspection,
+              sizeOfHome: formData.sizeOfHome,
+              numberOfLivingUnits: formData.numberOfLivingUnits,
+              isLotOverOneAcre: formData.isLotOverOneAcre,
+              hasSiteInfluence: formData.hasSiteInfluence,
+            },
+            couponCode: appliedCoupon?.code || null,
             customerEmail: formData.email,
             customerName: formData.name,
             bookingDetails: {
@@ -379,9 +404,6 @@ export default function PaymentForm({ onComplete, onBack, formData }: PaymentFor
               appointmentDate: formData.appointmentDate,
               appointmentTime: formData.appointmentTime,
               address: formData.address,
-              couponCode: appliedCoupon?.code || null,
-              originalAmount,
-              discountAmount: appliedCoupon?.discountAmount || 0,
             },
           }),
         });

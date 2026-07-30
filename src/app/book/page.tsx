@@ -202,7 +202,7 @@ export default function BookPage() {
     trackBookingStep('appointment_scheduled', 3);
   };
 
-  const handlePaymentComplete = async () => {
+  const handlePaymentComplete = async (paymentIntentId?: string) => {
     console.log('=== handlePaymentComplete CALLED ===');
     const attributionData = getAttributionData();
     
@@ -233,7 +233,9 @@ export default function BookPage() {
         phone: formData.phone || '',
         name: formData.name || '',
         address: formData.address || '',
-        notes: `PAID BOOKING - Confirmation: ${confirmationNum}
+        // NOT a payment claim: the server verifies the PaymentIntent with
+        // Stripe and prepends the real status and amount received.
+        notes: `Confirmation: ${confirmationNum}
 Appointment Time: ${formData.appointmentTime || 'N/A'}
 Property Size: ${formData.sizeOfHome || 'N/A'} sq ft
 Living Units: ${formData.numberOfLivingUnits || 'N/A'}
@@ -241,7 +243,7 @@ Scope: ${formData.scopeOfInspection || 'N/A'}
 Purpose: ${formData.purpose || 'N/A'}
 Requester: ${formData.requester || 'N/A'}
 Date Needed: ${formData.dateNeeded || 'N/A'}
-Amount Paid: $${formData.quoteAmount || 0}`
+Quoted: $${formData.quoteAmount ?? 'N/A'} (quote shown to customer; charged amount is verified server-side)`
       };
       
       console.log('Booking Data to Send:', bookingData);
@@ -252,7 +254,7 @@ Amount Paid: $${formData.quoteAmount || 0}`
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...bookingData, attribution: attributionData }),
+        body: JSON.stringify({ ...bookingData, paymentIntentId, attribution: attributionData }),
       });
 
       const result = await response.json();
