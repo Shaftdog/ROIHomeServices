@@ -19,6 +19,7 @@ import {
   type BlueprintProduct,
 } from '@/lib/blueprint-catalog';
 import { EXPLAINER_VIDEO_URL, HERO_VIDEO_URL, BOOKING_PATH } from '@/lib/blueprint-config';
+import { verifyCheckoutSession, type CheckoutVerdict } from '@/lib/blueprint-checkout-verify';
 
 export const metadata: Metadata = {
   title: 'The Billionaire Appraisal Platform — Value Strategy for Investors',
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ checkout?: string }>;
+  searchParams: Promise<{ checkout?: string; session_id?: string }>;
 }
 
 /** Rendered when the catalog can't be read — we never show a remembered price. */
@@ -57,25 +58,34 @@ function PricingUnavailable() {
   );
 }
 
-function CheckoutBanner({ status }: { status: string }) {
-  if (status !== 'success' && status !== 'cancelled') return null;
+/**
+ * Renders only what Stripe confirms. `verdict` comes from retrieving the Checkout
+ * Session server-side — a typed `?checkout=success` yields 'unknown', which says
+ * nothing about payment rather than congratulating someone who paid nothing.
+ */
+function CheckoutBanner({ verdict }: { verdict: CheckoutVerdict }) {
+  if (verdict === 'unknown') return null;
 
+  const paid = verdict === 'paid';
   return (
     <div
       role="status"
       className={`border-b px-4 py-3 text-center text-sm ${
-        status === 'success'
-          ? 'border-highlight/40 bg-highlight/10'
-          : 'border-border bg-light-gray'
+        paid ? 'border-highlight/40 bg-highlight/10' : 'border-border bg-light-gray'
       }`}
     >
-      {status === 'success' ? (
+      {paid ? (
         <span className="inline-flex items-center gap-2 font-medium">
           <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-          Checkout submitted — Rod will follow up by email.
+          Payment confirmed — Rod will follow up by email.
         </span>
-      ) : (
+      ) : verdict === 'cancelled' ? (
         <span className="text-muted-foreground">Checkout cancelled — nothing was charged.</span>
+      ) : (
+        <span className="text-muted-foreground">
+          We haven&apos;t seen a completed payment for that checkout yet. If you just paid, give it a
+          moment and refresh — otherwise nothing was charged.
+        </span>
       )}
     </div>
   );
@@ -122,7 +132,9 @@ function GroupSection({
 }
 
 export default async function BillionaireBlueprintPage({ searchParams }: PageProps) {
-  const { checkout } = await searchParams;
+  const { checkout, session_id: sessionId } = await searchParams;
+  // Verified with Stripe, not taken from the query string.
+  const checkoutVerdict = await verifyCheckoutSession(checkout, sessionId);
 
   let catalog: BlueprintProduct[] | null = null;
   try {
@@ -142,7 +154,7 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
 
   return (
     <div>
-      {checkout && <CheckoutBanner status={checkout} />}
+      <CheckoutBanner verdict={checkoutVerdict} />
 
       {/* HERO — intro video + the offer in one screen */}
       <section className="bg-gradient-to-br from-deep-charcoal to-accent text-white">

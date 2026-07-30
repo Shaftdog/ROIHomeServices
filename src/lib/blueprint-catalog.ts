@@ -12,13 +12,25 @@
  * may write to the Salesmod database (it is live production with paying clients).
  *
  * REQUIRED ENV (server-side only — never NEXT_PUBLIC_*):
- *   SALESMOD_SUPABASE_URL               e.g. https://<project>.supabase.co
- *   SALESMOD_SUPABASE_SERVICE_ROLE_KEY  service role key (RLS on `products` is
- *                                       tenant-scoped to authenticated users, so
- *                                       the anon key returns [] — see report)
+ *   SALESMOD_SUPABASE_URL   e.g. https://<project>.supabase.co
+ *   SALESMOD_SUPABASE_ANON_KEY
+ *
+ * DELIBERATELY THE ANON KEY, NOT THE SERVICE ROLE KEY. `products` RLS used to be
+ * granted only TO authenticated, so anon returned [] and reading a price list
+ * appeared to require the service role. That trade was badly lopsided: the
+ * service key bypasses RLS across the whole Salesmod database — every tenant's
+ * deals, documents, analyses and client records — and this is a public web
+ * server. Salesmod migration 20260730000000_public_bap_price_list.sql instead
+ * publishes exactly the rows this page renders (BAP-%, active, not deleted, ROI
+ * tenant) to anon, SELECT only. Verified: the anon key sees 11 product rows and
+ * zero rows from deals, deal_certified_analyses, profiles, clients and orders.
+ *
+ * If this file ever needs the service role again, that is a signal the data
+ * being asked for is not public — solve it with a policy, not a bigger key.
+ *
  * OPTIONAL:
- *   SALESMOD_CATALOG_TENANT_ID          extra tenant filter; the service role
- *                                       bypasses RLS, so pin the tenant when known.
+ *   SALESMOD_CATALOG_TENANT_ID   extra tenant filter, defence in depth on top of
+ *                                the policy's own tenant predicate.
  */
 
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
@@ -135,11 +147,13 @@ function normalize(row: CatalogRow): BlueprintProduct | null {
  */
 export async function fetchBlueprintCatalog(): Promise<BlueprintProduct[]> {
   const baseUrl = process.env.SALESMOD_SUPABASE_URL;
-  const serviceKey = process.env.SALESMOD_SUPABASE_SERVICE_ROLE_KEY;
+  // Anon key by design — see the module header. Never swap this for the service
+  // role key; that would put a full-database credential on a public server.
+  const anonKey = process.env.SALESMOD_SUPABASE_ANON_KEY;
 
-  if (!baseUrl || !serviceKey) {
+  if (!baseUrl || !anonKey) {
     throw new CatalogUnavailableError(
-      'Catalog not configured — set SALESMOD_SUPABASE_URL and SALESMOD_SUPABASE_SERVICE_ROLE_KEY'
+      'Catalog not configured — set SALESMOD_SUPABASE_URL and SALESMOD_SUPABASE_ANON_KEY'
     );
   }
 
@@ -158,8 +172,8 @@ export async function fetchBlueprintCatalog(): Promise<BlueprintProduct[]> {
     res = await fetch(`${baseUrl}/rest/v1/products?${params.toString()}`, {
       method: 'GET',
       headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
         Accept: 'application/json',
       },
       next: { revalidate: 300 },
