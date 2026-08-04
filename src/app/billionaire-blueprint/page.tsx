@@ -22,14 +22,14 @@ import { EXPLAINER_VIDEO_URL, HERO_VIDEO_URL, BOOKING_PATH } from '@/lib/bluepri
 import { verifyCheckoutSession, type CheckoutVerdict } from '@/lib/blueprint-checkout-verify';
 
 export const metadata: Metadata = {
-  title: 'The Billionaire Appraisal Platform — Value Strategy for Investors',
+  title: "The Billionaire's Blueprint — Value Strategy for Investors",
   description:
     "See the deal the way the appraiser will. A five-step appraisal system that runs alongside your project from acquisition through refinance or exit, plus a low-cost deal screen before you go under contract.",
   alternates: {
     canonical: 'https://www.roihomesvc.com/billionaire-blueprint',
   },
   openGraph: {
-    title: 'The Billionaire Appraisal Platform — Value Strategy for Investors',
+    title: "The Billionaire's Blueprint — Value Strategy for Investors",
     description:
       'A five-step appraisal system for investors, from acquisition through refinance or exit.',
     url: 'https://www.roihomesvc.com/billionaire-blueprint',
@@ -161,7 +161,7 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
         <div className="container mx-auto grid items-center gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-2 lg:px-8">
           <div>
             <span className="inline-flex items-center rounded-full bg-highlight px-4 py-1.5 text-sm font-semibold text-highlight-foreground">
-              The Billionaire Appraisal Platform
+              The Billionaire&rsquo;s Blueprint
             </span>
             <h1 className="mt-6 text-balance text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
               See the deal the way the appraiser will.
@@ -204,7 +204,7 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
           <div>
             <BlueprintVideo
               url={HERO_VIDEO_URL}
-              title="Introduction to the Billionaire Appraisal Platform"
+              title="Introduction to the Billionaire's Blueprint"
               emptyLabel="Intro video"
               className="shadow-2xl"
             />
@@ -226,7 +226,7 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
           <div className="mx-auto mb-12 max-w-3xl">
             <BlueprintVideo
               url={EXPLAINER_VIDEO_URL}
-              title="How the Billionaire Appraisal Platform works across a deal"
+              title="How the Billionaire's Blueprint works across a deal"
               emptyLabel="Explainer video"
             />
           </div>
