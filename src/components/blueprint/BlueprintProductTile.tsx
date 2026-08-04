@@ -19,6 +19,7 @@ export default function BlueprintProductTile({
 }: BlueprintProductTileProps) {
   const hasWebinarPrice =
     product.webinarAmountCents !== null && product.webinarAmountCents !== product.amountCents;
+  const isSubscription = product.billingInterval === 'month';
 
   return (
     <Card
@@ -44,7 +45,21 @@ export default function BlueprintProductTile({
           </p>
         )}
 
-        <p className="mt-3 text-3xl font-bold text-accent">{formatUsd(product.amountCents)}</p>
+        <p className="mt-3 text-3xl font-bold text-accent">
+          {formatUsd(product.amountCents)}
+          {isSubscription && (
+            <span className="text-base font-semibold text-muted-foreground">/month</span>
+          )}
+        </p>
+        {isSubscription && product.annualAmountCents !== null && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            or{' '}
+            <span className="font-semibold text-foreground">
+              {formatUsd(product.annualAmountCents)}
+            </span>{' '}
+            paid per year
+          </p>
+        )}
         {hasWebinarPrice && (
           <p className="mt-1 text-sm text-muted-foreground">
             Webinar price{' '}
@@ -58,12 +73,31 @@ export default function BlueprintProductTile({
           {product.description}
         </p>
 
-        <BlueprintBuyButton
-          sku={product.sku}
-          label={`Buy — ${formatUsd(product.amountCents)}`}
-          variant={featured ? 'highlight' : 'default'}
-          className="mt-6"
-        />
+        {isSubscription ? (
+          <div className="mt-6 space-y-2">
+            <BlueprintBuyButton
+              sku={product.sku}
+              interval="month"
+              label={`Subscribe — ${formatUsd(product.amountCents)}/mo`}
+              variant={featured ? 'highlight' : 'default'}
+            />
+            {product.annualAmountCents !== null && (
+              <BlueprintBuyButton
+                sku={product.sku}
+                interval="year"
+                label={`Annual — ${formatUsd(product.annualAmountCents)}/yr`}
+                variant="outline"
+              />
+            )}
+          </div>
+        ) : (
+          <BlueprintBuyButton
+            sku={product.sku}
+            label={`Buy — ${formatUsd(product.amountCents)}`}
+            variant={featured ? 'highlight' : 'default'}
+            className="mt-6"
+          />
+        )}
       </CardContent>
     </Card>
   );

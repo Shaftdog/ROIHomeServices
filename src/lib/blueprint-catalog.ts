@@ -63,6 +63,10 @@ export interface BlueprintProduct {
   amountCents: number;
   /** Discounted price offered on the webinar, when the catalog defines one. */
   webinarAmountCents: number | null;
+  /** 'month' when the SKU is sold as a recurring subscription; null for one-time. */
+  billingInterval: 'month' | null;
+  /** Annual-plan price in cents, when a subscription SKU offers one (`props.billing.annual_price`). */
+  annualAmountCents: number | null;
   group: BlueprintGroup;
   sortOrder: number;
   /** 1..5 for the ladder rungs; absent for tripwire/packages/addons. */
@@ -121,12 +125,23 @@ function normalize(row: CatalogRow): BlueprintProduct | null {
 
   const webinarPrice = readNumber(row.props?.webinar_price);
 
+  // Subscription SKUs declare `props.billing = { interval: 'month', annual_price? }`.
+  // Only 'month' is recognized; anything else stays a one-time purchase.
+  const billing =
+    row.props?.billing && typeof row.props.billing === 'object'
+      ? (row.props.billing as Record<string, unknown>)
+      : null;
+  const billingInterval = billing?.interval === 'month' ? ('month' as const) : null;
+  const annualPrice = billingInterval ? readNumber(billing?.annual_price) : null;
+
   return {
     sku: row.sku,
     name: row.name,
     description: row.description ?? '',
     amountCents: toCents(row.base_price),
     webinarAmountCents: webinarPrice === null ? null : Math.round(webinarPrice * 100),
+    billingInterval,
+    annualAmountCents: annualPrice === null ? null : Math.round(annualPrice * 100),
     group,
     sortOrder: row.sort_order ?? 0,
     step: readNumber(row.props?.step),

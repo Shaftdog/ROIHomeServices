@@ -7,6 +7,9 @@ import { Button, type ButtonProps } from '@/components/ui/button';
 interface BlueprintBuyButtonProps {
   /** The ONLY thing sent to the server. Price is resolved server-side from the SKU. */
   sku: string;
+  /** Plan selector for subscription SKUs — the server only honors it when the
+   *  catalog marks the SKU as a subscription, and resolves the price itself. */
+  interval?: 'month' | 'year';
   label: string;
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
@@ -23,6 +26,7 @@ interface BlueprintBuyButtonProps {
  */
 export default function BlueprintBuyButton({
   sku,
+  interval,
   label,
   variant = 'default',
   size = 'default',
@@ -39,7 +43,7 @@ export default function BlueprintBuyButton({
       const res = await fetch('/api/blueprint/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sku }),
+        body: JSON.stringify({ sku, ...(interval ? { interval } : {}) }),
       });
 
       const data = (await res.json().catch(() => null)) as { url?: string; error?: string } | null;

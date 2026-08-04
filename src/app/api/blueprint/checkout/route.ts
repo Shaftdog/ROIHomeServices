@@ -46,10 +46,13 @@ const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.roihomesvc
 const RETURN_PATH = '/billionaire-blueprint';
 
 // NOTE: no `amount`, no `price`, no `coupon`. `.strict()` rejects unknown keys.
+// `interval` only chooses between plans a subscription SKU actually offers in the
+// catalog — it can never change what a one-time product costs.
 const bodySchema = z
   .object({
     sku: z.string().min(1, 'A product SKU is required'),
     email: z.string().email('A valid email is required').optional(),
+    interval: z.enum(['month', 'year']).optional(),
   })
   .strict();
 
@@ -66,7 +69,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
   }
 
   try {
-    const { sku, email } = bodySchema.parse(await req.json());
+    const { sku, email, interval } = bodySchema.parse(await req.json());
 
     // SERVER-SIDE PRICE. Nothing the caller sent can influence this amount.
     const product = await resolveBlueprintProduct(sku);
@@ -75,15 +78,35 @@ async function handleBlueprintCheckout(req: NextRequest) {
       return NextResponse.json({ error: 'Unknown product' }, { status: 400 });
     }
 
+    // The billing model comes from the catalog, never the request. `interval`
+    // is only honored on SKUs the catalog marks as subscriptions.
+    if (interval && product.billingInterval === null) {
+      paymentLogger.warn({ requestId, sku, interval }, 'Interval sent for one-time product');
+      return NextResponse.json(
+        { error: 'This product is not sold as a subscription' },
+        { status: 400 }
+      );
+    }
+    const chosenInterval = product.billingInterval === null ? null : (interval ?? 'month');
+    if (chosenInterval === 'year' && product.annualAmountCents === null) {
+      paymentLogger.warn({ requestId, sku }, 'Annual plan requested but not offered');
+      return NextResponse.json(
+        { error: 'This product has no annual plan' },
+        { status: 400 }
+      );
+    }
+    const chargeAmountCents =
+      chosenInterval === 'year' ? (product.annualAmountCents as number) : product.amountCents;
+
     logEvent(
       paymentLogger,
       'payment_attempt',
-      { sku: product.sku, amountCents: product.amountCents, email },
+      { sku: product.sku, amountCents: chargeAmountCents, interval: chosenInterval, email },
       requestId
     );
 
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
+      mode: chosenInterval ? 'subscription' : 'payment',
       // Lets the owner's existing promotion codes (e.g. NELS500, JACOBY500) be
       // entered and validated by Stripe. We never take a discount from the body.
       allow_promotion_codes: true,
@@ -92,7 +115,8 @@ async function handleBlueprintCheckout(req: NextRequest) {
           quantity: 1,
           price_data: {
             currency: product.currency,
-            unit_amount: product.amountCents, // server-resolved, from the catalog
+            unit_amount: chargeAmountCents, // server-resolved, from the catalog
+            ...(chosenInterval ? { recurring: { interval: chosenInterval } } : {}),
             product_data: {
               name: product.name,
               ...(product.description ? { description: product.description } : {}),
@@ -107,9 +131,25 @@ async function handleBlueprintCheckout(req: NextRequest) {
         sku: product.sku,
         productName: product.name,
         productGroup: product.group,
+        billingInterval: chosenInterval ?? 'one-time',
         source: 'billionaire-blueprint',
         requestId,
       },
+      // Session metadata does not propagate to the Subscription object, so
+      // renewal events (invoice.paid, customer.subscription.*) would carry no
+      // SKU attribution without this mirror.
+      ...(chosenInterval
+        ? {
+            subscription_data: {
+              metadata: {
+                sku: product.sku,
+                productName: product.name,
+                billingInterval: chosenInterval,
+                source: 'billionaire-blueprint',
+              },
+            },
+          }
+        : {}),
     });
 
     return NextResponse.json({
@@ -117,7 +157,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
       sessionId: session.id,
       // Echoed for display/telemetry only — this is the server's number, and the
       // client sending it back would change nothing.
-      amountCents: product.amountCents,
+      amountCents: chargeAmountCents,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
