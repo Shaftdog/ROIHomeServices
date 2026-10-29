@@ -61,7 +61,7 @@ export const appraisalIntelligenceFAQs: FAQItem[] = [
   {
     question: 'What’s the difference between a free screen and Deal Analysis?',
     answer:
-      'The free screen and the subscription plans are the automated valuation — fast, but not certified. Deal Analysis ($297) adds a human review: a Certified Deal Analysis by a Florida-licensed appraiser for Florida properties, or an MLS-Supported Deal Analysis elsewhere. Deal Analysis is still not an appraisal and is not certified outside Florida.',
+      'The free screen and the subscription plans are the automated valuation — fast, but not certified. Deal Analysis ($297) adds a human review: a Certified Deal Analysis by a Florida state-certified residential appraiser for Florida properties, or an MLS-Supported Deal Analysis elsewhere. The MLS-Supported Deal Analysis is not an appraisal, is not certified, and is not for lender or third-party use.',
   },
   {
     question: 'Can I use a screen for a loan or in court?',

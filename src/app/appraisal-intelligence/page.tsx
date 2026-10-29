@@ -163,14 +163,14 @@ export default function AppraisalIntelligencePage() {
               <p className="max-w-xl text-balance text-muted-foreground">
                 Want a person to check the automated call? For Florida
                 properties, a <strong className="font-semibold text-foreground">Certified Deal Analysis</strong>{" "}
-                is prepared by a Florida-licensed appraiser. Outside Florida,
+                is prepared by a Florida state-certified residential appraiser. Outside Florida,
                 an <strong className="font-semibold text-foreground">MLS-Supported Deal Analysis</strong> is
                 available for your own decisions.
               </p>
               <p className="max-w-xl text-balance text-sm text-muted-foreground">
-                Neither is an appraisal. The MLS-Supported Deal Analysis is
-                not certified and is not valid outside Florida for certified
-                use.
+                The MLS-Supported Deal Analysis is an analysis of MLS sales
+                reviewed by our team. It is not an appraisal, is not
+                certified, and is not for lender or third-party use.
               </p>
               <CtaButton calendlyEventType="Investor Consult" size="lg" className="text-base">
                 Order a Deal Analysis
