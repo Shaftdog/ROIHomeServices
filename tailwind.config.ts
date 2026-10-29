@@ -7,6 +7,10 @@ export default {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    // Data files can carry Tailwind class strings (e.g. per-slide gradient
+    // classes in src/data/services-banner.ts) — without this, any utility
+    // that doesn't ALSO appear in a scanned component gets purged silently.
+    "./src/data/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
   	extend: {

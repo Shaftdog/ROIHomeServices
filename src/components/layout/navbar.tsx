@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const mainNavLinks = [
+  { href: "/appraisal-intelligence", label: "Appraisal Intelligence" },
+  { href: "/billionaire-blueprint", label: "Blueprint" },
   { href: "/case-studies", label: "Case Studies" },
   { href: "/insights", label: "Insights" },
   { href: "/contact", label: "Contact" },
@@ -98,7 +100,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden lg:flex items-center space-x-5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className={cn(
@@ -128,7 +130,7 @@ export default function Navbar() {
         </nav>
 
         {/* Mobile Navigation Trigger */}
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
