@@ -49,6 +49,8 @@ export default function Footer() {
           <div className="md:col-span-1">
             <h4 className="text-lg font-medium mb-2 text-slate-200">Quick Links</h4>
             <ul className="space-y-1">
+              <li><Link href="/appraisal-intelligence" className="text-sm text-slate-300 hover:text-highlight transition-colors">Appraisal Intelligence</Link></li>
+              <li><Link href="/billionaire-blueprint" className="text-sm text-slate-300 hover:text-highlight transition-colors">The Billionaire&rsquo;s Blueprint</Link></li>
               <li><Link href="/offerings" className="text-sm text-slate-300 hover:text-highlight transition-colors">Offerings</Link></li>
               <li><Link href="/about" className="text-sm text-slate-300 hover:text-highlight transition-colors">About Us</Link></li>
                <li><Link href="/case-studies" className="text-sm text-slate-300 hover:text-highlight transition-colors">Case Studies</Link></li>

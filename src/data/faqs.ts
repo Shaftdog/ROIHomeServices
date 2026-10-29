@@ -47,6 +47,39 @@ export const generalFAQs: FAQItem[] = [
   },
 ];
 
+export const appraisalIntelligenceFAQs: FAQItem[] = [
+  {
+    question: 'Is Appraisal Intelligence an appraisal?',
+    answer:
+      'No. It is an automated valuation (AVM) — a fast, data-driven screen, not an opinion of value by a certified appraiser, and no one inspects the property for it. When you need a certified appraiser’s opinion of value, order a Certified Deal Analysis (Florida) or an MLS-Supported Deal Analysis (elsewhere), or a full appraisal.',
+  },
+  {
+    question: 'What do I get from a screen?',
+    answer:
+      'A supported value range, a rehab estimate, a projected profit range, and a clear go / caution / no-go call — enough to decide whether a deal is worth pursuing further, in minutes.',
+  },
+  {
+    question: 'What’s the difference between a free screen and Deal Analysis?',
+    answer:
+      'The free screen and the subscription plans are the automated valuation — fast, but not certified. Deal Analysis ($297) adds a human review: a Certified Deal Analysis by a Florida state-certified residential appraiser for Florida properties, or an MLS-Supported Deal Analysis elsewhere. The MLS-Supported Deal Analysis is not an appraisal, is not certified, and is not for lender or third-party use.',
+  },
+  {
+    question: 'Can I use a screen for a loan or in court?',
+    answer:
+      'No. Appraisal Intelligence screens and Deal Analysis are for your own decision-making only. For lending, legal, or tax use, order a full certified appraisal.',
+  },
+  {
+    question: 'How is this different from the appraisal firm’s services?',
+    answer:
+      'ROI Home Services’ certified appraisal services and Appraisal Intelligence are offered as distinct products, consistent with appraiser independence. Appraisal Intelligence is the automated product; a certified opinion of value always comes from a separate, independent certified appraisal engagement.',
+  },
+  {
+    question: 'How do the plans work?',
+    answer:
+      'Essential, Pro, and Power are monthly or annual subscriptions with increasing screen volume. One-time screen packs are also available if you don’t want a subscription. Pricing is shown on this page.',
+  },
+];
+
 export const bookingFAQs: FAQItem[] = [
   {
     question: 'How do I schedule an appraisal?',

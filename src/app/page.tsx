@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   },
 };
 import { CheckCircle, Briefcase, FileText, Building2 } from "lucide-react";
-import Typer from './components/Typer';
-import HeroButton from './components/HeroButton';
 import WhoWeServe from "./components/WhoWeServe";
+import ServicesBanner from "@/components/home/services-banner";
+import { servicesBannerSlides } from "@/data/services-banner";
 import offeringsData from "../../public/data/offerings.json";
 import type { Offering } from "@/types/offerings";
 
@@ -31,32 +31,16 @@ export default function HomePage() {
 
   return (
     <>
-      {/* New Hero Section */}
-      <section className="relative h-screen flex flex-col items-center justify-center
-                          text-center text-white overflow-hidden
-                          before:absolute before:inset-0
-                          before:bg-[url('/grid.svg')] before:bg-[length:600px_600px]
-                          before:opacity-20 before:animate-gridMove">
-        <video src="/hero.mp4" autoPlay loop muted playsInline
-               className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-
-        <div className="relative z-10 px-6">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-4">
-            <Typer words={['Appraise It', 'Buy It', 'Sell It']} />
-          </h1>
-          <p className="text-xl md:text-2xl font-light mb-2">Your Property, Solved.</p>
-          <p className="mb-10 max-w-xl mx-auto text-balance">
-            Valuations, Insights & Real-Estate Solutions across Florida.
-          </p>
-
-          <div className="flex flex-wrap gap-4 justify-center">
-            <HeroButton href="/services/appraisal"         label="Get a Valuation" />
-            <HeroButton href="/sectors/disposition"  label="Sell a Property" />
-            <HeroButton href="/offerings#solutions"           label="Solve a Property Issue" />
-          </div>
-        </div>
-      </section>
+      {/* Services Banner — replaces the old single-hero section. A real,
+          static, non-animated H1 sits above the rotating slides so crawlers
+          and screen readers always get one stable headline; each slide's
+          own headline below is an <h2> (see ServicesBanner). */}
+      <div className="bg-deep-charcoal px-4 py-3 text-center sm:py-4">
+        <h1 className="text-balance text-lg font-semibold text-white sm:text-xl">
+          ROI Home Services &mdash; Florida Appraisals, Appraisal Intelligence &amp; Real Estate Solutions
+        </h1>
+      </div>
+      <ServicesBanner slides={servicesBannerSlides} />
 
       {/* Who We Serve Section */}
       <WhoWeServe />

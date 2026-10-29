@@ -32,6 +32,18 @@ const nextConfig: NextConfig = {
         destination: '/offerings',
         permanent: false, // Results in a 307 for client-side, 302 for server. Satisfies "temporary".
       },
+      // The $49 Deal Screen is retired — Appraisal Intelligence replaces it
+      // (free screen + subscription plans + $297 Deal Analysis).
+      {
+        source: '/deal-screen',
+        destination: '/appraisal-intelligence',
+        statusCode: 301,
+      },
+      {
+        source: '/deal-screen/start',
+        destination: '/appraisal-intelligence',
+        statusCode: 301,
+      },
       {
         source: '/products/:path*',
         destination: '/solutions/:path*',
