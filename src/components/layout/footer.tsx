@@ -4,6 +4,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { accuracyRecordUrl } from "@/lib/appraisal-intelligence";
 import ConsentBanner from "@/components/consent/ConsentBanner";
 
 const serviceRegions = [
@@ -50,6 +51,7 @@ export default function Footer() {
             <h4 className="text-lg font-medium mb-2 text-slate-200">Quick Links</h4>
             <ul className="space-y-1">
               <li><Link href="/appraisal-intelligence" className="text-sm text-slate-300 hover:text-highlight transition-colors">Appraisal Intelligence</Link></li>
+              <li><a href={accuracyRecordUrl("footer-accuracy")} className="text-sm text-slate-300 hover:text-highlight transition-colors">Screen Accuracy Record</a></li>
               <li><Link href="/billionaire-blueprint" className="text-sm text-slate-300 hover:text-highlight transition-colors">The Billionaire&rsquo;s Blueprint</Link></li>
               <li><Link href="/offerings" className="text-sm text-slate-300 hover:text-highlight transition-colors">Offerings</Link></li>
               <li><Link href="/about" className="text-sm text-slate-300 hover:text-highlight transition-colors">About Us</Link></li>

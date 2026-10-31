@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   APPRAISAL_INTELLIGENCE_PLANS,
   SCREEN_PACKS,
+  accuracyRecordUrl,
   freeScreenUrl,
 } from "@/lib/appraisal-intelligence";
 
@@ -76,6 +77,14 @@ export default function PlanLadder() {
           .
         </p>
       </div>
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        How accurate is the Screen?{" "}
+        <a href={accuracyRecordUrl("ai-page-plans-accuracy")}
+          className="inline-flex items-center gap-1 font-medium text-accent hover:underline">
+          See our published accuracy record <span aria-hidden="true">&rarr;</span>
+          <ExternalLink className="h-3 w-3" aria-hidden="true" />
+        </a>
+      </p>
     </div>
   );
 }
