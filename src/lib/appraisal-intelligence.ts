@@ -8,9 +8,6 @@
  */
 
 /** The investor portal app (Salesmod), where screening actually happens. */
-/** Public accuracy record (back-test of closed flips; AVM, not an appraisal). */
-export const ACCURACY_RECORD_URL = 'https://portal.roihomesvc.com/accuracy';
-
 export const APP_URL = 'https://app.appraisal-intelligence.com';
 
 /** The standalone Appraisal Intelligence marketing/product site. */
@@ -36,6 +33,14 @@ function readPath(value: string | undefined): string | null {
 
 export const FREE_SCREEN_PATH = readPath(process.env.NEXT_PUBLIC_AI_FREE_SCREEN_PATH) ?? '/free-screen';
 
+/** Shared UTM convention for every outbound link to the product surface. */
+function withUtm(url: URL, campaign: string): string {
+  url.searchParams.set('utm_source', 'roihomesvc');
+  url.searchParams.set('utm_medium', 'referral');
+  url.searchParams.set('utm_campaign', campaign);
+  return url.toString();
+}
+
 /**
  * Builds an app.appraisal-intelligence.com URL with UTM params attached.
  * `campaign` should identify the surface the click came from, e.g.
@@ -43,19 +48,21 @@ export const FREE_SCREEN_PATH = readPath(process.env.NEXT_PUBLIC_AI_FREE_SCREEN_
  */
 export function freeScreenUrl(campaign: string): string {
   const url = new URL(FREE_SCREEN_PATH, APP_URL);
-  url.searchParams.set('utm_source', 'roihomesvc');
-  url.searchParams.set('utm_medium', 'referral');
-  url.searchParams.set('utm_campaign', campaign);
-  return url.toString();
+  return withUtm(url, campaign);
+}
+
+/**
+ * Public accuracy record page in the app (back-test of closed flips;
+ * automated valuation, not an appraisal). Link only — never restate numbers.
+ */
+export function accuracyRecordUrl(campaign: string): string {
+  return withUtm(new URL('/accuracy', APP_URL), campaign);
 }
 
 /** Same UTM convention for the standalone product-site "learn more" link. */
 export function productSiteUrl(campaign: string): string {
   const url = new URL(AI_PRODUCT_SITE_URL);
-  url.searchParams.set('utm_source', 'roihomesvc');
-  url.searchParams.set('utm_medium', 'referral');
-  url.searchParams.set('utm_campaign', campaign);
-  return url.toString();
+  return withUtm(url, campaign);
 }
 
 /**
