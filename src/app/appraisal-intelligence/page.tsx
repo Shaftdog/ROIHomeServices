@@ -17,7 +17,7 @@ import { ServiceSchema } from "@/components/seo/JsonLd";
 import AvmDisclosure from "@/components/appraisal-intelligence/AvmDisclosure";
 import SampleScreenResult from "@/components/appraisal-intelligence/SampleScreenResult";
 import PlanLadder from "@/components/appraisal-intelligence/PlanLadder";
-import { freeScreenUrl, productSiteUrl } from "@/lib/appraisal-intelligence";
+import { ACCURACY_RECORD_URL, freeScreenUrl, productSiteUrl } from "@/lib/appraisal-intelligence";
 
 const PAGE_URL = "https://www.roihomesvc.com/appraisal-intelligence";
 
@@ -136,6 +136,12 @@ export default function AppraisalIntelligencePage() {
             </p>
           </div>
           <SampleScreenResult />
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            How accurate is the Screen?{" "}
+            <a href={ACCURACY_RECORD_URL} className="font-medium text-accent hover:underline">
+              See our published accuracy record &rarr;
+            </a>
+          </p>
         </div>
       </section>
 

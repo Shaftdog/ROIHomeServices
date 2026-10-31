@@ -8,6 +8,9 @@
  */
 
 /** The investor portal app (Salesmod), where screening actually happens. */
+/** Public accuracy record (back-test of closed flips; AVM, not an appraisal). */
+export const ACCURACY_RECORD_URL = 'https://portal.roihomesvc.com/accuracy';
+
 export const APP_URL = 'https://app.appraisal-intelligence.com';
 
 /** The standalone Appraisal Intelligence marketing/product site. */

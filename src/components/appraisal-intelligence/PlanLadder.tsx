@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   APPRAISAL_INTELLIGENCE_PLANS,
   SCREEN_PACKS,
+  ACCURACY_RECORD_URL,
   freeScreenUrl,
 } from "@/lib/appraisal-intelligence";
 
@@ -76,6 +77,12 @@ export default function PlanLadder() {
           .
         </p>
       </div>
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        How accurate is the Screen?{" "}
+        <a href={ACCURACY_RECORD_URL} className="font-medium text-accent hover:underline">
+          See our published accuracy record &rarr;
+        </a>
+      </p>
     </div>
   );
 }
