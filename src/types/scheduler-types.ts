@@ -4,6 +4,8 @@ export interface AppraisalFormData {
   name: string;
   email: string;
   phone: string;
+  /** Optional SMS consent from the contact step (unchecked by default). */
+  smsConsent?: boolean;
   
   // Property details
   address: string;

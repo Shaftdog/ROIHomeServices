@@ -9,6 +9,7 @@ import type { AppraisalFormData } from "@/types/scheduler-types";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { SmsConsentCheckbox } from "@/components/shared/SmsConsentCheckbox";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
@@ -18,6 +19,7 @@ const contactFormSchema = z.object({
     const digitsOnly = val.replace(/\D/g, '');
     return digitsOnly.length >= 10 && digitsOnly.length <= 15;
   }, { message: "Please enter a valid phone number" }),
+  smsConsent: z.boolean().default(false),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -30,12 +32,13 @@ interface ContactFormProps {
 export default function ContactForm({ onContinue, defaultValues = {} }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const form = useForm<ContactFormValues>({
+  const form = useForm<z.input<typeof contactFormSchema>, unknown, ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
       name: defaultValues.name || "",
       email: defaultValues.email || "",
       phone: defaultValues.phone || "",
+      smsConsent: defaultValues.smsConsent ?? false,
     },
   });
 
@@ -100,6 +103,21 @@ export default function ContactForm({ onContinue, defaultValues = {} }: ContactF
                   We&apos;ll use this number to contact you about your appraisal.
                 </FormDescription>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="smsConsent"
+            render={({ field }) => (
+              <FormItem>
+                <SmsConsentCheckbox
+                  id="booking-sms-consent"
+                  checked={field.value === true}
+                  onCheckedChange={field.onChange}
+                  disabled={isSubmitting}
+                />
               </FormItem>
             )}
           />

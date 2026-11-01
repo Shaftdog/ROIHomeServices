@@ -5,6 +5,7 @@ import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { sendBookingNotification } from '@/lib/email';
 import { forwardMarketingLead } from '@/lib/salesmod';
+import { SMS_CONSENT_VERSION, type SmsConsentRecord } from '@/lib/sms-consent';
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-11-20.acacia' })
@@ -22,6 +23,8 @@ const bookingSchema = z.object({
   notes: z.string().optional(),
   /** Stripe PaymentIntent id, when the caller believes this booking was paid. */
   paymentIntentId: z.string().optional(),
+  smsConsent: z.boolean().optional().default(false),
+  smsConsentVersion: z.string().optional(),
 });
 
 /**
@@ -99,7 +102,14 @@ async function handleBookingRequest(request: NextRequest) {
     // The verdict is prepended to the notes so the notification can never
     // describe an unpaid booking as paid.
     const payment = await verifyPayment(validatedData.paymentIntentId, bookingLogger);
-    const notes = [payment.note, validatedData.notes].filter(Boolean).join('\n');
+    const smsConsent: SmsConsentRecord = {
+      granted: validatedData.smsConsent,
+      version: validatedData.smsConsentVersion || SMS_CONSENT_VERSION,
+      at: new Date().toISOString(),
+      source: 'booking_form',
+    };
+    const smsConsentLine = smsConsent.granted ? `SMS consent: yes (v${smsConsent.version})` : 'SMS consent: no';
+    const notes = [payment.note, validatedData.notes, smsConsentLine].filter(Boolean).join('\n');
 
     logEvent(bookingLogger, 'booking_payment_verified', {
       bookingId,
@@ -157,6 +167,7 @@ async function handleBookingRequest(request: NextRequest) {
         preferredDate: validatedData.preferredDate,
         zip: validatedData.zip,
         requestId,
+        sms_consent: smsConsent,
       },
     }));
 

@@ -89,6 +89,7 @@ export default function Footer() {
             <ul className="space-y-1">
               <li><Link href="/privacy" className="text-sm text-slate-300 hover:text-highlight transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="text-sm text-slate-300 hover:text-highlight transition-colors">Terms of Service</Link></li>
+              <li><Link href="/sms" className="text-sm text-slate-300 hover:text-highlight transition-colors">SMS Program</Link></li>
               <li><Link href="/accessibility" className="text-sm text-slate-300 hover:text-highlight transition-colors">Accessibility Statement</Link></li>
               <li>
                 <button

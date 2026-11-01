@@ -111,6 +111,20 @@ export default function PrivacyPolicyPage() {
         <h2>11) Changes to This Policy</h2>
         <p>We may update this Policy from time to time. We will post the new date at the top and, if changes are material, provide additional notice as required.</p>
 
+        <h2>Text Messaging (SMS)</h2>
+        <p>
+          If you opt in to text messages, we collect your mobile phone number, a record of your consent (the date, time, form, and version of the consent language you agreed to), and the history of messages we exchange with you.
+        </p>
+        <p>
+          We use this information only to send the messages you agreed to receive: appointment scheduling, confirmations, and updates about your appraisal order.
+        </p>
+        <p>
+          We do not sell, rent or share mobile phone numbers or SMS opt-in data and consent with third parties or affiliates for marketing or promotional purposes. Mobile information may be shared only with service providers who help us deliver messages (for example, our SMS platform).
+        </p>
+        <p>
+          <strong>Opting out:</strong> Reply STOP to any text message at any time, or contact us using the details below. Message frequency varies. Msg &amp; data rates may apply. See our <a href="/terms">Terms of Service</a> and our <a href="/sms">SMS program page</a> for details.
+        </p>
+
         <h2>12) Contact Us</h2>
         <p>Questions or requests about this Privacy Policy?</p>
         <ul>

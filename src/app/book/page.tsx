@@ -13,6 +13,7 @@ import type { AppraisalFormData } from "@/types/scheduler-types";
 import { nanoid } from "nanoid";
 import { trackBookingStep, getAttributionData, sendGTMEvent } from "@/lib/gtag";
 import { pushEvent } from "@/lib/gtm";
+import { SMS_CONSENT_VERSION } from "@/lib/sms-consent";
 import TrackOnView from "@/components/TrackOnView";
 import { ErrorBoundary, BookingErrorFallback } from "@/components/shared/ErrorBoundary";
 
@@ -22,6 +23,7 @@ export default function BookPage() {
     name: "",
     email: "",
     phone: "",
+    smsConsent: false,
     address: "",
     dateNeeded: "",
     purpose: "",
@@ -84,7 +86,7 @@ export default function BookPage() {
     });
   }, [bookingId]); // Include bookingId in deps
 
-  const handleContactSubmit = async (data: { name: string, email: string, phone: string }) => {
+  const handleContactSubmit = async (data: { name: string, email: string, phone: string, smsConsent?: boolean }) => {
     // Get attribution data for enhanced tracking
     const attributionData = getAttributionData();
     
@@ -231,6 +233,8 @@ export default function BookPage() {
         zip: zip || undefined,
         email: formData.email || '',
         phone: formData.phone || '',
+        smsConsent: formData.smsConsent === true,
+        smsConsentVersion: SMS_CONSENT_VERSION,
         name: formData.name || '',
         address: formData.address || '',
         // NOT a payment claim: the server verifies the PaymentIntent with
