@@ -73,7 +73,7 @@ export default function TermsOfServicePage() {
 
         <h2>11. Electronic Communications & Signatures</h2>
         <p>
-          By providing an email address or phone number, you consent to receive communications (including texts) related to the Services. You can opt out of marketing messages at any time. Electronic signatures and records are valid and enforceable to the fullest extent permitted by law.
+          By providing an email address, you consent to receive emails related to the Services. You can opt out of marketing emails at any time. Providing a phone number does not by itself sign you up for text messages: we text only people who opt in as described in the SMS Terms below. Electronic signatures and records are valid and enforceable to the fullest extent permitted by law.
         </p>
 
         <h2>12. Disclaimers</h2>
@@ -127,7 +127,7 @@ export default function TermsOfServicePage() {
           These Terms constitute the entire agreement between you and us regarding the Sites and Services and supersede prior agreements on that subject. If any provision is held unenforceable, it will be limited or eliminated to the minimum extent necessary, and the remaining provisions will remain in effect. Our failure to enforce any right is not a waiver. Headings are for convenience only.
         </p>
 
-        <h2>SMS Terms</h2>
+        <h2 id="sms">SMS Terms</h2>
         <p><strong>Program:</strong> ROI Home Services appointment and order texts.</p>
         <p>
           By opting in, you agree to receive text messages from ROI Home Services about appointment scheduling, confirmations, and order updates. Message frequency varies. Msg &amp; data rates may apply.
