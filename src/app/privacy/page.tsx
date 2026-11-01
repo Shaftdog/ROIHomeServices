@@ -65,6 +65,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Business transfers:</strong> in a merger, financing, or sale, subject to confidentiality.</li>
         </ul>
         <p>For cross‑context behavioral advertising, we seek your consent via our cookie banner; you can opt out at any time (see Cookies and Your Rights).</p>
+        <p><strong>Text messaging:</strong> Mobile phone numbers and text messaging opt‑in data and consent are excluded from all of the sharing described above. We do not share them with third parties or affiliates for marketing or promotional purposes. They are shared only with the service providers that deliver our text messages. See <a href="#sms">Text Messaging (SMS)</a> below.</p>
         
         <h2>5) Data Storage &amp; Security</h2>
         <p>We use reasonable administrative, technical, and physical safeguards to protect information. No method of transmission or storage is 100% secure; please use caution when sending sensitive documents via email.</p>
@@ -111,7 +112,7 @@ export default function PrivacyPolicyPage() {
         <h2>11) Changes to This Policy</h2>
         <p>We may update this Policy from time to time. We will post the new date at the top and, if changes are material, provide additional notice as required.</p>
 
-        <h2>Text Messaging (SMS)</h2>
+        <h2 id="sms">Text Messaging (SMS)</h2>
         <p>
           If you opt in to text messages, we collect your mobile phone number, a record of your consent (the date, time, form, and version of the consent language you agreed to), and the history of messages we exchange with you.
         </p>
