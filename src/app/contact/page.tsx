@@ -11,6 +11,8 @@ import { Phone, Clock, MapPin, Send, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { InlineWidget } from "react-calendly";
 import { getAttributionData } from "@/lib/gtag";
+import { SmsConsentCheckbox } from "@/components/shared/SmsConsentCheckbox";
+import { SMS_CONSENT_VERSION } from "@/lib/sms-consent";
 
 export default function ContactPage() {
   const { toast } = useToast();
@@ -20,7 +22,8 @@ export default function ContactPage() {
     email: '',
     phone: '',
     subject: '',
-    message: ''
+    message: '',
+    smsConsent: false
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -63,7 +66,7 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...formData, attribution: getAttributionData() }),
+        body: JSON.stringify({ ...formData, smsConsentVersion: SMS_CONSENT_VERSION, attribution: getAttributionData() }),
       });
 
       const data = await response.json();
@@ -80,7 +83,8 @@ export default function ContactPage() {
           email: '',
           phone: '',
           subject: '',
-          message: ''
+          message: '',
+          smsConsent: false
         });
       } else {
         toast({
@@ -201,6 +205,12 @@ export default function ContactPage() {
                     disabled={isSubmitting}
                   />
                 </div>
+                <SmsConsentCheckbox
+                  id="smsConsent"
+                  checked={formData.smsConsent}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, smsConsent: checked }))}
+                  disabled={isSubmitting}
+                />
                 <div suppressHydrationWarning={true}>
                   <Label htmlFor="subject">Subject *</Label>
                   <Input 

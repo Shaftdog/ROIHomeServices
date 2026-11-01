@@ -4,6 +4,7 @@ import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import { sendContactNotification } from '@/lib/email';
 import { forwardMarketingLead } from '@/lib/salesmod';
+import { SMS_CONSENT_VERSION, type SmsConsentRecord } from '@/lib/sms-consent';
 
 // Contact form schema
 const contactSchema = z.object({
@@ -12,6 +13,8 @@ const contactSchema = z.object({
   phone: z.string().optional(),
   subject: z.string().min(5, 'Subject must be at least 5 characters'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
+  smsConsent: z.boolean().optional().default(false),
+  smsConsentVersion: z.string().optional(),
 });
 
 async function handleContactSubmission(request: NextRequest) {
@@ -37,6 +40,14 @@ async function handleContactSubmission(request: NextRequest) {
     // Validate the request
     const validatedData = contactSchema.parse(body);
     
+    const smsConsent: SmsConsentRecord = {
+      granted: validatedData.smsConsent,
+      version: validatedData.smsConsentVersion || SMS_CONSENT_VERSION,
+      at: new Date().toISOString(),
+      source: 'contact_form',
+    };
+    const smsConsentLine = smsConsent.granted ? `SMS consent: yes (v${smsConsent.version})` : 'SMS consent: no';
+
     // Send email notification to admin
     try {
       await sendContactNotification({
@@ -44,7 +55,7 @@ async function handleContactSubmission(request: NextRequest) {
         email: validatedData.email,
         phone: validatedData.phone,
         subject: validatedData.subject,
-        message: validatedData.message,
+        message: `${validatedData.message}\n\n${smsConsentLine}`,
         requestId,
       });
       
@@ -52,6 +63,7 @@ async function handleContactSubmission(request: NextRequest) {
         formType: 'contact',
         subject: validatedData.subject,
         emailSent: true,
+        smsConsent: smsConsent.granted,
       }, 'Admin notification email sent successfully');
       
     } catch (emailError) {
@@ -69,7 +81,7 @@ async function handleContactSubmission(request: NextRequest) {
       name: validatedData.name,
       phone: validatedData.phone,
       attribution: body?.attribution,
-      context: { subject: validatedData.subject, requestId },
+      context: { subject: validatedData.subject, requestId, sms_consent: smsConsent },
     }));
 
     contactLogger.info({

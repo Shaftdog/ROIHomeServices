@@ -127,6 +127,17 @@ export default function TermsOfServicePage() {
           These Terms constitute the entire agreement between you and us regarding the Sites and Services and supersede prior agreements on that subject. If any provision is held unenforceable, it will be limited or eliminated to the minimum extent necessary, and the remaining provisions will remain in effect. Our failure to enforce any right is not a waiver. Headings are for convenience only.
         </p>
 
+        <h2>SMS Terms</h2>
+        <p><strong>Program:</strong> ROI Home Services appointment and order texts.</p>
+        <p>
+          By opting in, you agree to receive text messages from ROI Home Services about appointment scheduling, confirmations, and order updates. Message frequency varies. Msg &amp; data rates may apply.
+        </p>
+        <p>
+          <strong>Opt out:</strong> Reply STOP at any time to stop receiving texts; you will receive one confirmation text. <strong>Help:</strong> Reply HELP, call (407) 720-9288, or email admin@myroihome.com.
+        </p>
+        <p>Carriers are not liable for delayed or undelivered messages.</p>
+        <p>Consent is not a condition of purchase. See our <a href="/privacy">Privacy Policy</a> for how we handle mobile information, and our <a href="/sms">SMS program page</a> for more detail.</p>
+
         <h2>21. Contact Us</h2>
         <p>Questions about these Terms?</p>
         <ul>
