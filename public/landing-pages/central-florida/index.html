@@ -55,12 +55,8 @@
             'wait_for_update': 2000 // Increased wait time for consent banner
         });
         
-        // Enable enhanced conversions for better attribution without cookies
-        // This helps Google Ads track conversions even when ad_storage is denied
-        gtag('config', 'AW-CONVERSION_ID', {
-            'allow_enhanced_conversions': true,
-            'enhanced_conversions_automatic_settings': true
-        });
+        // Google Ads conversion/enhanced-conversion config is managed inside the GTM container (GTM-PLG3HLD8).
+        // No standalone gtag('config','AW-...') here: no real Ads ID is defined in this repo.
         
         // Check for existing consent and apply immediately
         try {
