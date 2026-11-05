@@ -152,12 +152,10 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
   const packages = grouped?.['billionaire-package'] ?? [];
   const addons = grouped?.['billionaire-addon'] ?? [];
   const entryProduct = tripwire[0] ?? ladder[0] ?? null;
-  // Hero buy action: the flagship package, else the entry product. One-time SKUs only
-  // (a subscription needs its interval choice, which lives on the product tile).
-  const heroProduct =
-    [packages.find((p) => p.flagship), entryProduct].find(
-      (p): p is BlueprintProduct => !!p && p.billingInterval !== 'month'
-    ) ?? null;
+  // Hero buy action: pinned to the Desktop Blueprint (BAP-BLUEPRINT) in the ladder.
+  // If it is missing from the catalog, render no hero buy button; never substitute
+  // another product.
+  const heroProduct = ladder.find((p) => p.sku === 'BAP-BLUEPRINT') ?? null;
 
   return (
     <div>
@@ -181,7 +179,7 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
               the end.
             </p>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start">
               {heroProduct && (
                 <BlueprintBuyButton
                   sku={heroProduct.sku}
