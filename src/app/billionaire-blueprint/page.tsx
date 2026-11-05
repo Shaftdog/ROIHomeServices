@@ -186,7 +186,9 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
                   label={`Buy ${heroProduct.name} — ${formatUsd(heroProduct.amountCents)}`}
                   variant="highlight"
                   size="lg"
-                  className="sm:min-w-[16rem]"
+                  className="sm:w-80"
+                  buttonClassName="h-auto min-h-11 whitespace-normal py-2 text-base"
+                  errorClassName="text-white"
                 />
               )}
               {entryProduct && (
@@ -211,6 +213,13 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
                 <a href="#lifecycle">How it works</a>
               </Button>
             </div>
+            {heroProduct && (
+              <p className="mt-3 text-sm text-white">
+                Desktop Blueprint covers Florida properties. We confirm your property by email
+                after checkout.
+              </p>
+            )}
+
 
             {ladder.length > 0 && (
               <p className="mt-6 text-sm text-slate-300">
