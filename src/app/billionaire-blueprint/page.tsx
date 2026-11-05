@@ -8,6 +8,7 @@ import BlueprintProductTile from '@/components/blueprint/BlueprintProductTile';
 import BlueprintProductDetail from '@/components/blueprint/BlueprintProductDetail';
 import BlueprintPackages from '@/components/blueprint/BlueprintPackages';
 import BlueprintTestimonials from '@/components/blueprint/BlueprintTestimonials';
+import BlueprintBuyButton from '@/components/blueprint/BlueprintBuyButton';
 import BlueprintWebinarButton from '@/components/blueprint/BlueprintWebinarButton';
 import BlueprintChatWidget from '@/components/blueprint/BlueprintChatWidget';
 import {
@@ -151,6 +152,12 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
   const packages = grouped?.['billionaire-package'] ?? [];
   const addons = grouped?.['billionaire-addon'] ?? [];
   const entryProduct = tripwire[0] ?? ladder[0] ?? null;
+  // Hero buy action: the flagship package, else the entry product. One-time SKUs only
+  // (a subscription needs its interval choice, which lives on the product tile).
+  const heroProduct =
+    [packages.find((p) => p.flagship), entryProduct].find(
+      (p): p is BlueprintProduct => !!p && p.billingInterval !== 'month'
+    ) ?? null;
 
   return (
     <div>
@@ -175,8 +182,22 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              {heroProduct && (
+                <BlueprintBuyButton
+                  sku={heroProduct.sku}
+                  label={`Buy ${heroProduct.name} — ${formatUsd(heroProduct.amountCents)}`}
+                  variant="highlight"
+                  size="lg"
+                  className="sm:min-w-[16rem]"
+                />
+              )}
               {entryProduct && (
-                <Button asChild size="lg" variant="highlight" className="text-base">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-white/40 bg-transparent text-base text-white hover:bg-white/10 hover:text-white"
+                >
                   <a href="#products">
                     See the products
                     <ArrowRight aria-hidden="true" />
