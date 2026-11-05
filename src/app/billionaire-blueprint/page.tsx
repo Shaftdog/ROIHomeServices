@@ -8,6 +8,7 @@ import BlueprintProductTile from '@/components/blueprint/BlueprintProductTile';
 import BlueprintProductDetail from '@/components/blueprint/BlueprintProductDetail';
 import BlueprintPackages from '@/components/blueprint/BlueprintPackages';
 import BlueprintTestimonials from '@/components/blueprint/BlueprintTestimonials';
+import BlueprintBuyButton from '@/components/blueprint/BlueprintBuyButton';
 import BlueprintWebinarButton from '@/components/blueprint/BlueprintWebinarButton';
 import BlueprintChatWidget from '@/components/blueprint/BlueprintChatWidget';
 import {
@@ -151,6 +152,10 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
   const packages = grouped?.['billionaire-package'] ?? [];
   const addons = grouped?.['billionaire-addon'] ?? [];
   const entryProduct = tripwire[0] ?? ladder[0] ?? null;
+  // Hero buy action: pinned to the Desktop Blueprint (BAP-BLUEPRINT) in the ladder.
+  // If it is missing from the catalog, render no hero buy button; never substitute
+  // another product.
+  const heroProduct = ladder.find((p) => p.sku === 'BAP-BLUEPRINT') ?? null;
 
   return (
     <div>
@@ -174,9 +179,25 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
               the end.
             </p>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start">
+              {heroProduct && (
+                <BlueprintBuyButton
+                  sku={heroProduct.sku}
+                  label={`Buy ${heroProduct.name} — ${formatUsd(heroProduct.amountCents)}`}
+                  variant="highlight"
+                  size="lg"
+                  className="sm:w-80"
+                  buttonClassName="h-auto min-h-11 whitespace-normal py-2 text-base"
+                  errorClassName="text-white"
+                />
+              )}
               {entryProduct && (
-                <Button asChild size="lg" variant="highlight" className="text-base">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-white/40 bg-transparent text-base text-white hover:bg-white/10 hover:text-white"
+                >
                   <a href="#products">
                     See the products
                     <ArrowRight aria-hidden="true" />
@@ -192,6 +213,13 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
                 <a href="#lifecycle">How it works</a>
               </Button>
             </div>
+            {heroProduct && (
+              <p className="mt-3 text-sm text-white">
+                Desktop Blueprint covers Florida properties. We confirm your property by email
+                after checkout.
+              </p>
+            )}
+
 
             {ladder.length > 0 && (
               <p className="mt-6 text-sm text-slate-300">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button, type ButtonProps } from '@/components/ui/button';
 
@@ -14,6 +14,10 @@ interface BlueprintBuyButtonProps {
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
   className?: string;
+  /** Extra classes for the inner Button (e.g. text size). */
+  buttonClassName?: string;
+  /** Error text color; defaults to the destructive token. */
+  errorClassName?: string;
 }
 
 /**
@@ -31,9 +35,21 @@ export default function BlueprintBuyButton({
   variant = 'default',
   size = 'default',
   className = '',
+  buttonClassName = '',
+  errorClassName = 'text-destructive',
 }: BlueprintBuyButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Back from Stripe can restore this page from the bfcache with the button still
+  // disabled; reset it when the page is restored.
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setIsSubmitting(false);
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
 
   async function startCheckout() {
     setIsSubmitting(true);
@@ -73,7 +89,7 @@ export default function BlueprintBuyButton({
         size={size}
         onClick={startCheckout}
         disabled={isSubmitting}
-        className="w-full"
+        className={`w-full ${buttonClassName}`}
       >
         {isSubmitting ? (
           <>
@@ -85,7 +101,7 @@ export default function BlueprintBuyButton({
         )}
       </Button>
       {error && (
-        <p role="alert" className="mt-2 text-sm text-destructive">
+        <p role="alert" className={`mt-2 text-sm ${errorClassName}`}>
           {error}
         </p>
       )}
