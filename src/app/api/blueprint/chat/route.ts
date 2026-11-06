@@ -89,12 +89,8 @@ const VALUATION_DEFLECTION =
 function buildCatalogContext(products: BlueprintProduct[]): string {
   return products
     .map((p) => {
-      const webinar =
-        p.webinarAmountCents !== null && p.webinarAmountCents !== p.amountCents
-          ? ` (webinar price ${formatUsd(p.webinarAmountCents)})`
-          : '';
       const step = p.step !== null ? ` [Step ${p.step}${p.phase ? `, ${p.phase}` : ''}]` : '';
-      return `- ${p.name} (${p.sku}) — ${formatUsd(p.amountCents)}${webinar}${step}: ${p.description}`;
+      return `- ${p.name} (${p.sku}) — ${formatUsd(p.amountCents)}${step}: ${p.description}`;
     })
     .join('\n');
 }

@@ -61,8 +61,6 @@ export interface BlueprintProduct {
   description: string;
   /** Retail price in cents. Server-resolved; the authoritative charge amount. */
   amountCents: number;
-  /** Discounted price offered on the webinar, when the catalog defines one. */
-  webinarAmountCents: number | null;
   /** 'month' when the SKU is sold as a recurring subscription; null for one-time. */
   billingInterval: 'month' | null;
   /** Annual-plan price in cents, when a subscription SKU offers one (`props.billing.annual_price`). */
@@ -123,8 +121,6 @@ function normalize(row: CatalogRow): BlueprintProduct | null {
   // than inventing a placement.
   if (!row.sku || !group) return null;
 
-  const webinarPrice = readNumber(row.props?.webinar_price);
-
   // Subscription SKUs declare `props.billing = { interval: 'month', annual_price? }`.
   // Only 'month' is recognized; anything else stays a one-time purchase.
   const billing =
@@ -139,7 +135,6 @@ function normalize(row: CatalogRow): BlueprintProduct | null {
     name: row.name,
     description: row.description ?? '',
     amountCents: toCents(row.base_price),
-    webinarAmountCents: webinarPrice === null ? null : Math.round(webinarPrice * 100),
     billingInterval,
     annualAmountCents: annualPrice === null ? null : Math.round(annualPrice * 100),
     group,
@@ -203,8 +198,19 @@ export async function fetchBlueprintCatalog(): Promise<BlueprintProduct[]> {
     throw new CatalogUnavailableError(`Catalog read failed with status ${res.status}`);
   }
 
-  const rows = (await res.json()) as CatalogRow[];
+  let rows: CatalogRow[];
+  try {
+    rows = (await res.json()) as CatalogRow[];
+  } catch (err) {
+    catalogLogger.error({ err }, 'BAP catalog response was not valid JSON');
+    throw new CatalogUnavailableError('Catalog returned a malformed response');
+  }
+  if (!Array.isArray(rows)) {
+    catalogLogger.error('BAP catalog response was not an array');
+    throw new CatalogUnavailableError('Catalog returned a malformed response');
+  }
   const products = rows
+    .filter((r): r is CatalogRow => typeof r === 'object' && r !== null)
     .map(normalize)
     .filter((p): p is BlueprintProduct => p !== null)
     .sort((a, b) => a.sortOrder - b.sortOrder);

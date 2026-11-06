@@ -43,6 +43,17 @@ const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.roihomesvc
   ''
 );
 
+/** Stripe label limit is 50 chars; text fields accept up to 255. */
+function propertyAddressField(optional: boolean): Stripe.Checkout.SessionCreateParams.CustomField {
+  return {
+    key: 'propertyaddress',
+    label: { type: 'custom', custom: 'Property address' },
+    type: 'text',
+    optional,
+    text: { minimum_length: 5, maximum_length: 200 },
+  };
+}
+
 const RETURN_PATH = '/billionaire-blueprint';
 
 // NOTE: no `amount`, no `price`, no `coupon`. `.strict()` rejects unknown keys.
@@ -125,6 +136,12 @@ async function handleBlueprintCheckout(req: NextRequest) {
         },
       ],
       ...(email ? { customer_email: email } : {}),
+      // Property address, by catalog group: add-ons and subscriptions get no
+      // field, packages get an optional one, other one-time SKUs require it. The
+      // answer is stored on session.custom_fields in Stripe.
+      ...(chosenInterval || product.group === 'billionaire-addon'
+        ? {}
+        : { custom_fields: [propertyAddressField(product.group === 'billionaire-package')] }),
       success_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=cancelled`,
       metadata: {

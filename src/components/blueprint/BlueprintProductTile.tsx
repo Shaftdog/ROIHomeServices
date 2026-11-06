@@ -10,15 +10,12 @@ interface BlueprintProductTileProps {
 
 /**
  * One product. Every number rendered here comes from the server-side catalog —
- * no price is hardcoded, and the tile shows a webinar price only when the catalog
- * defines one for that SKU.
+ * no price is hardcoded, and it shows only the price the checkout charges.
  */
 export default function BlueprintProductTile({
   product,
   featured = false,
 }: BlueprintProductTileProps) {
-  const hasWebinarPrice =
-    product.webinarAmountCents !== null && product.webinarAmountCents !== product.amountCents;
   const isSubscription = product.billingInterval === 'month';
 
   return (
@@ -60,14 +57,6 @@ export default function BlueprintProductTile({
             paid per year
           </p>
         )}
-        {hasWebinarPrice && (
-          <p className="mt-1 text-sm text-muted-foreground">
-            Webinar price{' '}
-            <span className="font-semibold text-foreground">
-              {formatUsd(product.webinarAmountCents as number)}
-            </span>
-          </p>
-        )}
 
         <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
           {product.description}
@@ -78,6 +67,7 @@ export default function BlueprintProductTile({
             <BlueprintBuyButton
               sku={product.sku}
               interval="month"
+              placement="tile"
               label={`Subscribe — ${formatUsd(product.amountCents)}/mo`}
               variant={featured ? 'highlight' : 'default'}
             />
@@ -85,6 +75,7 @@ export default function BlueprintProductTile({
               <BlueprintBuyButton
                 sku={product.sku}
                 interval="year"
+                placement="tile"
                 label={`Annual — ${formatUsd(product.annualAmountCents)}/yr`}
                 variant="outline"
               />
@@ -95,6 +86,7 @@ export default function BlueprintProductTile({
             sku={product.sku}
             label={`Buy — ${formatUsd(product.amountCents)}`}
             variant={featured ? 'highlight' : 'default'}
+            placement="tile"
             className="mt-6"
           />
         )}

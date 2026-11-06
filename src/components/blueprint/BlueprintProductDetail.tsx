@@ -93,6 +93,7 @@ export default function BlueprintProductDetail({ product }: BlueprintProductDeta
             <BlueprintBuyButton
               sku={product.sku}
               label="Order this step"
+              placement="detail"
               className="mt-4"
             />
           </div>

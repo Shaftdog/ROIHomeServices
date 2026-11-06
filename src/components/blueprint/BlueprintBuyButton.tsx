@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button, type ButtonProps } from '@/components/ui/button';
+import { pushEvent } from '@/lib/gtm';
 
 interface BlueprintBuyButtonProps {
   /** The ONLY thing sent to the server. Price is resolved server-side from the SKU. */
@@ -11,6 +12,8 @@ interface BlueprintBuyButtonProps {
    *  catalog marks the SKU as a subscription, and resolves the price itself. */
   interval?: 'month' | 'year';
   label: string;
+  /** Where on the page this button sits; sent on the GTM click event so hero/tile/package buys can be told apart. */
+  placement?: 'hero' | 'tile' | 'package' | 'detail';
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
   className?: string;
@@ -32,6 +35,7 @@ export default function BlueprintBuyButton({
   sku,
   interval,
   label,
+  placement,
   variant = 'default',
   size = 'default',
   className = '',
@@ -52,6 +56,7 @@ export default function BlueprintBuyButton({
   }, []);
 
   async function startCheckout() {
+    pushEvent('blueprint_buy_click', { sku, placement: placement ?? 'unknown', interval: interval ?? 'one-time' });
     setIsSubmitting(true);
     setError(null);
 
