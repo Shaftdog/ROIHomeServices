@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:blueprint": "node --test src/lib/__tests__/blueprint-florida.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

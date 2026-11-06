@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { z } from 'zod';
+import { blueprintCheckoutBodySchema as bodySchema } from '@/lib/blueprint-checkout-schema';
+import { checkFloridaGate } from '@/lib/blueprint-florida';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import {
@@ -56,17 +58,6 @@ function propertyAddressField(optional: boolean): Stripe.Checkout.SessionCreateP
 
 const RETURN_PATH = '/billionaire-blueprint';
 
-// NOTE: no `amount`, no `price`, no `coupon`. `.strict()` rejects unknown keys.
-// `interval` only chooses between plans a subscription SKU actually offers in the
-// catalog — it can never change what a one-time product costs.
-const bodySchema = z
-  .object({
-    sku: z.string().min(1, 'A product SKU is required'),
-    email: z.string().email('A valid email is required').optional(),
-    interval: z.enum(['month', 'year']).optional(),
-  })
-  .strict();
-
 async function handleBlueprintCheckout(req: NextRequest) {
   const requestId = req.headers.get('x-request-id') || crypto.randomUUID();
   const paymentLogger = createChildLogger({
@@ -80,13 +71,24 @@ async function handleBlueprintCheckout(req: NextRequest) {
   }
 
   try {
-    const { sku, email, interval } = bodySchema.parse(await req.json());
+    const { sku, email, interval, propertyState } = bodySchema.parse(await req.json());
 
     // SERVER-SIDE PRICE. Nothing the caller sent can influence this amount.
     const product = await resolveBlueprintProduct(sku);
     if (!product) {
       paymentLogger.warn({ requestId, sku }, 'Unknown Blueprint SKU rejected');
       return NextResponse.json({ error: 'Unknown product' }, { status: 400 });
+    }
+
+    // FLORIDA GATE — enforced here, before any Stripe session exists. Credentialed
+    // (USPAP) products are Florida-only; see src/lib/blueprint-florida.ts.
+    const gate = checkFloridaGate(product.sku, propertyState);
+    if (!gate.ok) {
+      paymentLogger.warn(
+        { requestId, sku, code: gate.code, propertyState: propertyState ?? null },
+        'Blueprint checkout refused by Florida gate'
+      );
+      return NextResponse.json({ error: gate.error, code: gate.code }, { status: gate.status });
     }
 
     // The billing model comes from the catalog, never the request. `interval`
@@ -112,7 +114,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
     logEvent(
       paymentLogger,
       'payment_attempt',
-      { sku: product.sku, amountCents: chargeAmountCents, interval: chosenInterval, email },
+      { sku: product.sku, amountCents: chargeAmountCents, interval: chosenInterval, hasEmail: Boolean(email) },
       requestId
     );
 
@@ -151,6 +153,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
         billingInterval: chosenInterval ?? 'one-time',
         source: 'billionaire-blueprint',
         requestId,
+        ...(gate.propertyState ? { propertyState: gate.propertyState } : {}),
       },
       // Session metadata does not propagate to the Subscription object, so
       // renewal events (invoice.paid, customer.subscription.*) would carry no

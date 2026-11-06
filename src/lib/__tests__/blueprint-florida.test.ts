@@ -1,0 +1,67 @@
+// Run: npm run test:blueprint  (Node's built-in runner; no test framework is
+// installed in this repo, so this covers the pure gate + request schema only).
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { checkFloridaGate, isFloridaOnlySku, NATIONWIDE_SKUS } from '../blueprint-florida.ts';
+import { blueprintCheckoutBodySchema as schema } from '../blueprint-checkout-schema.ts';
+
+const FL_ONLY = [
+  'BAP-BLUEPRINT', 'BAP-HALFWAY', 'BAP-FULL-SENS', 'BAP-PACKAGE', 'BAP-REVIEW-ROV',
+  'BAP-DEAL-ANALYZER', 'BAP-PKG-BLUEPRINT', 'BAP-PKG-AI', 'BAP-PKG-PROTECTION',
+];
+
+test('Florida-only SKUs accept FL (any case/whitespace)', () => {
+  for (const sku of FL_ONLY) {
+    assert.deepEqual(checkFloridaGate(sku, 'FL'), { ok: true, propertyState: 'FL' });
+  }
+  assert.equal(checkFloridaGate('BAP-BLUEPRINT', ' fl ').ok, true);
+});
+
+test('Florida-only SKUs refuse non-FL with 422', () => {
+  for (const sku of FL_ONLY) {
+    const r = checkFloridaGate(sku, 'GA');
+    assert.equal(r.ok, false);
+    if (!r.ok) {
+      assert.equal(r.status, 422);
+      assert.equal(r.code, 'florida_only');
+    }
+  }
+});
+
+test('Florida-only SKUs refuse a missing or blank state with 400', () => {
+  for (const state of [undefined, '', '  ']) {
+    const r = checkFloridaGate('BAP-BLUEPRINT', state);
+    assert.equal(r.ok, false);
+    if (!r.ok) {
+      assert.equal(r.status, 400);
+      assert.equal(r.code, 'property_state_required');
+    }
+  }
+});
+
+test('nationwide SKUs are never gated', () => {
+  for (const sku of NATIONWIDE_SKUS) {
+    assert.equal(isFloridaOnlySku(sku), false);
+    assert.equal(checkFloridaGate(sku, undefined).ok, true);
+    assert.equal(checkFloridaGate(sku, 'TX').ok, true);
+  }
+  assert.ok(NATIONWIDE_SKUS.has('BAP-DEAL-SCOUT'));
+});
+
+test('unknown / new SKUs default to Florida-only', () => {
+  assert.equal(isFloridaOnlySku('BAP-SOMETHING-NEW'), true);
+  assert.equal(checkFloridaGate('BAP-SOMETHING-NEW', 'GA').ok, false);
+});
+
+test('schema stays strict: smuggled amount/price/currency/discount are rejected', () => {
+  for (const extra of [{ amount: 1 }, { price: 1 }, { amountCents: 1 }, { currency: 'usd' }, { coupon: 'X' }]) {
+    assert.equal(schema.safeParse({ sku: 'BAP-BLUEPRINT', propertyState: 'FL', ...extra }).success, false);
+  }
+});
+
+test('schema accepts a valid body and rejects a malformed state', () => {
+  assert.equal(schema.safeParse({ sku: 'BAP-BLUEPRINT', propertyState: 'FL' }).success, true);
+  assert.equal(schema.safeParse({ sku: 'BAP-DEAL-SCOUT', interval: 'month' }).success, true);
+  assert.equal(schema.safeParse({ sku: 'BAP-BLUEPRINT', propertyState: 'Florida' }).success, false);
+  assert.equal(schema.safeParse({ propertyState: 'FL' }).success, false);
+});

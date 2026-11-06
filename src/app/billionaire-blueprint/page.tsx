@@ -190,6 +190,7 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
                   className="sm:w-80"
                   buttonClassName="h-auto min-h-11 whitespace-normal py-2 text-base"
                   errorClassName="text-white"
+                  noteClassName="text-white"
                 />
               )}
               {entryProduct && (

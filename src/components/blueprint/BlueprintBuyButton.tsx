@@ -1,9 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { pushEvent } from '@/lib/gtm';
+import { freeScreenUrl } from '@/lib/appraisal-intelligence';
+import {
+  FLORIDA_ONLY_NOTICE,
+  NON_FLORIDA_MESSAGE,
+  US_STATES,
+  isFloridaOnlySku,
+} from '@/lib/blueprint-florida';
 
 interface BlueprintBuyButtonProps {
   /** The ONLY thing sent to the server. Price is resolved server-side from the SKU. */
@@ -21,6 +28,8 @@ interface BlueprintBuyButtonProps {
   buttonClassName?: string;
   /** Error text color; defaults to the destructive token. */
   errorClassName?: string;
+  /** Color for the Florida note and state label; defaults to the muted token. */
+  noteClassName?: string;
 }
 
 /**
@@ -41,9 +50,14 @@ export default function BlueprintBuyButton({
   className = '',
   buttonClassName = '',
   errorClassName = 'text-destructive',
+  noteClassName = 'text-muted-foreground',
 }: BlueprintBuyButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const floridaOnly = isFloridaOnlySku(sku);
+  const [propertyState, setPropertyState] = useState('');
+  const stateId = useId();
+  const nonFlorida = floridaOnly && propertyState !== '' && propertyState !== 'FL';
 
   // Back from Stripe can restore this page from the bfcache with the button still
   // disabled; reset it when the page is restored.
@@ -56,7 +70,20 @@ export default function BlueprintBuyButton({
   }, []);
 
   async function startCheckout() {
-    pushEvent('blueprint_buy_click', { sku, placement: placement ?? 'unknown', interval: interval ?? 'one-time' });
+    if (floridaOnly && propertyState !== 'FL') {
+      setError(
+        propertyState === ''
+          ? 'Choose the state the property is in before checking out.'
+          : NON_FLORIDA_MESSAGE
+      );
+      return;
+    }
+    pushEvent('blueprint_buy_click', {
+      sku,
+      placement: placement ?? 'unknown',
+      interval: interval ?? 'one-time',
+      ...(floridaOnly ? { property_state: propertyState } : {}),
+    });
     setIsSubmitting(true);
     setError(null);
 
@@ -64,16 +91,22 @@ export default function BlueprintBuyButton({
       const res = await fetch('/api/blueprint/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sku, ...(interval ? { interval } : {}) }),
+        body: JSON.stringify({
+          sku,
+          ...(interval ? { interval } : {}),
+          ...(floridaOnly ? { propertyState } : {}),
+        }),
       });
 
-      const data = (await res.json().catch(() => null)) as { url?: string; error?: string } | null;
+      const data = (await res.json().catch(() => null)) as { url?: string; error?: string; code?: string } | null;
 
       if (!res.ok || !data?.url) {
         setError(
           data?.error === 'Pricing is temporarily unavailable'
             ? 'Pricing is temporarily unavailable. Please try again shortly.'
-            : "We couldn't start checkout. Please try again or book a call."
+            : data?.code && data.error
+              ? data.error
+              : "We couldn't start checkout. Please try again or book a call."
         );
         setIsSubmitting(false);
         return;
@@ -88,6 +121,44 @@ export default function BlueprintBuyButton({
 
   return (
     <div className={className}>
+      {floridaOnly && (
+        <div className="mb-3">
+          <p className={`text-xs font-semibold uppercase tracking-wide ${noteClassName}`}>
+            {FLORIDA_ONLY_NOTICE}
+          </p>
+          <label htmlFor={stateId} className={`mt-2 block text-sm ${noteClassName}`}>
+            Which state is the property in?
+          </label>
+          <select
+            id={stateId}
+            value={propertyState}
+            onChange={(e) => {
+              setPropertyState(e.target.value);
+              setError(null);
+            }}
+            aria-describedby={nonFlorida ? `${stateId}-msg` : undefined}
+            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+          >
+            <option value="">Select a state</option>
+            {US_STATES.map((st) => (
+              <option key={st.code} value={st.code}>
+                {st.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {nonFlorida ? (
+        <div id={`${stateId}-msg`} role="status" className="rounded-md border border-border bg-background p-3 text-foreground">
+          <p className="text-sm">{NON_FLORIDA_MESSAGE}</p>
+          <Button asChild variant="outline" size={size} className="mt-3 w-full">
+            <a href={freeScreenUrl('blueprint-non-florida')}>Screen a deal free</a>
+          </Button>
+          <p className="mt-2 text-xs text-muted-foreground">
+            An automated valuation (AVM), not an appraisal.
+          </p>
+        </div>
+      ) : (
       <Button
         type="button"
         variant={variant}
@@ -105,7 +176,8 @@ export default function BlueprintBuyButton({
           label
         )}
       </Button>
-      {error && (
+      )}
+      {error && !nonFlorida && (
         <p role="alert" className={`mt-2 text-sm ${errorClassName}`}>
           {error}
         </p>
