@@ -1,4 +1,5 @@
 import { CheckCircle2, MapPin } from 'lucide-react';
+import { displayName } from '@/lib/blueprint-florida';
 import { formatUsd, type BlueprintProduct } from '@/lib/blueprint-catalog';
 import { blueprintProductCopy } from '@/data/blueprint-product-copy';
 import BlueprintBuyButton from './BlueprintBuyButton';
@@ -31,7 +32,7 @@ export default function BlueprintProductDetail({ product }: BlueprintProductDeta
                 {product.step}
               </span>
             )}
-            <h3 className="text-2xl font-bold">{product.name}</h3>
+            <h3 className="text-2xl font-bold">{displayName(product.sku, product.name)}</h3>
           </div>
 
           {product.phase && (

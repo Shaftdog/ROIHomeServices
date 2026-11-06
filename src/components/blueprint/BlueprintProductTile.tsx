@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { displayName } from '@/lib/blueprint-florida';
 import { formatUsd, type BlueprintProduct } from '@/lib/blueprint-catalog';
 import BlueprintBuyButton from './BlueprintBuyButton';
 
@@ -27,7 +28,7 @@ export default function BlueprintProductTile({
     >
       <CardContent className="flex flex-1 flex-col p-6">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-lg font-semibold">{product.name}</h3>
+          <h3 className="text-lg font-semibold">{displayName(product.sku, product.name)}</h3>
           {featured && (
             <span className="shrink-0 rounded-full bg-highlight px-2.5 py-0.5 text-xs font-semibold text-highlight-foreground">
               Flagship

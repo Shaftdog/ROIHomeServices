@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { z } from 'zod';
+import { blueprintCheckoutBodySchema as bodySchema } from '@/lib/blueprint-checkout-schema';
+import { checkFloridaGate, lineItemName, propertyAddressLabel } from '@/lib/blueprint-florida';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import {
@@ -14,7 +16,8 @@ import {
  * Creates a Stripe Checkout Session for one Billionaire Appraisal Platform SKU.
  *
  * SECURITY — the whole point of this route:
- *   The request body carries a SKU (and optionally an email). It carries NO
+ *   The request body carries a SKU, optionally an email, interval and the
+ *   buyer-stated property state (which can only gate a purchase). It carries NO
  *   amount, NO price, NO currency, NO discount. The charge is resolved
  *   server-side from the Salesmod catalog by SKU (see src/lib/blueprint-catalog.ts),
  *   the same guarantee documented in src/lib/products.ts. An unknown SKU is
@@ -44,10 +47,10 @@ const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.roihomesvc
 );
 
 /** Stripe label limit is 50 chars; text fields accept up to 255. */
-function propertyAddressField(optional: boolean): Stripe.Checkout.SessionCreateParams.CustomField {
+function propertyAddressField(sku: string, optional: boolean): Stripe.Checkout.SessionCreateParams.CustomField {
   return {
     key: 'propertyaddress',
-    label: { type: 'custom', custom: 'Property address' },
+    label: { type: 'custom', custom: propertyAddressLabel(sku) },
     type: 'text',
     optional,
     text: { minimum_length: 5, maximum_length: 200 },
@@ -55,17 +58,6 @@ function propertyAddressField(optional: boolean): Stripe.Checkout.SessionCreateP
 }
 
 const RETURN_PATH = '/billionaire-blueprint';
-
-// NOTE: no `amount`, no `price`, no `coupon`. `.strict()` rejects unknown keys.
-// `interval` only chooses between plans a subscription SKU actually offers in the
-// catalog — it can never change what a one-time product costs.
-const bodySchema = z
-  .object({
-    sku: z.string().min(1, 'A product SKU is required'),
-    email: z.string().email('A valid email is required').optional(),
-    interval: z.enum(['month', 'year']).optional(),
-  })
-  .strict();
 
 async function handleBlueprintCheckout(req: NextRequest) {
   const requestId = req.headers.get('x-request-id') || crypto.randomUUID();
@@ -80,13 +72,24 @@ async function handleBlueprintCheckout(req: NextRequest) {
   }
 
   try {
-    const { sku, email, interval } = bodySchema.parse(await req.json());
+    const { sku, email, interval, propertyState } = bodySchema.parse(await req.json());
 
     // SERVER-SIDE PRICE. Nothing the caller sent can influence this amount.
     const product = await resolveBlueprintProduct(sku);
     if (!product) {
       paymentLogger.warn({ requestId, sku }, 'Unknown Blueprint SKU rejected');
       return NextResponse.json({ error: 'Unknown product' }, { status: 400 });
+    }
+
+    // FLORIDA GATE — enforced here, before any Stripe session exists. Credentialed
+    // (USPAP) products are Florida-only; see src/lib/blueprint-florida.ts.
+    const gate = checkFloridaGate(product.sku, propertyState);
+    if (!gate.ok) {
+      paymentLogger.warn(
+        { requestId, sku, code: gate.code, propertyState: propertyState ?? null },
+        'Blueprint checkout refused by Florida gate'
+      );
+      return NextResponse.json({ error: gate.error, code: gate.code }, { status: gate.status });
     }
 
     // The billing model comes from the catalog, never the request. `interval`
@@ -112,9 +115,11 @@ async function handleBlueprintCheckout(req: NextRequest) {
     logEvent(
       paymentLogger,
       'payment_attempt',
-      { sku: product.sku, amountCents: chargeAmountCents, interval: chosenInterval, email },
+      { sku: product.sku, amountCents: chargeAmountCents, interval: chosenInterval, hasEmail: Boolean(email) },
       requestId
     );
+
+    const itemName = lineItemName(product.sku, product.name);
 
     const session = await stripe.checkout.sessions.create({
       mode: chosenInterval ? 'subscription' : 'payment',
@@ -129,7 +134,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
             unit_amount: chargeAmountCents, // server-resolved, from the catalog
             ...(chosenInterval ? { recurring: { interval: chosenInterval } } : {}),
             product_data: {
-              name: product.name,
+              name: itemName,
               ...(product.description ? { description: product.description } : {}),
             },
           },
@@ -141,16 +146,17 @@ async function handleBlueprintCheckout(req: NextRequest) {
       // answer is stored on session.custom_fields in Stripe.
       ...(chosenInterval || product.group === 'billionaire-addon'
         ? {}
-        : { custom_fields: [propertyAddressField(product.group === 'billionaire-package')] }),
+        : { custom_fields: [propertyAddressField(product.sku, product.group === 'billionaire-package')] }),
       success_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=cancelled`,
       metadata: {
         sku: product.sku,
-        productName: product.name,
+        productName: itemName,
         productGroup: product.group,
         billingInterval: chosenInterval ?? 'one-time',
         source: 'billionaire-blueprint',
         requestId,
+        ...(gate.propertyState ? { propertyState: gate.propertyState } : {}),
       },
       // Session metadata does not propagate to the Subscription object, so
       // renewal events (invoice.paid, customer.subscription.*) would carry no

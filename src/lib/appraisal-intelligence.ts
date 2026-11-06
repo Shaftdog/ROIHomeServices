@@ -13,6 +13,9 @@ export const APP_URL = 'https://app.appraisal-intelligence.com';
 /** The standalone Appraisal Intelligence marketing/product site. */
 export const AI_PRODUCT_SITE_URL = 'https://appraisal-intelligence.com';
 
+/** Short AVM line for compact surfaces (full text: AVM_DISCLOSURE_TEXT). */
+export const AVM_SHORT_LINE = 'An automated valuation (AVM), not an appraisal.';
+
 /**
  * Path to the free, no-signup deal screen inside the app.
  *
