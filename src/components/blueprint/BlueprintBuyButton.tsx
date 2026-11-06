@@ -4,13 +4,14 @@ import { useEffect, useId, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { pushEvent } from '@/lib/gtm';
-import { freeScreenUrl } from '@/lib/appraisal-intelligence';
+import { AVM_SHORT_LINE, freeScreenUrl } from '@/lib/appraisal-intelligence';
 import {
   FLORIDA_ONLY_NOTICE,
-  NON_FLORIDA_MESSAGE,
+  nonFloridaMessage,
   US_STATES,
   isFloridaOnlySku,
 } from '@/lib/blueprint-florida';
+import { setPropertyState, usePropertyState } from '@/lib/blueprint-property-state';
 
 interface BlueprintBuyButtonProps {
   /** The ONLY thing sent to the server. Price is resolved server-side from the SKU. */
@@ -35,8 +36,9 @@ interface BlueprintBuyButtonProps {
 /**
  * Starts a Stripe Checkout Session for one SKU.
  *
- * The request body carries the SKU and nothing else — no amount, no price, no
- * discount code. The server resolves the charge from the catalog
+ * The request body carries the SKU, plus the buyer-stated property state for
+ * Florida-only SKUs and the plan interval for subscriptions — never an amount,
+ * price, or discount code. The server resolves the charge from the catalog
  * (src/app/api/blueprint/checkout/route.ts), and Stripe Checkout collects the
  * email and validates any promotion code the buyer enters.
  */
@@ -55,8 +57,9 @@ export default function BlueprintBuyButton({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const floridaOnly = isFloridaOnlySku(sku);
-  const [propertyState, setPropertyState] = useState('');
+  const propertyState = usePropertyState();
   const stateId = useId();
+  const [needsState, setNeedsState] = useState(false);
   const nonFlorida = floridaOnly && propertyState !== '' && propertyState !== 'FL';
 
   // Back from Stripe can restore this page from the bfcache with the button still
@@ -71,11 +74,7 @@ export default function BlueprintBuyButton({
 
   async function startCheckout() {
     if (floridaOnly && propertyState !== 'FL') {
-      setError(
-        propertyState === ''
-          ? 'Choose the state the property is in before checking out.'
-          : NON_FLORIDA_MESSAGE
-      );
+      setNeedsState(true);
       return;
     }
     pushEvent('blueprint_buy_click', {
@@ -134,9 +133,14 @@ export default function BlueprintBuyButton({
             value={propertyState}
             onChange={(e) => {
               setPropertyState(e.target.value);
+              setNeedsState(false);
               setError(null);
             }}
-            aria-describedby={nonFlorida ? `${stateId}-msg` : undefined}
+            disabled={isSubmitting}
+            aria-invalid={needsState && propertyState === '' ? true : undefined}
+            aria-describedby={
+              needsState && propertyState === '' ? `${stateId}-needs` : undefined
+            }
             className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
           >
             <option value="">Select a state</option>
@@ -146,19 +150,30 @@ export default function BlueprintBuyButton({
               </option>
             ))}
           </select>
+          {needsState && propertyState === '' && (
+            <p id={`${stateId}-needs`} className={`mt-2 text-sm ${errorClassName}`}>
+              Choose the state the property is in before checking out.
+            </p>
+          )}
         </div>
       )}
-      {nonFlorida ? (
-        <div id={`${stateId}-msg`} role="status" className="rounded-md border border-border bg-background p-3 text-foreground">
-          <p className="text-sm">{NON_FLORIDA_MESSAGE}</p>
-          <Button asChild variant="outline" size={size} className="mt-3 w-full">
-            <a href={freeScreenUrl('blueprint-non-florida')}>Screen a deal free</a>
-          </Button>
-          <p className="mt-2 text-xs text-muted-foreground">
-            An automated valuation (AVM), not an appraisal.
-          </p>
-        </div>
-      ) : (
+      {/* Always mounted so screen readers announce the refusal when it is filled. */}
+      <div
+        role="status"
+        aria-live="polite"
+        className={nonFlorida ? 'rounded-md border border-border bg-background p-3 text-foreground' : 'sr-only'}
+      >
+        {nonFlorida && (
+          <>
+            <p className="text-sm">{nonFloridaMessage(sku)}</p>
+            <Button asChild variant="outline" size={size} className="mt-3 w-full">
+              <a href={freeScreenUrl('blueprint-non-florida')}>Screen a deal free</a>
+            </Button>
+            <p className="mt-2 text-xs text-muted-foreground">{AVM_SHORT_LINE}</p>
+          </>
+        )}
+      </div>
+      {!nonFlorida && (
       <Button
         type="button"
         variant={variant}

@@ -9,10 +9,12 @@
  *
  * This is an ALLOW-LIST of the nationwide SKUs, not a list of Florida ones. A new
  * SKU added to the Salesmod catalog therefore defaults to Florida-only. That is
- * the safe failure: the cost of a wrong default is one extra question asked of a
- * buyer who could have skipped it; the cost of the opposite default is a stranger
- * paying for a credentialed product we cannot deliver and a manual refund. Adding
- * a SKU here is the explicit, reviewed step that opens it nationwide.
+ * the safe failure: a wrong default means a non-Florida buyer is refused a
+ * product they could have bought (a lost sale we can fix by adding the SKU here);
+ * the opposite default means a stranger pays for a credentialed product we cannot
+ * deliver and we owe a manual refund. Adding a SKU here is the explicit, reviewed
+ * step that opens it nationwide. Mirrors Salesmod's NON_FL_ALLOWED_SKUS
+ * (src/lib/bap/status.ts) — keep the two in step.
  *
  * Pure module (no imports) so client components can use it.
  */
@@ -21,12 +23,47 @@
 export const NATIONWIDE_SKUS: ReadonlySet<string> = new Set([
   // Automated deal screen (AVM). Nationwide by Rod's rule.
   'BAP-DEAL-SCOUT',
+  // Appraiser Package: nationwide per Rod 2026-10-25. Sold under a fixed line
+  // item name (see lineItemName) because Salesmod never uses the catalog name.
+  'BAP-PACKAGE',
   // Software subscription (AI agent, dashboard, alerts). No property is attached
   // at checkout and no credentialed work product is delivered. JUDGEMENT CALL.
   'BAP-AI-AGENT',
   // Support/updates add-on. No property, no appraisal deliverable. JUDGEMENT CALL.
   'BAP-PRIORITY',
 ]);
+
+/*
+ * BAP-DEAL-ANALYZER is gated on THIS site deliberately. Its catalog name is
+ * "Certified Deal Analyzer" and the site has no MLS-Supported variant logic, so a
+ * non-Florida buyer here would be sold something named Certified. Outside Florida
+ * the MLS-Supported Deal Analysis is reached through the investor portal instead
+ * (see DEAL_ANALYZER_OUTSIDE_FL_NOTE).
+ */
+
+/** Fixed Stripe line item for BAP-PACKAGE (not the catalog name). */
+export const APPRAISER_PACKAGE_LINE_ITEM =
+  "Appraiser Package — comps and market data organized for your lender's appraiser";
+
+/** Line-item / display name for a SKU: fixed text for BAP-PACKAGE, catalog name otherwise. */
+export function lineItemName(sku: string, catalogName: string): string {
+  return sku === 'BAP-PACKAGE' ? APPRAISER_PACKAGE_LINE_ITEM : catalogName;
+}
+
+/** Stripe custom-field label. The field KEY (`propertyaddress`) never changes. */
+export function propertyAddressLabel(sku: string): string {
+  return isFloridaOnlySku(sku) ? 'Florida property address' : 'Property address';
+}
+
+/** Extra sentence for the Deal Analyzer refusal only. Never says Certified/appraisal. */
+export const DEAL_ANALYZER_OUTSIDE_FL_NOTE =
+  'Outside Florida, an MLS-Supported Deal Analysis is available for your own decisions (not an appraisal, not certified): start with a free screen in the investor portal.';
+
+export function nonFloridaMessage(sku: string): string {
+  return sku === 'BAP-DEAL-ANALYZER'
+    ? `${NON_FLORIDA_MESSAGE} ${DEAL_ANALYZER_OUTSIDE_FL_NOTE}`
+    : NON_FLORIDA_MESSAGE;
+}
 
 export function isFloridaOnlySku(sku: string): boolean {
   return !NATIONWIDE_SKUS.has(sku);
@@ -57,7 +94,7 @@ export function checkFloridaGate(sku: string, propertyState: string | undefined)
     };
   }
   if (state !== 'FL') {
-    return { ok: false, status: 422, code: 'florida_only', error: NON_FLORIDA_MESSAGE };
+    return { ok: false, status: 422, code: 'florida_only', error: nonFloridaMessage(sku) };
   }
   return { ok: true, propertyState: 'FL' };
 }

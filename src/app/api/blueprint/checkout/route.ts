@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { z } from 'zod';
 import { blueprintCheckoutBodySchema as bodySchema } from '@/lib/blueprint-checkout-schema';
-import { checkFloridaGate } from '@/lib/blueprint-florida';
+import { checkFloridaGate, lineItemName, propertyAddressLabel } from '@/lib/blueprint-florida';
 import { withRouteLogging, logEvent } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
 import {
@@ -16,7 +16,8 @@ import {
  * Creates a Stripe Checkout Session for one Billionaire Appraisal Platform SKU.
  *
  * SECURITY — the whole point of this route:
- *   The request body carries a SKU (and optionally an email). It carries NO
+ *   The request body carries a SKU, optionally an email, interval and the
+ *   buyer-stated property state (which can only gate a purchase). It carries NO
  *   amount, NO price, NO currency, NO discount. The charge is resolved
  *   server-side from the Salesmod catalog by SKU (see src/lib/blueprint-catalog.ts),
  *   the same guarantee documented in src/lib/products.ts. An unknown SKU is
@@ -46,10 +47,10 @@ const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.roihomesvc
 );
 
 /** Stripe label limit is 50 chars; text fields accept up to 255. */
-function propertyAddressField(optional: boolean): Stripe.Checkout.SessionCreateParams.CustomField {
+function propertyAddressField(sku: string, optional: boolean): Stripe.Checkout.SessionCreateParams.CustomField {
   return {
     key: 'propertyaddress',
-    label: { type: 'custom', custom: 'Property address' },
+    label: { type: 'custom', custom: propertyAddressLabel(sku) },
     type: 'text',
     optional,
     text: { minimum_length: 5, maximum_length: 200 },
@@ -131,7 +132,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
             unit_amount: chargeAmountCents, // server-resolved, from the catalog
             ...(chosenInterval ? { recurring: { interval: chosenInterval } } : {}),
             product_data: {
-              name: product.name,
+              name: lineItemName(product.sku, product.name),
               ...(product.description ? { description: product.description } : {}),
             },
           },
@@ -143,12 +144,12 @@ async function handleBlueprintCheckout(req: NextRequest) {
       // answer is stored on session.custom_fields in Stripe.
       ...(chosenInterval || product.group === 'billionaire-addon'
         ? {}
-        : { custom_fields: [propertyAddressField(product.group === 'billionaire-package')] }),
+        : { custom_fields: [propertyAddressField(product.sku, product.group === 'billionaire-package')] }),
       success_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=cancelled`,
       metadata: {
         sku: product.sku,
-        productName: product.name,
+        productName: lineItemName(product.sku, product.name),
         productGroup: product.group,
         billingInterval: chosenInterval ?? 'one-time',
         source: 'billionaire-blueprint',
