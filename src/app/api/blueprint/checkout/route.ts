@@ -43,6 +43,15 @@ const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.roihomesvc
   ''
 );
 
+/** Stripe label limit is 50 chars; text fields accept up to 255. */
+const PROPERTY_ADDRESS_FIELD: Stripe.Checkout.SessionCreateParams.CustomField = {
+  key: 'property_address',
+  label: { type: 'custom', custom: 'Property address' },
+  type: 'text',
+  optional: false,
+  text: { minimum_length: 5, maximum_length: 200 },
+};
+
 const RETURN_PATH = '/billionaire-blueprint';
 
 // NOTE: no `amount`, no `price`, no `coupon`. `.strict()` rejects unknown keys.
@@ -125,6 +134,10 @@ async function handleBlueprintCheckout(req: NextRequest) {
         },
       ],
       ...(email ? { customer_email: email } : {}),
+      // One-time purchases are for a specific property, and nothing else on this
+      // path tells us which. Subscriptions are not property-specific. The answer
+      // lands on session.custom_fields (Stripe dashboard / webhook payload).
+      ...(chosenInterval ? {} : { custom_fields: [PROPERTY_ADDRESS_FIELD] }),
       success_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=cancelled`,
       metadata: {

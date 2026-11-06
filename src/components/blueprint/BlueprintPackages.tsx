@@ -70,8 +70,6 @@ export default function BlueprintPackages({
       <div className="grid gap-6 lg:grid-cols-3">
         {packages.map((pkg) => {
           const compare = comparison(pkg, ladderTotalCents, ladderPlusAddonsCents);
-          const hasWebinarPrice =
-            pkg.webinarAmountCents !== null && pkg.webinarAmountCents !== pkg.amountCents;
 
           return (
             <Card
@@ -94,14 +92,6 @@ export default function BlueprintPackages({
                 <p className="mt-3 text-3xl font-bold text-accent">
                   {formatUsd(pkg.amountCents)}
                 </p>
-                {hasWebinarPrice && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Webinar price{' '}
-                    <span className="font-semibold text-foreground">
-                      {formatUsd(pkg.webinarAmountCents as number)}
-                    </span>
-                  </p>
-                )}
 
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                   {pkg.description}
@@ -133,6 +123,7 @@ export default function BlueprintPackages({
                   sku={pkg.sku}
                   label={`Buy — ${formatUsd(pkg.amountCents)}`}
                   variant={pkg.flagship ? 'highlight' : 'default'}
+                  placement="package"
                   className="mt-6"
                 />
               </CardContent>

@@ -61,7 +61,7 @@ export interface BlueprintProduct {
   description: string;
   /** Retail price in cents. Server-resolved; the authoritative charge amount. */
   amountCents: number;
-  /** Discounted price offered on the webinar, when the catalog defines one. */
+  /** Webinar price from the catalog. NOT charged by checkout and not displayed; kept for reference only. */
   webinarAmountCents: number | null;
   /** 'month' when the SKU is sold as a recurring subscription; null for one-time. */
   billingInterval: 'month' | null;
@@ -203,7 +203,17 @@ export async function fetchBlueprintCatalog(): Promise<BlueprintProduct[]> {
     throw new CatalogUnavailableError(`Catalog read failed with status ${res.status}`);
   }
 
-  const rows = (await res.json()) as CatalogRow[];
+  let rows: CatalogRow[];
+  try {
+    rows = (await res.json()) as CatalogRow[];
+  } catch (err) {
+    catalogLogger.error({ err }, 'BAP catalog response was not valid JSON');
+    throw new CatalogUnavailableError('Catalog returned a malformed response');
+  }
+  if (!Array.isArray(rows)) {
+    catalogLogger.error('BAP catalog response was not an array');
+    throw new CatalogUnavailableError('Catalog returned a malformed response');
+  }
   const products = rows
     .map(normalize)
     .filter((p): p is BlueprintProduct => p !== null)
