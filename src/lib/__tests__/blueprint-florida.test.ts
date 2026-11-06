@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  APPRAISER_PACKAGE_LINE_ITEM, checkFloridaGate, isFloridaOnlySku, lineItemName, NATIONWIDE_SKUS,
+  APPRAISER_PACKAGE_LINE_ITEM, checkFloridaGate, isFloridaOnlySku, displayName, lineItemName, NATIONWIDE_SKUS,
   propertyAddressLabel,
 } from '../blueprint-florida.ts';
 import { blueprintCheckoutBodySchema as schema } from '../blueprint-checkout-schema.ts';
@@ -95,7 +95,16 @@ test('only the Deal Analyzer refusal points to the MLS-Supported analysis, witho
   if (!da.ok && !bp.ok) {
     assert.match(da.error, /MLS-Supported Deal Analysis/);
     assert.match(da.error, /free screen/);
+    // Only negations are allowed: the sentence says what the analysis is NOT.
+    assert.match(da.error, /\(not an appraisal, not certified\)/);
     assert.doesNotMatch(da.error, /Certified/);
+    assert.match(da.error, /investor portal/);
     assert.doesNotMatch(bp.error, /MLS-Supported/);
   }
+});
+
+test('BAP-PACKAGE displays as "Appraiser Package" even with the old seeded catalog name', () => {
+  assert.equal(displayName('BAP-PACKAGE', 'Lender-Ready Appraisal Package'), 'Appraiser Package');
+  assert.equal(displayName('BAP-PACKAGE', 'Appraiser Package'), 'Appraiser Package');
+  assert.equal(displayName('BAP-BLUEPRINT', 'Desktop Blueprint'), 'Desktop Blueprint');
 });

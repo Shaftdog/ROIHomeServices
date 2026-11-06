@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
+import { freeScreenUrl } from '@/lib/appraisal-intelligence';
 import { isFloridaOnlySku, lineItemName } from '@/lib/blueprint-florida';
 import {
   CatalogUnavailableError,
@@ -111,8 +112,7 @@ function buildSystemPrompt(catalogContext: string): string {
     `- Any question heading toward valuation: say you cannot give a value and offer to book a call (${BOOKING_PATH}).`,
     '- Never invent a price, a statistic, a client count, a turnaround guarantee, or a results figure. Prices come only from the catalog below.',
     "- If you don't know something, say so and offer to book a call. Do not guess.",
-    '',
-    '- Products tagged [Florida properties only] must not be recommended for a property outside Florida. Screens (the Deal Screener) are nationwide. For a non-Florida property, point to the free screen instead.',
+    `- Products tagged [Florida properties only] must not be recommended for a property outside Florida. Screens (the Deal Screener) are nationwide. For a non-Florida property, point to the free screen (${freeScreenUrl('blueprint-chat')}) and say a screen is an automated valuation (AVM), not an appraisal.`,
     '',
     'Keep replies short — two or three sentences unless the visitor asks for detail.',
     '',

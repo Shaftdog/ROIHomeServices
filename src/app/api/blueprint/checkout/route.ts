@@ -119,6 +119,8 @@ async function handleBlueprintCheckout(req: NextRequest) {
       requestId
     );
 
+    const itemName = lineItemName(product.sku, product.name);
+
     const session = await stripe.checkout.sessions.create({
       mode: chosenInterval ? 'subscription' : 'payment',
       // Lets the owner's existing promotion codes (e.g. NELS500, JACOBY500) be
@@ -132,7 +134,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
             unit_amount: chargeAmountCents, // server-resolved, from the catalog
             ...(chosenInterval ? { recurring: { interval: chosenInterval } } : {}),
             product_data: {
-              name: lineItemName(product.sku, product.name),
+              name: itemName,
               ...(product.description ? { description: product.description } : {}),
             },
           },
@@ -149,7 +151,7 @@ async function handleBlueprintCheckout(req: NextRequest) {
       cancel_url: `${SITE_ORIGIN}${RETURN_PATH}?checkout=cancelled`,
       metadata: {
         sku: product.sku,
-        productName: lineItemName(product.sku, product.name),
+        productName: itemName,
         productGroup: product.group,
         billingInterval: chosenInterval ?? 'one-time',
         source: 'billionaire-blueprint',

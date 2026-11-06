@@ -45,6 +45,11 @@ export const NATIONWIDE_SKUS: ReadonlySet<string> = new Set([
 export const APPRAISER_PACKAGE_LINE_ITEM =
   "Appraiser Package — comps and market data organized for your lender's appraiser";
 
+/** On-page display name. BAP-PACKAGE reads "Appraiser Package" whatever the catalog row says. */
+export function displayName(sku: string, catalogName: string): string {
+  return sku === 'BAP-PACKAGE' ? 'Appraiser Package' : catalogName;
+}
+
 /** Line-item / display name for a SKU: fixed text for BAP-PACKAGE, catalog name otherwise. */
 export function lineItemName(sku: string, catalogName: string): string {
   return sku === 'BAP-PACKAGE' ? APPRAISER_PACKAGE_LINE_ITEM : catalogName;
@@ -55,7 +60,11 @@ export function propertyAddressLabel(sku: string): string {
   return isFloridaOnlySku(sku) ? 'Florida property address' : 'Property address';
 }
 
-/** Extra sentence for the Deal Analyzer refusal only. Never says Certified/appraisal. */
+/**
+ * Extra sentence for the Deal Analyzer refusal only. It names the MLS-Supported
+ * Deal Analysis (existing site copy) and says only what that copy says it is NOT:
+ * not an appraisal, not certified. It never offers anything as Certified.
+ */
 export const DEAL_ANALYZER_OUTSIDE_FL_NOTE =
   'Outside Florida, an MLS-Supported Deal Analysis is available for your own decisions (not an appraisal, not certified): start with a free screen in the investor portal.';
 

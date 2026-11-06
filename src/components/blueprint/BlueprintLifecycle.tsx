@@ -1,4 +1,5 @@
 import { ArrowRight, Repeat } from 'lucide-react';
+import { displayName } from '@/lib/blueprint-florida';
 import { formatUsd, type BlueprintProduct } from '@/lib/blueprint-catalog';
 
 interface BlueprintLifecycleProps {
@@ -68,7 +69,7 @@ export default function BlueprintLifecycle({
                     key={product.sku}
                     className="flex h-full flex-col rounded-xl border border-highlight/60 bg-highlight/10 p-4"
                   >
-                    <p className="text-sm font-semibold">{product.name}</p>
+                    <p className="text-sm font-semibold">{displayName(product.sku, product.name)}</p>
                     <p className="mt-1 text-lg font-bold text-accent">
                       {formatUsd(product.amountCents)}
                     </p>
@@ -108,7 +109,7 @@ export default function BlueprintLifecycle({
                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
                       {product.step ?? '•'}
                     </span>
-                    <p className="mt-3 text-sm font-semibold">{product.name}</p>
+                    <p className="mt-3 text-sm font-semibold">{displayName(product.sku, product.name)}</p>
                     <p className="mt-1 text-lg font-bold text-accent">
                       {formatUsd(product.amountCents)}
                     </p>
@@ -133,7 +134,7 @@ export default function BlueprintLifecycle({
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {addons.map((product) => (
               <div key={product.sku} className="rounded-lg bg-light-gray p-3">
-                <p className="text-sm font-semibold">{product.name}</p>
+                <p className="text-sm font-semibold">{displayName(product.sku, product.name)}</p>
                 <p className="text-base font-bold text-accent">
                   {formatUsd(product.amountCents)}
                 </p>
