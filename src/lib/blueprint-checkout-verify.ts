@@ -17,7 +17,7 @@ const stripe = process.env.STRIPE_SECRET_KEY
   : null;
 
 export type CheckoutVerdict =
-  /** Stripe says this session is paid. */
+  /** Stripe says this session is paid, or it completed with a $0 total (100%-off promo). */
   | 'paid'
   /** A real session that is not paid (abandoned, async method still pending). */
   | 'unpaid'
@@ -41,7 +41,9 @@ export async function verifyCheckoutSession(
     // when the total really is zero.
     const paid =
       session.payment_status === 'paid' ||
-      (session.payment_status === 'no_payment_required' && session.amount_total === 0);
+      (session.payment_status === 'no_payment_required' &&
+        session.status === 'complete' &&
+        session.amount_total === 0);
     return paid ? 'paid' : 'unpaid';
   } catch {
     // Unrecognised id: a typed URL or a stale link. Not a payment.

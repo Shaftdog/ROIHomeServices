@@ -46,11 +46,11 @@ const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.roihomesvc
 /** Stripe label limit is 50 chars; text fields accept up to 255. */
 function propertyAddressField(optional: boolean): Stripe.Checkout.SessionCreateParams.CustomField {
   return {
-  key: 'propertyaddress',
-  label: { type: 'custom', custom: 'Property address' },
-  type: 'text',
-  optional,
-  text: { minimum_length: 5, maximum_length: 200 },
+    key: 'propertyaddress',
+    label: { type: 'custom', custom: 'Property address' },
+    type: 'text',
+    optional,
+    text: { minimum_length: 5, maximum_length: 200 },
   };
 }
 
