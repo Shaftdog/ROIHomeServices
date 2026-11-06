@@ -216,8 +216,8 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
             </div>
             {heroProduct && (
               <p className="mt-3 text-sm text-white">
-                Desktop Blueprint covers Florida properties. We confirm your property by email
-                after checkout.
+                Desktop Blueprint covers Florida properties. Enter the property address at
+                checkout.
               </p>
             )}
 

@@ -37,7 +37,12 @@ export async function verifyCheckoutSession(
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    return session.payment_status === 'paid' ? 'paid' : 'unpaid';
+    // A 100%-off promo completes with no_payment_required; that is paid only
+    // when the total really is zero.
+    const paid =
+      session.payment_status === 'paid' ||
+      (session.payment_status === 'no_payment_required' && session.amount_total === 0);
+    return paid ? 'paid' : 'unpaid';
   } catch {
     // Unrecognised id: a typed URL or a stale link. Not a payment.
     return 'unknown';
