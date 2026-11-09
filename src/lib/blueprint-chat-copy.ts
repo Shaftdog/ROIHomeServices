@@ -21,7 +21,7 @@ export const VALUATION_DEFLECTION =
   'I can also tell you which product covers your question and what it costs.';
 
 /** Link label for the free screen, built from the shared AVM wording. */
-export const FREE_SCREEN_LINK_LABEL = `Try the free deal screen (${AVM_SHORT_LINE.replace(/\.$/, '')})`;
+export const FREE_SCREEN_LINK_LABEL = `Try the free deal screen (${AVM_SHORT_LINE.charAt(0).toLowerCase()}${AVM_SHORT_LINE.slice(1).replace(/\.$/, '')})`;
 
 /** True when a model reply refers to the free screen, so the link is worth attaching. */
 export function mentionsFreeScreen(reply: string): boolean {

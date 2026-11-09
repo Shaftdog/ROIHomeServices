@@ -34,3 +34,8 @@ test('mentionsFreeScreen gates the link on model replies', () => {
   assert.equal(mentionsFreeScreen('Try the free deal screen for an estimate.'), true);
   assert.equal(mentionsFreeScreen('The Blueprint costs $750.'), false);
 });
+
+test('link label reads naturally', async () => {
+  const { FREE_SCREEN_LINK_LABEL } = await import('../blueprint-chat-copy.ts');
+  assert.equal(FREE_SCREEN_LINK_LABEL, 'Try the free deal screen (an automated valuation (AVM), not an appraisal)');
+});
