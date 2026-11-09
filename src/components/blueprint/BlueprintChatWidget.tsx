@@ -5,7 +5,7 @@ import { Loader2, MessageCircle, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BOOKING_PATH } from '@/lib/blueprint-config';
-import { APP_URL } from '@/lib/appraisal-intelligence';
+import { FREE_SCREEN_LINK_LABEL, isAllowedScreenUrl } from '@/lib/blueprint-chat-copy';
 
 /**
  * Floating "ROI Assistant" for the Blueprint page.
@@ -48,14 +48,6 @@ const SUGGESTIONS = [
   'How does the process work?',
   'What is the difference between the packages?',
 ];
-
-function isAllowedScreenUrl(url: string | undefined): url is string {
-  try {
-    return !!url && new URL(url).origin === APP_URL;
-  } catch {
-    return false;
-  }
-}
 
 export default function BlueprintChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -210,7 +202,7 @@ export default function BlueprintChatWidget() {
                   rel="noopener noreferrer"
                   className="mt-2 block break-words font-semibold text-accent underline"
                 >
-                  Try the free deal screen (automated estimate, not an appraisal)
+                  {FREE_SCREEN_LINK_LABEL}
                 </a>
               )}
               {turn.isNotice && turn.id !== 'opening' && (

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
-import { chatFreeScreenUrl, VALUATION_DEFLECTION } from '@/lib/blueprint-chat-copy';
+import { chatFreeScreenUrl, mentionsFreeScreen, VALUATION_DEFLECTION } from '@/lib/blueprint-chat-copy';
 import { isFloridaOnlySku, lineItemName } from '@/lib/blueprint-florida';
 import {
   CatalogUnavailableError,
@@ -51,11 +51,11 @@ const bodySchema = z
 
 /**
  * Anything that reads as "tell me what this property is worth". Matching here
- * short-circuits the model entirely and returns a booking offer — a stated
+ * short-circuits the model entirely and returns a free-screen offer — a stated
  * policy response, not an attempt to answer the question.
  *
  * Deliberately over-inclusive: a false positive costs a visitor one extra click
- * to book a call, while a false negative lets an automated widget hand out
+ * to read the free-screen offer, while a false negative lets an automated widget hand out
  * something that reads like a licensed appraiser's value opinion. The deflection
  * copy still offers product help, so the over-broad case degrades gracefully.
  */
@@ -107,7 +107,7 @@ function buildSystemPrompt(catalogContext: string): string {
     `- Any question heading toward valuation: say you cannot give a value, offer the free deal screen (an automated valuation estimate, not an appraisal, for any property), and say a certified appraisal from Rod is available for Florida properties only. Offer a call (${BOOKING_PATH}) as a secondary option.`,
     '- Never invent a price, a statistic, a client count, a turnaround guarantee, or a results figure. Prices come only from the catalog below.',
     "- If you don't know something, say so and offer to book a call. Do not guess.",
-    `- Products tagged [Florida properties only] must not be recommended for a property outside Florida. Screens (the Deal Screener) are nationwide. For a non-Florida property, point to the free screen (${chatFreeScreenUrl()}) and say a screen is an automated valuation (AVM), not an appraisal.`,
+    `- Products tagged [Florida properties only] must not be recommended for a property outside Florida. Screens (the Deal Screener) are nationwide. For a non-Florida property, point to the free screen (a link to it is shown below your reply; do not write out a URL) and say a screen is an automated valuation (AVM), not an appraisal.`,
     '',
     'Keep replies short — two or three sentences unless the visitor asks for detail.',
     '',
@@ -201,7 +201,7 @@ async function handleBlueprintChat(req: NextRequest) {
       configured: true,
       reply,
       bookingUrl: BOOKING_PATH,
-      freeScreenUrl: chatFreeScreenUrl(),
+      ...(mentionsFreeScreen(reply) ? { freeScreenUrl: chatFreeScreenUrl() } : {}),
     });
   } catch (error) {
     chatLogger.error({ err: error }, 'Unexpected error in Blueprint chat');
