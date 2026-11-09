@@ -5,6 +5,7 @@ import { Loader2, MessageCircle, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BOOKING_PATH } from '@/lib/blueprint-config';
+import { APP_URL } from '@/lib/appraisal-intelligence';
 
 /**
  * Floating "ROI Assistant" for the Blueprint page.
@@ -24,12 +25,15 @@ interface ChatTurn {
   content: string;
   /** Assistant turns that are honest system notices rather than model output. */
   isNotice?: boolean;
+  /** Free deal screen link, rendered as an anchor when the server supplies it. */
+  freeScreenUrl?: string;
 }
 
 const OPENING_MESSAGE =
   "I'm the ROI Assistant — an automated assistant, not Rod. I can explain what each " +
   'product covers, what it costs, and which one fits your situation. I can’t give ' +
-  'property values or ARVs; those come from Rod on an actual engagement.';
+  'property values or ARVs. The free deal screen gives an automated estimate (AVM, not an ' +
+  'appraisal) for any property; a certified appraisal from Rod is Florida only.';
 
 const UNCONFIGURED_NOTICE =
   "I'm not connected to an assistant yet, so I can't answer that here — I'd rather say " +
@@ -44,6 +48,14 @@ const SUGGESTIONS = [
   'How does the process work?',
   'What is the difference between the packages?',
 ];
+
+function isAllowedScreenUrl(url: string | undefined): url is string {
+  try {
+    return !!url && new URL(url).origin === APP_URL;
+  } catch {
+    return false;
+  }
+}
 
 export default function BlueprintChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -99,7 +111,7 @@ export default function BlueprintChatWidget() {
       });
 
       const data = (await res.json().catch(() => null)) as
-        | { configured?: boolean; reply?: string }
+        | { configured?: boolean; reply?: string; freeScreenUrl?: string }
         | null;
 
       if (!res.ok || !data) {
@@ -114,7 +126,10 @@ export default function BlueprintChatWidget() {
 
       setTurns((prev) => [
         ...prev,
-        { id: `a-${Date.now()}`, role: 'assistant', content: data.reply as string },
+        { id: `a-${Date.now()}`, role: 'assistant', content: data.reply as string,
+          // Only the free-screen app host is linked; ignore anything else.
+          freeScreenUrl: isAllowedScreenUrl(data.freeScreenUrl) ? data.freeScreenUrl : undefined,
+        },
       ]);
     } catch {
       appendNotice(NETWORK_NOTICE);
@@ -187,7 +202,17 @@ export default function BlueprintChatWidget() {
                   : 'bg-light-gray text-foreground'
               }`}
             >
-              <p className="whitespace-pre-wrap">{turn.content}</p>
+              <p className="whitespace-pre-wrap break-words">{turn.content}</p>
+              {turn.freeScreenUrl && (
+                <a
+                  href={turn.freeScreenUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 block break-words font-semibold text-accent underline"
+                >
+                  Try the free deal screen (automated estimate, not an appraisal)
+                </a>
+              )}
               {turn.isNotice && turn.id !== 'opening' && (
                 <a
                   href={BOOKING_PATH}

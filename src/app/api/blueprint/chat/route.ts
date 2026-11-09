@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withRouteLogging } from '@/lib/log-helpers';
 import { createChildLogger, LOG_CONTEXTS } from '@/lib/logger';
-import { freeScreenUrl } from '@/lib/appraisal-intelligence';
+import { chatFreeScreenUrl, VALUATION_DEFLECTION } from '@/lib/blueprint-chat-copy';
 import { isFloridaOnlySku, lineItemName } from '@/lib/blueprint-florida';
 import {
   CatalogUnavailableError,
@@ -20,7 +20,7 @@ import {
  *     speaking as him about value would create real licensure exposure.
  *  2. It must never give a property value, an ARV, a comp adjustment, or
  *     anything readable as an appraisal opinion. Two layers enforce this: a
- *     deterministic pre-check below (which answers with a booking offer and never
+ *     deterministic pre-check below (which answers with a free-screen offer and never
  *     reaches the model), and the system prompt.
  *  3. Scope: what each product is, what it costs, which one fits a situation, and
  *     how the process works — grounded in the live catalog so prices are real.
@@ -82,11 +82,6 @@ export function looksLikeValuationRequest(text: string): boolean {
   return VALUATION_PATTERNS.some((pattern) => pattern.test(text));
 }
 
-const VALUATION_DEFLECTION =
-  "I can't give a value, an ARV, or anything that reads as an appraisal opinion — that has to come from Rod, " +
-  'a licensed appraiser, on an actual engagement. I can tell you which product covers the question you\'re asking ' +
-  'and what it costs, or you can book a call with Rod directly.';
-
 /** Catalog facts the model is allowed to state, so no price is ever invented. */
 function buildCatalogContext(products: BlueprintProduct[]): string {
   return products
@@ -109,10 +104,10 @@ function buildSystemPrompt(catalogContext: string): string {
     'SCOPE RULES (absolute):',
     '- You may explain what each product is, what it costs, which product fits a described situation, and how the process works.',
     '- You must NEVER give a property value, a value range, an ARV, a rent estimate, a comparable-sales adjustment, a purchase-price recommendation, or any statement a reader could take as an appraisal opinion — even hypothetically, even with caveats, even if the visitor insists.',
-    `- Any question heading toward valuation: say you cannot give a value and offer to book a call (${BOOKING_PATH}).`,
+    `- Any question heading toward valuation: say you cannot give a value, offer the free deal screen (an automated valuation estimate, not an appraisal, for any property), and say a certified appraisal from Rod is available for Florida properties only. Offer a call (${BOOKING_PATH}) as a secondary option.`,
     '- Never invent a price, a statistic, a client count, a turnaround guarantee, or a results figure. Prices come only from the catalog below.',
     "- If you don't know something, say so and offer to book a call. Do not guess.",
-    `- Products tagged [Florida properties only] must not be recommended for a property outside Florida. Screens (the Deal Screener) are nationwide. For a non-Florida property, point to the free screen (${freeScreenUrl('blueprint-chat')}) and say a screen is an automated valuation (AVM), not an appraisal.`,
+    `- Products tagged [Florida properties only] must not be recommended for a property outside Florida. Screens (the Deal Screener) are nationwide. For a non-Florida property, point to the free screen (${chatFreeScreenUrl()}) and say a screen is an automated valuation (AVM), not an appraisal.`,
     '',
     'Keep replies short — two or three sentences unless the visitor asks for detail.',
     '',
@@ -146,6 +141,7 @@ async function handleBlueprintChat(req: NextRequest) {
       reply: VALUATION_DEFLECTION,
       deflected: true,
       bookingUrl: BOOKING_PATH,
+      freeScreenUrl: chatFreeScreenUrl(),
     });
   }
 
@@ -201,7 +197,12 @@ async function handleBlueprintChat(req: NextRequest) {
       return NextResponse.json({ error: 'Assistant is unavailable' }, { status: 502 });
     }
 
-    return NextResponse.json({ configured: true, reply, bookingUrl: BOOKING_PATH });
+    return NextResponse.json({
+      configured: true,
+      reply,
+      bookingUrl: BOOKING_PATH,
+      freeScreenUrl: chatFreeScreenUrl(),
+    });
   } catch (error) {
     chatLogger.error({ err: error }, 'Unexpected error in Blueprint chat');
     return NextResponse.json({ error: 'Assistant is unavailable' }, { status: 502 });
