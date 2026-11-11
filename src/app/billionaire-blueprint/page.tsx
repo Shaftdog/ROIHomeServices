@@ -351,9 +351,10 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
       <TestimonialsSection
         variant="compact"
         title="What our appraisal clients say"
-        subtitle="Real reviews from homeowners, attorneys, and investors who have worked with ROI Home Services."
+        subtitle="Real reviews from clients who have worked with ROI Home Services."
         testimonials={testimonials}
-        className="bg-light-gray"
+        note="These reviews are about our appraisal work, not the Blueprint."
+        className="bg-white"
       />
 
       {/* CLOSING CTA */}
