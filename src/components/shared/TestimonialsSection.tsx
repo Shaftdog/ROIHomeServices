@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { Star } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Star } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
-import type { Testimonial } from '@/data/testimonials';
+} from "@/components/ui/carousel";
+import type { Testimonial } from "@/data/testimonials";
 
 interface StarRatingProps {
   rating: number;
@@ -22,59 +22,84 @@ function StarRating({ rating }: StarRatingProps) {
       stars.push(
         <Star
           key={i}
+          aria-hidden="true"
           className="h-5 w-5 text-highlight"
           fill="hsl(var(--highlight))"
-        />
+        />,
       );
     } else if (i === Math.ceil(rating) && !Number.isInteger(rating)) {
       stars.push(
         <div key={i} className="relative">
-          <Star className="h-5 w-5 text-highlight" />
+          <Star aria-hidden="true" className="h-5 w-5 text-highlight" />
           <div className="absolute top-0 left-0 h-full w-1/2 overflow-hidden">
             <Star
+              aria-hidden="true"
               className="h-5 w-5 text-highlight"
               fill="hsl(var(--highlight))"
             />
           </div>
-        </div>
+        </div>,
       );
     } else {
       stars.push(
-        <Star key={i} className="h-5 w-5 text-highlight opacity-50" />
+        <Star key={i} className="h-5 w-5 text-highlight opacity-50" />,
       );
     }
   }
-  return <div className="flex">{stars}</div>;
+  return (
+    <div className="flex" role="img" aria-label={`${rating} out of 5 stars`}>
+      {stars}
+    </div>
+  );
 }
 
 interface TestimonialsSectionProps {
   title?: string;
   subtitle?: string;
+  note?: string;
   testimonials: Testimonial[];
   className?: string;
-  variant?: 'default' | 'compact';
+  variant?: "default" | "compact";
 }
 
 export default function TestimonialsSection({
-  title = 'What Our Clients Say',
+  title = "What Our Clients Say",
   subtitle,
+  note,
   testimonials,
-  className = '',
-  variant = 'default',
+  className = "",
+  variant = "default",
 }: TestimonialsSectionProps) {
-  if (variant === 'compact') {
+  if (variant === "compact") {
     return (
       <section className={`py-12 md:py-16 ${className}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
             {title}
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {testimonials.slice(0, 6).map((testimonial, index) => (
-              <Card key={index} className="h-full">
-                <CardContent className="p-6 flex flex-col h-full">
+          {subtitle && (
+            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-8 text-balance">
+              {subtitle}
+            </p>
+          )}
+          {note && (
+            <p className="text-center text-xs text-muted-foreground mb-8 -mt-5">
+              {note}
+            </p>
+          )}
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto ${
+              subtitle ? "" : "mt-8"
+            }`}
+          >
+            {testimonials.map((testimonial) => (
+              <Card
+                key={`${testimonial.name}-${testimonial.quote.slice(0, 24)}`}
+                className="h-full bg-background"
+              >
+                <CardContent className="p-4 md:p-6 flex flex-col h-full">
                   <StarRating rating={testimonial.rating} />
-                  <blockquote className="text-muted-foreground italic my-4 flex-grow">
+                  <blockquote className="text-muted-foreground italic my-3 flex-grow">
                     &quot;{testimonial.quote}&quot;
                   </blockquote>
                   <div className="text-sm">
@@ -107,7 +132,7 @@ export default function TestimonialsSection({
         </div>
         <Carousel
           opts={{
-            align: 'start',
+            align: "start",
             loop: true,
           }}
           className="w-full max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto"
