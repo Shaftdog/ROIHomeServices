@@ -14,6 +14,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import FAQSection from "@/components/shared/FAQSection";
 import { appraisalIntelligenceFAQs } from "@/data/faqs";
 import { ServiceSchema } from "@/components/seo/JsonLd";
+import TestimonialsSection from "@/components/shared/TestimonialsSection";
+import { testimonials } from "@/data/testimonials";
 import AvmDisclosure from "@/components/appraisal-intelligence/AvmDisclosure";
 import SampleScreenResult from "@/components/appraisal-intelligence/SampleScreenResult";
 import PlanLadder from "@/components/appraisal-intelligence/PlanLadder";
@@ -179,6 +181,15 @@ export default function AppraisalIntelligencePage() {
           </Card>
         </div>
       </section>
+
+      {/* SOCIAL PROOF */}
+      <TestimonialsSection
+        variant="compact"
+        title="What our appraisal clients say"
+        subtitle="Real reviews from homeowners, attorneys, and investors who have worked with ROI Home Services."
+        testimonials={testimonials}
+        className="bg-light-gray"
+      />
 
       {/* FAQ */}
       <FAQSection

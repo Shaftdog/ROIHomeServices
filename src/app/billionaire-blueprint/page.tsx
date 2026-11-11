@@ -7,6 +7,8 @@ import BlueprintLifecycle from '@/components/blueprint/BlueprintLifecycle';
 import BlueprintProductTile from '@/components/blueprint/BlueprintProductTile';
 import BlueprintProductDetail from '@/components/blueprint/BlueprintProductDetail';
 import BlueprintPackages from '@/components/blueprint/BlueprintPackages';
+import TestimonialsSection from '@/components/shared/TestimonialsSection';
+import { testimonials } from '@/data/testimonials';
 import BlueprintTestimonials from '@/components/blueprint/BlueprintTestimonials';
 import BlueprintBuyButton from '@/components/blueprint/BlueprintBuyButton';
 import BlueprintWebinarButton from '@/components/blueprint/BlueprintWebinarButton';
@@ -344,6 +346,15 @@ export default async function BillionaireBlueprintPage({ searchParams }: PagePro
         See src/data/blueprint-testimonials.ts; do not add sample copy there.
       */}
       <BlueprintTestimonials />
+
+      {/* Reviews of our appraisal work (not of the Blueprint) — titled accordingly. */}
+      <TestimonialsSection
+        variant="compact"
+        title="What our appraisal clients say"
+        subtitle="Real reviews from homeowners, attorneys, and investors who have worked with ROI Home Services."
+        testimonials={testimonials}
+        className="bg-light-gray"
+      />
 
       {/* CLOSING CTA */}
       <section className="py-16 md:py-24">

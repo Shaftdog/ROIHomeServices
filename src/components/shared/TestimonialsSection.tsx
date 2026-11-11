@@ -66,15 +66,27 @@ export default function TestimonialsSection({
     return (
       <section className={`py-12 md:py-16 ${className}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
             {title}
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {testimonials.slice(0, 6).map((testimonial, index) => (
-              <Card key={index} className="h-full">
-                <CardContent className="p-6 flex flex-col h-full">
+          {subtitle && (
+            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-8 text-balance">
+              {subtitle}
+            </p>
+          )}
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto ${
+              subtitle ? '' : 'mt-8'
+            }`}
+          >
+            {testimonials.map((testimonial) => (
+              <Card
+                key={`${testimonial.name}-${testimonial.quote.slice(0, 24)}`}
+                className="h-full bg-background"
+              >
+                <CardContent className="p-4 md:p-6 flex flex-col h-full">
                   <StarRating rating={testimonial.rating} />
-                  <blockquote className="text-muted-foreground italic my-4 flex-grow">
+                  <blockquote className="text-muted-foreground italic my-3 flex-grow">
                     &quot;{testimonial.quote}&quot;
                   </blockquote>
                   <div className="text-sm">
