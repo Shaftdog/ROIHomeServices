@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test:blueprint": "node --test src/lib/__tests__/blueprint-florida.test.ts src/lib/__tests__/blueprint-chat-copy.test.ts"
+    "test:blueprint": "node --test src/lib/__tests__/blueprint-florida.test.ts src/lib/__tests__/blueprint-chat-copy.test.ts",
+    "test:catalog": "node --test src/lib/__tests__/ai-catalog.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

@@ -1,0 +1,277 @@
+{
+  "version": "a673ac534660",
+  "launch": false,
+  "names": {
+    "checker": "Scout",
+    "check": "Scout check",
+    "checks": "Scout checks",
+    "analysis": "Deal Screen",
+    "analyses": "Deal Screens",
+    "analysisShort": "screen",
+    "analysesShort": "screens",
+    "analysisReport": "Deal Screen Report",
+    "certified": "Certified Deal Analysis",
+    "certifiedPlural": "Certified Deal Analyses",
+    "certifiedShort": "Certified Analysis",
+    "mlsSupported": "MLS-Supported Deal Analysis",
+    "mlsSupportedPlural": "MLS-Supported Deal Analyses",
+    "mlsSupportedShort": "MLS-Supported Analysis"
+  },
+  "plans": [
+    {
+      "code": "member_monthly",
+      "name": "Essential",
+      "price": 47,
+      "interval": "month",
+      "member": true,
+      "newsletter": true,
+      "analyses": 6,
+      "checks": 30,
+      "blurb": "30 Scout checks and 6 full Deal Screens every month, your own buy box, and the newsletter."
+    },
+    {
+      "code": "member_annual",
+      "name": "Essential (annual)",
+      "price": 397,
+      "interval": "year",
+      "member": true,
+      "newsletter": true,
+      "analyses": 100,
+      "checks": 500,
+      "blurb": "500 Scout checks and 100 full Deal Screens a year, your own buy box, and the newsletter."
+    },
+    {
+      "code": "pro_monthly",
+      "name": "Pro",
+      "price": 97,
+      "interval": "month",
+      "member": true,
+      "newsletter": true,
+      "analyses": 20,
+      "checks": 100,
+      "blurb": "100 Scout checks and 20 full Deal Screens every month, your own buy box, and the newsletter."
+    },
+    {
+      "code": "pro_annual",
+      "name": "Pro (annual)",
+      "price": 997,
+      "interval": "year",
+      "member": true,
+      "newsletter": true,
+      "analyses": 300,
+      "checks": 1500,
+      "blurb": "1,500 Scout checks and 300 full Deal Screens a year, your own buy box, and the newsletter."
+    },
+    {
+      "code": "power_monthly",
+      "name": "Power",
+      "price": 297,
+      "interval": "month",
+      "member": true,
+      "newsletter": true,
+      "analyses": 70,
+      "checks": 350,
+      "blurb": "350 Scout checks and 70 full Deal Screens every month, your own buy box, and the newsletter."
+    },
+    {
+      "code": "power_annual",
+      "name": "Power (annual)",
+      "price": 1997,
+      "interval": "year",
+      "member": true,
+      "newsletter": true,
+      "analyses": 1000,
+      "checks": 5000,
+      "blurb": "5,000 Scout checks and 1,000 full Deal Screens a year, your own buy box, and the newsletter."
+    },
+    {
+      "code": "newsletter_monthly",
+      "name": "Newsletter",
+      "price": 8,
+      "interval": "month",
+      "member": false,
+      "newsletter": true,
+      "analyses": 1,
+      "checks": 0,
+      "blurb": "The newsletter, plus one full Deal Screen every month."
+    },
+    {
+      "code": "newsletter_annual",
+      "name": "Newsletter (annual)",
+      "price": 80,
+      "interval": "year",
+      "member": false,
+      "newsletter": true,
+      "analyses": 15,
+      "checks": 0,
+      "blurb": "The newsletter, plus 15 full Deal Screens a year."
+    }
+  ],
+  "packs": [
+    {
+      "code": "screen_single",
+      "name": "One Deal Screen",
+      "price": 39,
+      "analyses": 1
+    },
+    {
+      "code": "screen_pack_5",
+      "name": "5 Deal Screens",
+      "price": 47,
+      "analyses": 5
+    },
+    {
+      "code": "screen_pack_15",
+      "name": "15 Deal Screens",
+      "price": 97,
+      "analyses": 15
+    }
+  ],
+  "perDeal": [
+    {
+      "sku": "BAP-DEAL-SCOUT",
+      "name": "Deal Analysis",
+      "price": 39,
+      "description": "One automated Deal Analysis: value range, rehab and projected profit with a go / caution / no-go call. An automated valuation (AVM), not an appraisal.",
+      "group": "billionaire-tripwire",
+      "step": null,
+      "phase": null,
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-BLUEPRINT",
+      "name": "Desktop Blueprint",
+      "price": 750,
+      "description": "Step 1 — Desktop valuation from the appraiser's perspective: floor plan, budget & value strategy.",
+      "group": "billionaire-ladder",
+      "step": 1,
+      "phase": "Acquire",
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-HALFWAY",
+      "name": "Midway Analysis",
+      "price": 500,
+      "description": "Step 2 — On-site mid-project check; confirm the work matches plans and value goals.",
+      "group": "billionaire-ladder",
+      "step": 2,
+      "phase": "Renovate",
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-FULL-SENS",
+      "name": "Full Appraisal + Sensitivity Report",
+      "price": 750,
+      "description": "Step 3 — Final lender-ready appraisal with a sensitivity analysis and value range.",
+      "group": "billionaire-ladder",
+      "step": 3,
+      "phase": "Revalue",
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-PACKAGE",
+      "name": "Appraiser Package",
+      "price": 500,
+      "description": "Step 4 — Updated comps and market data organized into a file for the lender's appraiser.",
+      "group": "billionaire-ladder",
+      "step": 4,
+      "phase": "Exit / Refi",
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-REVIEW-ROV",
+      "name": "Review & ROV Support",
+      "price": 350,
+      "description": "Step 5 — Detailed appraisal review and Reconsideration of Value (ROV) support.",
+      "group": "billionaire-ladder",
+      "step": 5,
+      "phase": "Exit / Refi",
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-DEAL-ANALYZER",
+      "name": "Certified Deal Analyzer",
+      "price": 297,
+      "description": "MLS-verified deep analysis of a potential acquisition — real comps with condition intelligence, photo-based rehab assessment, supported ARV and the offer math (Maximum Allowable Offer). The upgrade from the Deal Analysis.",
+      "group": "billionaire-tripwire",
+      "step": null,
+      "phase": null,
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-PKG-BLUEPRINT",
+      "name": "Appraisal Blueprint Package",
+      "price": 2500,
+      "description": "Core package — the full Blueprint system for investors.",
+      "group": "billionaire-package",
+      "step": null,
+      "phase": null,
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-PKG-AI",
+      "name": "Blueprint + AI Intelligence Package",
+      "price": 3500,
+      "description": "FLAGSHIP — Blueprint system + 12 months AI Appraisal Agent, dashboard & alerts + priority support.",
+      "group": "billionaire-package",
+      "step": null,
+      "phase": null,
+      "flagship": true,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-PKG-PROTECTION",
+      "name": "Investor Protection Package",
+      "price": 4000,
+      "description": "Top tier — full coverage for serious investors.",
+      "group": "billionaire-package",
+      "step": null,
+      "phase": null,
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-AI-AGENT",
+      "name": "12-Mo AI Appraisal Agent + Dashboard + Alerts",
+      "price": 1200,
+      "description": "Ongoing AI appraisal agent, portfolio dashboard and value alerts (annual).",
+      "group": "billionaire-addon",
+      "step": null,
+      "phase": null,
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    },
+    {
+      "sku": "BAP-PRIORITY",
+      "name": "Priority Support & Updates",
+      "price": 300,
+      "description": "Priority support and product updates.",
+      "group": "billionaire-addon",
+      "step": null,
+      "phase": null,
+      "flagship": false,
+      "billingInterval": null,
+      "annualPrice": null
+    }
+  ],
+  "disclosure": "Automated valuation (AVM) — not an appraisal, and not an opinion of value by a certified appraiser. No one has inspected this property for this screen. For a certified appraiser's opinion of value on a Florida property, order a Certified Deal Analysis; outside Florida, an MLS-Supported Deal Analysis is available for your own decisions (not an appraisal)."
+}

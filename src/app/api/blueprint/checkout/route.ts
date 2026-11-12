@@ -20,7 +20,7 @@ import {
  *   buyer-stated property state (which can only gate a purchase). It carries NO
  *   amount, NO price, NO currency, NO discount. The charge is resolved
  *   server-side from the Salesmod catalog by SKU (see src/lib/blueprint-catalog.ts),
- *   the same guarantee documented in src/lib/products.ts. An unknown SKU is
+ *   so the client can never influence what we charge. An unknown SKU is
  *   rejected with 400 rather than charged an arbitrary or zero amount.
  *   The schema is `.strict()`, so a request that tries to smuggle `amount` or
  *   `price` fails validation outright instead of being silently ignored.
@@ -31,7 +31,7 @@ import {
  */
 
 // Match the Stripe apiVersion pinned across this app (create-payment-intent /
-// deal-screen / stripe-webhook all pin '2024-11-20.acacia'). The installed types
+// booking / validate-coupon all pin '2024-11-20.acacia'). The installed types
 // only declare the latest version literal, so cast to keep runtime identical.
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {

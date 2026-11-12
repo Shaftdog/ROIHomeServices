@@ -44,6 +44,12 @@ const nextConfig: NextConfig = {
         destination: '/appraisal-intelligence',
         statusCode: 301,
       },
+      // Must stay above /products/:path*: that rule would send this to /solutions/deal-screen, which is a 404.
+      {
+        source: '/products/deal-screen',
+        destination: '/appraisal-intelligence',
+        statusCode: 301,
+      },
       {
         source: '/products/:path*',
         destination: '/solutions/:path*',
