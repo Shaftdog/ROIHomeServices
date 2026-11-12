@@ -187,12 +187,6 @@ The following API endpoints are implemented with logging:
 - **PII Redacted**: name, email, phone
 - **Response**: `{ success: true, message: "...", requestId: "uuid" }`
 
-### POST /api/quote
-- **Purpose**: Calculate service quotes
-- **Events**: `quote_request`
-- **PII Redacted**: email (if provided)
-- **Response**: `{ success: true, quoteId: "uuid", estimatedPrice: 595, requestId: "uuid" }`
-
 ## Testing
 
 Test the logging system with these curl commands:

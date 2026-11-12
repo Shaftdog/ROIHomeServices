@@ -200,7 +200,7 @@ mongodump --uri="$MONGODB_URI" --out=backup_$(date +%Y%m%d_%H%M%S)
    - [ ] **Offerings:** Service pages load and display properly
    - [ ] **Booking System:** Calendar integration works
    - [ ] **Contact Form:** Submits successfully
-   - [ ] **API Endpoints:** `/api/booking`, `/api/contact`, `/api/quote`
+   - [ ] **API Endpoints:** `/api/booking`, `/api/contact`
    - [ ] **Search:** Site search functionality
    - [ ] **Error Pages:** 404 and error boundaries work
 

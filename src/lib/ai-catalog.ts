@@ -15,7 +15,8 @@
  * No page or component imports this yet (ai-catalog.test.ts checks that).
  *
  * OPTIONAL ENV (server-side only — never NEXT_PUBLIC_*):
- *   AI_CATALOG_URL   full URL of the route; defaults to AI_CATALOG_DEFAULT_URL. The repo has no env var
+ *   AI_CATALOG_URL   full http(s) URL of the route, with no username or password (one that has either is
+ *                    refused); defaults to AI_CATALOG_DEFAULT_URL. The repo has no env var
  *                    that holds the app's origin (SALESMOD_WEBHOOK_URL is a webhook endpoint), so this
  *                    one is new, and optional: nothing has to be added to Vercel.
  *
@@ -32,17 +33,25 @@
  *
  * TREAT EVERY STRING AS PLAIN TEXT. `name`, `description`, `blurb`, `disclosure` and the `names` values
  * are stored text. React escapes them when rendered as children; never pass one to
- * dangerouslySetInnerHTML, and a JSON-LD <script> must escape `<` (e.g. replace it with <) before
- * it embeds one. This module builds no JSON-LD.
+ * dangerouslySetInnerHTML, and a JSON-LD <script> must escape `<` (replace each `<` with the six
+ * characters \u003c) before it embeds one. This module builds no JSON-LD.
  *
  * ONE SKU, TWO NAMES. The BAP-DEAL-ANALYZER row carries one name: the name as stored before launch,
  * `names.certified` after. A page that knows the viewer is outside Florida shows `names.mlsSupported`
  * for that SKU instead. The route cannot know where the viewer is, so the rule lives in the page, not
  * here, and there is deliberately no helper for it (the site sells that SKU only in Florida).
  *
- * CACHING. Cached for 5 minutes (`next.revalidate`), so a price change in the app reaches the site within
- * that window. The 5 second timeout belongs to the request that fills the cache; Next refreshes a stale
- * entry in the background without the signal.
+ * CACHING. A price change in the app does NOT reach the site within the 5 minutes below:
+ *   - the app's route answers with `s-maxage=300, stale-while-revalidate=600`, and its edge cache is in
+ *     front of this fetch. Next (`next.revalidate` = 5 minutes) serves its own stale entry first and
+ *     refreshes it in the background, so a change shows in about 10 minutes, about 20 at worst.
+ *   - Next stores only status-200 answers. If the app starts failing after a good read, the last good body
+ *     keeps being served while that entry lives: old prices, not "unavailable".
+ *   - a 200 that fails validation is cached too, so that error can last up to 5 minutes after the app is fixed.
+ *   - when a change must show at once, purge the site's data cache, or call `revalidateTag('ai-catalog')`
+ *     (the fetch carries that tag).
+ * The 5 second timeout belongs to the request that fills the cache; Next refreshes a stale entry in the
+ * background without the signal.
  */
 
 // Relative import with the .ts extension, unlike blueprint-catalog.ts's `@/lib/logger`: the tests run
@@ -53,8 +62,13 @@ const catalogLogger = createChildLogger({ context: LOG_CONTEXTS.API });
 
 export const AI_CATALOG_DEFAULT_URL = 'https://portal.roihomesvc.com/api/public/catalog';
 
+/** Cache tag on the fetch, so a later step can call `revalidateTag(AI_CATALOG_CACHE_TAG)` to refresh at once. */
+export const AI_CATALOG_CACHE_TAG = 'ai-catalog';
+
 const REVALIDATE_SECONDS = 300;
 const TIMEOUT_MS = 5000;
+/** A value from the response is echoed into an error message (and so the log) at most this long. */
+const ECHO_MAX = 80;
 
 /** The fourteen names the route publishes. All required, and the same keys in both states. */
 export const AI_CATALOG_NAME_KEYS = [
@@ -165,6 +179,9 @@ function fail(path: string, expected: string): never {
 
 const isRecord = (v: unknown): v is Json => typeof v === 'object' && v !== null && !Array.isArray(v);
 
+/** A response value as it may appear in an error message: cut at ECHO_MAX characters. */
+const echo = (v: string): string => (v.length > ECHO_MAX ? `${v.slice(0, ECHO_MAX)}...` : v);
+
 function record(v: unknown, path: string): Json {
   if (!isRecord(v)) fail(path, 'an object');
   return v;
@@ -230,7 +247,7 @@ function list<T>(o: Json, key: string, read: (item: unknown, path: string) => T,
   const seen = new Set<string>();
   for (const item of items) {
     const id = unique(item);
-    if (seen.has(id)) fail(key, `unique entries (${id} appears twice)`);
+    if (seen.has(id)) fail(key, `unique entries (${echo(id)} appears twice)`);
     seen.add(id);
   }
   return items;
@@ -315,7 +332,7 @@ function readRateCard(body: Json): AiRateCard | null {
       const path = `rateCard.actions[${i}]`;
       const a = record(item, path);
       const action = text(a, 'action', path);
-      if (seen.has(action)) fail('rateCard.actions', `unique entries (${action} appears twice)`);
+      if (seen.has(action)) fail('rateCard.actions', `unique entries (${echo(action)} appears twice)`);
       seen.add(action);
       return { action, credits: count(a, 'credits', path, 1) };
     }),
@@ -359,17 +376,33 @@ export function parseAiCatalog(input: unknown): AiCatalog {
   };
 }
 
+/**
+ * The URL to read. A URL with a username or password is refused: a failed fetch is logged with its
+ * error, and the route is public, so credentials in the URL could only ever leak into the log.
+ * Neither message below repeats the configured value.
+ */
 function catalogUrl(): string {
   const configured = process.env.AI_CATALOG_URL?.trim();
   if (!configured) return AI_CATALOG_DEFAULT_URL;
   try {
     const url = new URL(configured);
-    if (url.protocol === 'https:' || url.protocol === 'http:') return url.toString();
+    if ((url.protocol === 'https:' || url.protocol === 'http:') && !url.username && !url.password) {
+      return url.toString();
+    }
   } catch {
     // falls through to the error below
   }
-  catalogLogger.error('AI_CATALOG_URL is not an http(s) URL');
-  throw new AiCatalogUnavailableError('AI_CATALOG_URL is not a valid http(s) URL');
+  catalogLogger.error('AI_CATALOG_URL is not a plain http(s) URL');
+  throw new AiCatalogUnavailableError('AI_CATALOG_URL is not a valid http(s) URL without a username or password');
+}
+
+/** Give back the connection of an answer we are about to refuse. Never throws. */
+async function discardBody(res: Response): Promise<void> {
+  try {
+    await res.body?.cancel();
+  } catch {
+    // nothing to do: the answer is being refused anyway
+  }
 }
 
 /**
@@ -387,7 +420,7 @@ export async function fetchAiCatalog(): Promise<AiCatalog> {
   let res: Response;
   try {
     res = await fetch(url, {
-      next: { revalidate: REVALIDATE_SECONDS },
+      next: { revalidate: REVALIDATE_SECONDS, tags: [AI_CATALOG_CACHE_TAG] },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (err) {
@@ -397,6 +430,7 @@ export async function fetchAiCatalog(): Promise<AiCatalog> {
 
   if (res.status !== 200) {
     catalogLogger.error({ status: res.status }, 'AI price list read returned non-200');
+    await discardBody(res);
     throw new AiCatalogUnavailableError(`Price list read failed with status ${res.status}`);
   }
 
@@ -412,6 +446,7 @@ export async function fetchAiCatalog(): Promise<AiCatalog> {
     return parseAiCatalog(body);
   } catch (err) {
     catalogLogger.error({ err }, 'AI price list response failed validation');
-    throw err;
+    // Every exit is the named error or a full catalog: a surprise from the parser is wrapped, not leaked.
+    throw err instanceof AiCatalogUnavailableError ? err : new AiCatalogUnavailableError('Price list could not be validated');
   }
 }
