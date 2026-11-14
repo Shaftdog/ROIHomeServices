@@ -19,14 +19,27 @@ import { testimonials } from "@/data/testimonials";
 import AvmDisclosure from "@/components/appraisal-intelligence/AvmDisclosure";
 import SampleScreenResult from "@/components/appraisal-intelligence/SampleScreenResult";
 import PlanLadder from "@/components/appraisal-intelligence/PlanLadder";
+import BlueprintBuyButton from "@/components/blueprint/BlueprintBuyButton";
 import { freeScreenUrl, productSiteUrl } from "@/lib/appraisal-intelligence";
+import {
+  CatalogUnavailableError,
+  fetchBlueprintCatalog,
+  formatUsd,
+} from "@/lib/blueprint-catalog";
+
+/** The Certified Deal Analysis SKU: the same row the Blueprint page sells with a buy button. */
+const CERTIFIED_DEAL_ANALYSIS_SKU = "BAP-DEAL-ANALYZER";
 
 const PAGE_URL = "https://www.roihomesvc.com/appraisal-intelligence";
+
+// The page reads a price at render time. Re-render it every 5 minutes (the catalog's own cache window)
+// so a read that failed, or a build without catalog access, does not stay on the page until the next deploy.
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Appraisal Intelligence — Screen a Deal in Minutes",
   description:
-    "Screen any property for value, rehab, and projected profit with a clear go / caution / no-go call. An automated valuation (AVM), not an appraisal — plus a $297 Deal Analysis when you want a human second opinion.",
+    "Screen any property for value, rehab, and projected profit with a clear go / caution / no-go call. An automated valuation (AVM), not an appraisal — plus a $297 Certified Deal Analysis when you want a human second opinion.",
   alternates: {
     canonical: PAGE_URL,
   },
@@ -56,7 +69,26 @@ const howItWorks: { icon: typeof MapPin; title: string; body: string }[] = [
   },
 ];
 
-export default function AppraisalIntelligencePage() {
+/**
+ * The Certified Deal Analysis price in cents, read from the same catalog the Blueprint page and its
+ * checkout use. null when the catalog cannot be read or the row is missing: the section then shows no
+ * price and no buy button rather than a remembered number.
+ */
+async function readCertifiedPriceCents(): Promise<number | null> {
+  try {
+    const catalog = await fetchBlueprintCatalog();
+    return catalog.find((p) => p.sku === CERTIFIED_DEAL_ANALYSIS_SKU)?.amountCents ?? null;
+  } catch (error) {
+    // A missing catalog degrades the section; it must not 500 the page. Anything other than an
+    // expected catalog failure is a real bug and should surface.
+    if (!(error instanceof CatalogUnavailableError)) throw error;
+    return null;
+  }
+}
+
+export default async function AppraisalIntelligencePage() {
+  const certifiedPriceCents = await readCertifiedPriceCents();
+
   return (
     <div>
       <ServiceSchema
@@ -159,9 +191,11 @@ export default function AppraisalIntelligencePage() {
           <Card className="mx-auto max-w-3xl border-accent/20 shadow-md">
             <CardContent className="flex flex-col items-center gap-6 p-8 text-center md:p-12">
               <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-sm font-semibold text-accent">
-                Human second opinion &mdash; $297
+                {certifiedPriceCents === null
+                  ? "Human second opinion"
+                  : `Human second opinion — ${formatUsd(certifiedPriceCents)}`}
               </span>
-              <h2 className="text-3xl font-bold md:text-4xl">Deal Analysis</h2>
+              <h2 className="text-3xl font-bold md:text-4xl">Certified Deal Analysis</h2>
               <p className="max-w-xl text-balance text-muted-foreground">
                 Want a person to check the automated call? For Florida
                 properties, a <strong className="font-semibold text-foreground">Certified Deal Analysis</strong>{" "}
@@ -174,9 +208,25 @@ export default function AppraisalIntelligencePage() {
                 reviewed by our team. It is not an appraisal, is not
                 certified, and is not for lender or third-party use.
               </p>
-              <CtaButton calendlyEventType="Investor Consult" size="lg" className="text-base">
-                Order a Deal Analysis
-              </CtaButton>
+              {certifiedPriceCents === null ? (
+                <CtaButton calendlyEventType="Investor Consult" size="lg" className="text-base">
+                  Book a call
+                </CtaButton>
+              ) : (
+                <div className="flex w-full max-w-md flex-col items-center gap-2">
+                  <BlueprintBuyButton
+                    sku={CERTIFIED_DEAL_ANALYSIS_SKU}
+                    label={`Order a Certified Deal Analysis — ${formatUsd(certifiedPriceCents)}`}
+                    size="lg"
+                    placement="ai-page"
+                    className="w-full text-left"
+                    buttonClassName="h-auto min-h-11 whitespace-normal py-2 text-base"
+                  />
+                  <CtaButton calendlyEventType="Investor Consult" variant="link" size="sm">
+                    Outside Florida? Book a call
+                  </CtaButton>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

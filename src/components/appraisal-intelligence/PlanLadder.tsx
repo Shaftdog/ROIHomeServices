@@ -8,6 +8,7 @@ import {
   APPRAISAL_INTELLIGENCE_PLANS,
   SCREEN_PACKS,
   accuracyRecordUrl,
+  formatWholeDollars,
   freeScreenUrl,
 } from "@/lib/appraisal-intelligence";
 
@@ -33,11 +34,11 @@ export default function PlanLadder() {
             </CardHeader>
             <CardContent className="flex flex-1 flex-col">
               <p className="text-3xl font-bold">
-                ${plan.monthlyPrice}
+                ${formatWholeDollars(plan.monthlyPrice)}
                 <span className="text-base font-normal text-muted-foreground">/mo</span>
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                or ${plan.annualPrice}/yr
+                or ${formatWholeDollars(plan.annualPrice)}/yr
               </p>
               <p className="mt-4 flex-1 text-sm text-muted-foreground">{plan.description}</p>
               <Button asChild className="mt-6" variant={plan.featured ? "default" : "outline"}>
@@ -56,7 +57,7 @@ export default function PlanLadder() {
         <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-3">
           {SCREEN_PACKS.map((pack) => (
             <Card key={pack.id} className="flex flex-col items-center p-6 text-center">
-              <p className="text-2xl font-bold">${pack.price}</p>
+              <p className="text-2xl font-bold">${formatWholeDollars(pack.price)}</p>
               <p className="mt-1 text-sm text-muted-foreground">{pack.name}</p>
               <Button asChild className="mt-4 w-full" variant="outline" size="sm">
                 <Link href={freeScreenUrl(`ai-page-pack-${pack.id}`)}>Start free</Link>
@@ -72,7 +73,7 @@ export default function PlanLadder() {
           Every plan is the automated valuation (AVM) — see the disclosure
           above. For a certified appraiser&rsquo;s opinion of value, see{" "}
           <Link href="#deal-analysis" className="font-medium text-accent hover:underline">
-            Deal Analysis
+            Certified Deal Analysis
           </Link>
           .
         </p>

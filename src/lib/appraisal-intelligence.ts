@@ -126,6 +126,14 @@ export const APPRAISAL_INTELLIGENCE_PLANS: AppraisalIntelligencePlan[] = [
 ];
 
 /**
+ * A whole-dollar price with a thousands separator: 47 -> "47", 1997 -> "1,997". No currency symbol
+ * (the caller prints it), and a price under 1,000 comes out exactly as the number itself.
+ */
+export function formatWholeDollars(price: number): string {
+  return price.toLocaleString('en-US');
+}
+
+/**
  * One-time screen packs — the three `screen_*` plan codes in plans.ts.
  * No subscription, good for a year (ONE_TIME_CREDIT_DAYS).
  */

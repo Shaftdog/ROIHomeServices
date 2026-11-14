@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test:blueprint": "node --test src/lib/__tests__/blueprint-florida.test.ts src/lib/__tests__/blueprint-chat-copy.test.ts",
-    "test:catalog": "node --test src/lib/__tests__/ai-catalog.test.ts"
+    "test:catalog": "node --test src/lib/__tests__/ai-catalog.test.ts",
+    "test:ai-page": "node --test src/lib/__tests__/appraisal-intelligence-page.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

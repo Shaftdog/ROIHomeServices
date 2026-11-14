@@ -21,7 +21,7 @@ interface BlueprintBuyButtonProps {
   interval?: 'month' | 'year';
   label: string;
   /** Where on the page this button sits; sent on the GTM click event so hero/tile/package buys can be told apart. */
-  placement?: 'hero' | 'tile' | 'package' | 'detail';
+  placement?: 'hero' | 'tile' | 'package' | 'detail' | 'ai-page';
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
   className?: string;
