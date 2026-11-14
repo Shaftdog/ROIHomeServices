@@ -126,6 +126,31 @@ export const APPRAISAL_INTELLIGENCE_PLANS: AppraisalIntelligencePlan[] = [
 ];
 
 /**
+ * A whole-dollar price with a thousands separator: 47 -> "47", 1997 -> "1,997". No currency symbol
+ * (the caller prints it), and a price under 1,000 comes out exactly as the number itself.
+ */
+export function formatWholeDollars(price: number): string {
+  return price.toLocaleString('en-US');
+}
+
+/** The Certified Deal Analysis SKU: the same row the Blueprint page sells with a buy button. */
+export const CERTIFIED_DEAL_ANALYSIS_SKU = 'BAP-DEAL-ANALYZER';
+
+/**
+ * The Certified Deal Analysis price in cents, from the catalog rows the page reads, or null when the
+ * rows cannot support a one-time order: the row is missing, its amount is not a whole number above
+ * zero, or it carries a billing interval (a recurring charge under a one-time label). The structural
+ * row type keeps the server-only catalog reader out of this module, which client components import.
+ */
+export function certifiedOrderPriceCents(
+  rows: ReadonlyArray<{ sku: string; amountCents: number; billingInterval: string | null }>,
+): number | null {
+  const row = rows.find((r) => r.sku === CERTIFIED_DEAL_ANALYSIS_SKU);
+  if (!row || row.billingInterval) return null;
+  return Number.isInteger(row.amountCents) && row.amountCents > 0 ? row.amountCents : null;
+}
+
+/**
  * One-time screen packs — the three `screen_*` plan codes in plans.ts.
  * No subscription, good for a year (ONE_TIME_CREDIT_DAYS).
  */

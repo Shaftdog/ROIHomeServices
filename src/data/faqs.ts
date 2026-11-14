@@ -59,14 +59,14 @@ export const appraisalIntelligenceFAQs: FAQItem[] = [
       'A supported value range, a rehab estimate, a projected profit range, and a clear go / caution / no-go call — enough to decide whether a deal is worth pursuing further, in minutes.',
   },
   {
-    question: 'What’s the difference between a free screen and Deal Analysis?',
+    question: 'What’s the difference between a free screen and a Certified Deal Analysis?',
     answer:
-      'The free screen and the subscription plans are the automated valuation — fast, but not certified. Deal Analysis ($297) adds a human review: a Certified Deal Analysis by a Florida state-certified residential appraiser for Florida properties, or an MLS-Supported Deal Analysis elsewhere. The MLS-Supported Deal Analysis is not an appraisal, is not certified, and is not for lender or third-party use.',
+      'The free screen and the subscription plans are the automated valuation — fast, but not certified. A Certified Deal Analysis ($297) adds a human review: it is prepared by a Florida state-certified residential appraiser for Florida properties. Outside Florida, an MLS-Supported Deal Analysis is available instead. The MLS-Supported Deal Analysis is not an appraisal, is not certified, and is not for lender or third-party use.',
   },
   {
     question: 'Can I use a screen for a loan or in court?',
     answer:
-      'No. Appraisal Intelligence screens and Deal Analysis are for your own decision-making only. For lending, legal, or tax use, order a full certified appraisal.',
+      'No. Appraisal Intelligence screens, Certified Deal Analyses, and MLS-Supported Deal Analyses are for your own decision-making only. For lending, legal, or tax use, order a full certified appraisal.',
   },
   {
     question: 'How is this different from the appraisal firm’s services?',
