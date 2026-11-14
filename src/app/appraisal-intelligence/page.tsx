@@ -222,9 +222,12 @@ export default async function AppraisalIntelligencePage() {
                     className="w-full text-left"
                     buttonClassName="h-auto min-h-11 whitespace-normal py-2 text-base"
                   />
-                  <CtaButton calendlyEventType="Investor Consult" variant="link" size="sm">
-                    Outside Florida? Book a call
-                  </CtaButton>
+                  <Link
+                    href={freeScreenUrl("ai-page-certified-outside-fl")}
+                    className="text-sm font-medium text-accent underline-offset-4 hover:underline"
+                  >
+                    Property outside Florida? Screen a deal free
+                  </Link>
                 </div>
               )}
             </CardContent>
