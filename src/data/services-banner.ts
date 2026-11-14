@@ -63,7 +63,7 @@ export const servicesBannerSlides: ServicesBannerSlide[] = [
     headline: "A $297 second opinion before you commit",
     support:
       "Certified Deal Analysis in Florida; an MLS-Supported Deal Analysis everywhere else. Not an appraisal.",
-    ctaLabel: "See Deal Analysis pricing",
+    ctaLabel: "See Certified Deal Analysis pricing",
     ctaHref: "/appraisal-intelligence#deal-analysis",
     background: "gradient",
     gradientClassName: "bg-gradient-to-br from-deep-charcoal via-slate-700 to-accent",

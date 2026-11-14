@@ -31,6 +31,8 @@ interface BlueprintBuyButtonProps {
   errorClassName?: string;
   /** Color for the Florida note and state label; defaults to the muted token. */
   noteClassName?: string;
+  /** utm_campaign on the "Screen a deal free" link shown when the buyer picks a state outside Florida. */
+  outsideFloridaCampaign?: string;
 }
 
 /**
@@ -53,6 +55,7 @@ export default function BlueprintBuyButton({
   buttonClassName = '',
   errorClassName = 'text-destructive',
   noteClassName = 'text-muted-foreground',
+  outsideFloridaCampaign = 'blueprint-non-florida',
 }: BlueprintBuyButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -185,7 +188,7 @@ export default function BlueprintBuyButton({
         <div className="rounded-md border border-border bg-background p-3 text-foreground">
           <p className="text-sm">{nonFloridaMessage(sku)}</p>
           <Button asChild variant="outline" size={size} className="mt-3 w-full">
-            <a href={freeScreenUrl('blueprint-non-florida')}>Screen a deal free</a>
+            <a href={freeScreenUrl(outsideFloridaCampaign)}>Screen a deal free</a>
           </Button>
           <p className="mt-2 text-xs text-muted-foreground">{AVM_SHORT_LINE}</p>
         </div>

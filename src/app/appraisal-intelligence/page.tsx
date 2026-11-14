@@ -20,15 +20,17 @@ import AvmDisclosure from "@/components/appraisal-intelligence/AvmDisclosure";
 import SampleScreenResult from "@/components/appraisal-intelligence/SampleScreenResult";
 import PlanLadder from "@/components/appraisal-intelligence/PlanLadder";
 import BlueprintBuyButton from "@/components/blueprint/BlueprintBuyButton";
-import { freeScreenUrl, productSiteUrl } from "@/lib/appraisal-intelligence";
+import {
+  CERTIFIED_DEAL_ANALYSIS_SKU,
+  certifiedOrderPriceCents,
+  freeScreenUrl,
+  productSiteUrl,
+} from "@/lib/appraisal-intelligence";
 import {
   CatalogUnavailableError,
   fetchBlueprintCatalog,
   formatUsd,
 } from "@/lib/blueprint-catalog";
-
-/** The Certified Deal Analysis SKU: the same row the Blueprint page sells with a buy button. */
-const CERTIFIED_DEAL_ANALYSIS_SKU = "BAP-DEAL-ANALYZER";
 
 const PAGE_URL = "https://www.roihomesvc.com/appraisal-intelligence";
 
@@ -71,13 +73,14 @@ const howItWorks: { icon: typeof MapPin; title: string; body: string }[] = [
 
 /**
  * The Certified Deal Analysis price in cents, read from the same catalog the Blueprint page and its
- * checkout use. null when the catalog cannot be read or the row is missing: the section then shows no
- * price and no buy button rather than a remembered number.
+ * checkout use. null when the catalog cannot be read or the row cannot be a one-time order (missing,
+ * no positive whole-cent amount, or a recurring price): the section then shows no price and no buy
+ * button rather than a remembered number.
  */
 async function readCertifiedPriceCents(): Promise<number | null> {
   try {
     const catalog = await fetchBlueprintCatalog();
-    return catalog.find((p) => p.sku === CERTIFIED_DEAL_ANALYSIS_SKU)?.amountCents ?? null;
+    return certifiedOrderPriceCents(catalog);
   } catch (error) {
     // A missing catalog degrades the section; it must not 500 the page. Anything other than an
     // expected catalog failure is a real bug and should surface.
@@ -219,6 +222,7 @@ export default async function AppraisalIntelligencePage() {
                     label={`Order a Certified Deal Analysis — ${formatUsd(certifiedPriceCents)}`}
                     size="lg"
                     placement="ai-page"
+                    outsideFloridaCampaign="ai-page-certified-outside-fl"
                     className="w-full text-left"
                     buttonClassName="h-auto min-h-11 whitespace-normal py-2 text-base"
                   />
